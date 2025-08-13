@@ -169,7 +169,7 @@ export default function ReviewTeacher() {
                   </div>
                   <div className="text-right text-sm text-gray-600">
                     <div className="flex items-center gap-1 mb-1">
-                      <Calendar className="h-4 w-4" />
+                      <CalendarIcon className="h-4 w-4" />
                       <span>{new Date(lesson.date).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center gap-1 mb-1">
