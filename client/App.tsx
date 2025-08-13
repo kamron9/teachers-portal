@@ -9,6 +9,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Index from "./pages/Index";
 import Teachers from "./pages/Teachers";
+import TeacherProfile from "./pages/TeacherProfile";
+import StudentRegister from "./pages/StudentRegister";
+import StudentProfile from "./pages/StudentProfile";
+import StudentDashboard from "./pages/StudentDashboard";
+import BookLesson from "./pages/BookLesson";
+import Payment from "./pages/Payment";
+import ReviewTeacher from "./pages/ReviewTeacher";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 
@@ -24,11 +31,18 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/teachers" element={<Teachers />} />
+          <Route path="/teacher/:id" element={<TeacherProfile />} />
+          <Route path="/student-register" element={<StudentRegister />} />
+          <Route path="/student-profile" element={<StudentProfile />} />
+          <Route path="/student-dashboard" element={<StudentDashboard />} />
+          <Route path="/book-lesson/:teacherId" element={<BookLesson />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/review/:lessonId" element={<ReviewTeacher />} />
           <Route path="/subjects" element={<PlaceholderPage title="Subjects" description="Browse all available subjects and find the perfect tutor for your learning goals." />} />
           <Route path="/how-it-works" element={<PlaceholderPage title="How It Works" description="Learn how our platform connects students with expert teachers for effective online learning." />} />
           <Route path="/pricing" element={<PlaceholderPage title="Pricing" description="Transparent pricing with no hidden fees. Pay as you learn with flexible payment options." />} />
           <Route path="/login" element={<PlaceholderPage title="Login" description="Sign in to your account to access your lessons and connect with teachers." />} />
-          <Route path="/register" element={<PlaceholderPage title="Register" description="Create your student account and start learning with expert tutors today." />} />
+          <Route path="/register" element={<StudentRegister />} />
           <Route path="/teacher-signup" element={<PlaceholderPage title="Become a Teacher" description="Join our community of expert educators and start teaching students worldwide." />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
