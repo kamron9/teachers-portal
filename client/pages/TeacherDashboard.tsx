@@ -712,7 +712,7 @@ export default function TeacherDashboard() {
       case "overview":
         return renderOverview();
       case "profile":
-        return renderPlaceholderSection("Profile Management", "Manage your teaching profile, bio, subjects, and qualifications");
+        return renderProfileManagement();
       case "schedule":
         return renderPlaceholderSection("Schedule & Availability", "Set your availability and manage your teaching schedule");
       case "bookings":
