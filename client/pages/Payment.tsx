@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, CreditCard, Shield, Lock, Check, Loader2, AlertCircle, Calendar, Clock, User } from "lucide-react";
+import { ArrowLeft, CreditCard, Shield, Lock, Check, Loader2, AlertCircle, Calendar as CalendarIcon, Clock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
