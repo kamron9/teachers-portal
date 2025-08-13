@@ -328,6 +328,362 @@ export default function TeacherDashboard() {
     </div>
   );
 
+  const renderProfileManagement = () => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [profileData, setProfileData] = useState({
+      firstName: "Aziza",
+      lastName: "Karimova",
+      email: "aziza@example.com",
+      phone: "+998901234567",
+      location: "Tashkent, Uzbekistan",
+      title: "English Language Expert & IELTS Specialist",
+      bio: "Certified English teacher with extensive experience in IELTS preparation and business communication. I help students achieve their language goals through personalized lessons and proven methodologies.",
+      experience: "5+ years",
+      education: "Masters in English Literature - National University of Uzbekistan\nTESOL Certification - British Council\nIELTS Teacher Training Certificate",
+      subjects: ["English", "IELTS", "Business English", "Conversation Practice"],
+      hourlyRate: "50000",
+      languages: ["Uzbek", "English", "Russian"]
+    });
+    const [profileImage, setProfileImage] = useState("/placeholder.svg");
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+    const profileCompletion = 85;
+    const subjects = [
+      'Mathematics', 'English', 'Programming', 'Physics', 'Chemistry', 'Biology',
+      'History', 'Geography', 'Literature', 'Music', 'Art', 'Economics', 'Psychology'
+    ];
+    const languages = ['Uzbek', 'English', 'Russian', 'Arabic', 'Turkish', 'Korean', 'Chinese', 'French', 'German', 'Spanish'];
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Profile Management</h1>
+            <p className="text-gray-600">Manage your teaching profile, bio, subjects, and qualifications</p>
+          </div>
+          <div className="flex gap-2">
+            {!isEditing ? (
+              <Button onClick={() => setIsEditing(true)}>
+                <Edit3 className="h-4 w-4 mr-2" />
+                Edit Profile
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => { setIsEditing(false); setHasUnsavedChanges(false); }}>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Profile Completion */}
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <div className="font-medium text-blue-900">Profile Completion</div>
+                <div className="text-sm text-blue-700">{profileCompletion}% complete</div>
+              </div>
+              <Badge variant="outline" className="bg-white">
+                {profileCompletion >= 90 ? 'Excellent' : profileCompletion >= 70 ? 'Good' : 'Needs Work'}
+              </Badge>
+            </div>
+            <Progress value={profileCompletion} className="h-2" />
+          </CardContent>
+        </Card>
+
+        {/* Basic Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Basic Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Profile Photo */}
+            <div className="flex items-start gap-6">
+              <div className="flex flex-col items-center space-y-3">
+                <Avatar className="w-24 h-24">
+                  <AvatarImage src={profileImage} alt="Profile" />
+                  <AvatarFallback className="text-xl">
+                    {profileData.firstName[0]}{profileData.lastName[0]}
+                  </AvatarFallback>
+                </Avatar>
+                {isEditing && (
+                  <Button variant="outline" size="sm">
+                    <Camera className="h-4 w-4 mr-2" />
+                    Change Photo
+                  </Button>
+                )}
+              </div>
+              <div className="flex-1 grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">First Name *</label>
+                  <input
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    value={profileData.firstName}
+                    disabled={!isEditing}
+                    onChange={(e) => {
+                      setProfileData(prev => ({...prev, firstName: e.target.value}));
+                      setHasUnsavedChanges(true);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Last Name *</label>
+                  <input
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    value={profileData.lastName}
+                    disabled={!isEditing}
+                    onChange={(e) => {
+                      setProfileData(prev => ({...prev, lastName: e.target.value}));
+                      setHasUnsavedChanges(true);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Email Address</label>
+                  <input
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    value={profileData.email}
+                    disabled
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Phone Number</label>
+                  <input
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    value={profileData.phone}
+                    disabled={!isEditing}
+                    onChange={(e) => {
+                      setProfileData(prev => ({...prev, phone: e.target.value}));
+                      setHasUnsavedChanges(true);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Professional Title */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Professional Title *</label>
+              <input
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={profileData.title}
+                disabled={!isEditing}
+                placeholder="e.g., English Language Expert & IELTS Specialist"
+                onChange={(e) => {
+                  setProfileData(prev => ({...prev, title: e.target.value}));
+                  setHasUnsavedChanges(true);
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Professional Bio */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Professional Bio & Experience
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Professional Bio *</label>
+              <textarea
+                className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={profileData.bio}
+                disabled={!isEditing}
+                placeholder="Tell students about your teaching experience, methodology, and what makes you a great teacher..."
+                onChange={(e) => {
+                  setProfileData(prev => ({...prev, bio: e.target.value}));
+                  setHasUnsavedChanges(true);
+                }}
+              />
+              <div className="text-xs text-gray-500">{profileData.bio.length}/500 characters</div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Education & Certifications *</label>
+              <textarea
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={profileData.education}
+                disabled={!isEditing}
+                placeholder="List your education background and certifications..."
+                onChange={(e) => {
+                  setProfileData(prev => ({...prev, education: e.target.value}));
+                  setHasUnsavedChanges(true);
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Teaching Experience</label>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={profileData.experience}
+                disabled={!isEditing}
+                onChange={(e) => {
+                  setProfileData(prev => ({...prev, experience: e.target.value}));
+                  setHasUnsavedChanges(true);
+                }}
+              >
+                <option value="0-1">Less than 1 year</option>
+                <option value="1-2">1-2 years</option>
+                <option value="3-5">3-5 years</option>
+                <option value="6-10">6-10 years</option>
+                <option value="10+">10+ years</option>
+              </select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Video Introduction */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Video className="h-5 w-5" />
+              Video Introduction
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <Video className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload Video Introduction</h3>
+              <p className="text-gray-600 mb-4">
+                Help students get to know you with a 2-3 minute introduction video
+              </p>
+              {isEditing ? (
+                <Button>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Video
+                </Button>
+              ) : (
+                <Button variant="outline" disabled>
+                  No video uploaded
+                </Button>
+              )}
+              <div className="text-xs text-gray-500 mt-3">
+                • Max file size: 50MB • Formats: MP4, MOV • Recommended: 2-3 minutes
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Subjects & Pricing */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <GraduationCap className="h-5 w-5" />
+              Subjects & Expertise
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3">
+              <label className="text-sm font-medium">Languages You Teach In</label>
+              <div className="flex flex-wrap gap-2">
+                {languages.map((language) => (
+                  <Badge
+                    key={language}
+                    variant={profileData.languages.includes(language) ? "default" : "outline"}
+                    className={`cursor-pointer ${!isEditing ? 'pointer-events-none' : ''}`}
+                  >
+                    {language}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-medium">Subjects You Teach</label>
+              <div className="flex flex-wrap gap-2">
+                {subjects.map((subject) => (
+                  <Badge
+                    key={subject}
+                    variant={profileData.subjects.includes(subject) ? "default" : "outline"}
+                    className={`cursor-pointer ${!isEditing ? 'pointer-events-none' : ''}`}
+                  >
+                    {subject}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Hourly Rate (UZS)</label>
+              <div className="relative">
+                <input
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm pr-12"
+                  type="number"
+                  value={profileData.hourlyRate}
+                  disabled={!isEditing}
+                  onChange={(e) => {
+                    setProfileData(prev => ({...prev, hourlyRate: e.target.value}));
+                    setHasUnsavedChanges(true);
+                  }}
+                />
+                <span className="absolute right-3 top-3 text-sm text-gray-500">UZS</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Qualifications & Documents */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="h-5 w-5" />
+              Qualifications & Documents
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <Upload className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                <h4 className="font-medium text-gray-900 mb-2">Upload Certificates & Documents</h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  Upload teaching certificates, degrees, and other qualifications
+                </p>
+                {isEditing ? (
+                  <Button variant="outline">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Choose Files
+                  </Button>
+                ) : (
+                  <div className="text-sm text-gray-500">No documents uploaded</div>
+                )}
+                <div className="text-xs text-gray-500 mt-3">
+                  Supported formats: PDF, JPG, PNG • Max size: 10MB per file
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Save Status */}
+        {hasUnsavedChanges && (
+          <Card className="border-amber-200 bg-amber-50">
+            <CardContent className="p-4">
+              <div className="flex items-center text-amber-800">
+                <AlertCircle className="h-5 w-5 mr-2" />
+                <span className="font-medium">You have unsaved changes</span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  };
+
   const renderPlaceholderSection = (title: string, description: string) => (
     <div className="space-y-6">
       <div>
