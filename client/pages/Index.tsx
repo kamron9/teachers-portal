@@ -315,13 +315,17 @@ export default function Index() {
             Join thousands of students who are already improving their skills with our expert teachers
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="text-primary">
-              Find a Teacher
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
-              Become a Teacher
-            </Button>
+            <Link to="/teachers">
+              <Button size="lg" variant="secondary" className="text-primary">
+                Find a Teacher
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <Link to="/student-register">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+                Start Learning
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
