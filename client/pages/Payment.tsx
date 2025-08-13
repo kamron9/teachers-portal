@@ -293,7 +293,7 @@ export default function Payment() {
                   <div className="space-y-3 text-sm">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-600">
-                        <Calendar className="h-4 w-4" />
+                        <CalendarIcon className="h-4 w-4" />
                         <span>Date</span>
                       </div>
                       <span className="font-medium">{bookingDetails.lesson.date}</span>
