@@ -153,25 +153,6 @@ export default function TeacherDashboard() {
   ];
 
 
-  // Mock reviews
-  const recentReviews = [
-    {
-      id: 1,
-      student: "John Doe",
-      rating: 5,
-      comment: "Excellent teacher! Very patient and explains concepts clearly.",
-      date: "2024-01-18",
-      lesson: "IELTS Preparation"
-    },
-    {
-      id: 2,
-      student: "Sarah Smith", 
-      rating: 5,
-      comment: "Great first lesson. Looking forward to more sessions!",
-      date: "2024-01-17",
-      lesson: "Trial Lesson"
-    }
-  ];
 
   const renderOverview = () => (
     <div className="space-y-6">
