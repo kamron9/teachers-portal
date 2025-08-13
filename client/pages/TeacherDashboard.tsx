@@ -7,7 +7,10 @@ import {
   Camera, Upload, Award, GraduationCap, Plus, Minus, ChevronLeft, ChevronDown,
   Eye, Filter, Search, RefreshCw, Printer, Globe, Save, X, Check, AlertTriangle,
   BarChart3, PieChart, Calendar as CalendarIcon, Timer, MapPin, Phone, Mail,
-  ZoomIn, ZoomOut, Grid3X3, List, Sun, Moon, Coffee, BookOpenCheck
+  ZoomIn, ZoomOut, Grid3X3, List, Sun, Moon, Coffee, BookOpenCheck, CreditCard,
+  Wallet, Receipt, TrendingDown, Target, Percent, Calculator, FileText,
+  ArrowUpRight, ArrowDownRight, Banknote, Building, CreditCard as BankCard,
+  Smartphone, ChartLine, Coins, PiggyBank, ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,6 +66,14 @@ export default function TeacherDashboard() {
   const [messageText, setMessageText] = useState('');
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
+
+  // Earnings management state
+  const [earningsTimeframe, setEarningsTimeframe] = useState<'week' | 'month' | 'year'>('month');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('bank');
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [showTaxModal, setShowTaxModal] = useState(false);
+  const [paymentFilter, setPaymentFilter] = useState<'all' | 'completed' | 'pending' | 'failed'>('all');
+  const [earningsGoal, setEarningsGoal] = useState(3000000); // 3M UZS
   const [profileData, setProfileData] = useState({
     firstName: "Aziza",
     lastName: "Karimova",
@@ -908,6 +919,148 @@ export default function TeacherDashboard() {
     monthlyProjection: 2850000,
     popularTimeSlots: ['10:00', '14:00', '16:00', '19:00']
   };
+
+  // Earnings data
+  const earningsData = {
+    totalLifetime: 17500000,
+    thisMonth: 2850000,
+    lastMonth: 2450000,
+    pendingPayments: 425000,
+    nextPayoutDate: '2024-01-25',
+    nextPayoutAmount: 2100000,
+    averageHourlyRate: 65000,
+    platformFeeRate: 15,
+    totalPlatformFees: 382500,
+
+    monthlyTrend: [
+      { month: 'Jul', amount: 1800000 },
+      { month: 'Aug', amount: 2100000 },
+      { month: 'Sep', amount: 2300000 },
+      { month: 'Oct', amount: 2450000 },
+      { month: 'Nov', amount: 2650000 },
+      { month: 'Dec', amount: 2850000 }
+    ],
+
+    subjectBreakdown: [
+      { subject: 'English', earnings: 1200000, percentage: 42, color: '#3B82F6' },
+      { subject: 'IELTS', earnings: 950000, percentage: 33, color: '#10B981' },
+      { subject: 'Business English', earnings: 500000, percentage: 18, color: '#F59E0B' },
+      { subject: 'Conversation', earnings: 200000, percentage: 7, color: '#EF4444' }
+    ],
+
+    topStudents: [
+      { name: 'John Doe', earnings: 350000, lessons: 14 },
+      { name: 'Sarah Smith', earnings: 280000, lessons: 11 },
+      { name: 'Ahmad Karim', earnings: 245000, lessons: 9 },
+      { name: 'Maria Garcia', earnings: 210000, lessons: 8 }
+    ]
+  };
+
+  const paymentHistory = [
+    {
+      id: 1,
+      date: '2024-01-18',
+      student: { name: 'John Doe', image: '/placeholder.svg' },
+      subject: 'IELTS Preparation',
+      amount: 50000,
+      platformFee: 7500,
+      netAmount: 42500,
+      status: 'completed',
+      paymentMethod: 'Credit Card',
+      transactionId: 'TXN-001234',
+      lessonId: 'LSN-5678'
+    },
+    {
+      id: 2,
+      date: '2024-01-17',
+      student: { name: 'Sarah Smith', image: '/placeholder.svg' },
+      subject: 'Trial Lesson',
+      amount: 25000,
+      platformFee: 3750,
+      netAmount: 21250,
+      status: 'completed',
+      paymentMethod: 'UzCard',
+      transactionId: 'TXN-001235',
+      lessonId: 'LSN-5679'
+    },
+    {
+      id: 3,
+      date: '2024-01-16',
+      student: { name: 'Ahmad Karim', image: '/placeholder.svg' },
+      subject: 'Business English',
+      amount: 75000,
+      platformFee: 11250,
+      netAmount: 63750,
+      status: 'pending',
+      paymentMethod: 'Bank Transfer',
+      transactionId: 'TXN-001236',
+      lessonId: 'LSN-5680'
+    },
+    {
+      id: 4,
+      date: '2024-01-15',
+      student: { name: 'Maria Garcia', image: '/placeholder.svg' },
+      subject: 'English Conversation',
+      amount: 40000,
+      platformFee: 6000,
+      netAmount: 34000,
+      status: 'completed',
+      paymentMethod: 'PayPal',
+      transactionId: 'TXN-001237',
+      lessonId: 'LSN-5681'
+    },
+    {
+      id: 5,
+      date: '2024-01-14',
+      student: { name: 'David Wilson', image: '/placeholder.svg' },
+      subject: 'IELTS Speaking',
+      amount: 65000,
+      platformFee: 9750,
+      netAmount: 55250,
+      status: 'failed',
+      paymentMethod: 'Credit Card',
+      transactionId: 'TXN-001238',
+      lessonId: 'LSN-5682'
+    }
+  ];
+
+  const payoutHistory = [
+    {
+      id: 1,
+      date: '2024-01-15',
+      amount: 1850000,
+      status: 'completed',
+      method: 'Bank Transfer',
+      reference: 'PAY-2024-001',
+      processingFee: 15000
+    },
+    {
+      id: 2,
+      date: '2023-12-15',
+      amount: 1650000,
+      status: 'completed',
+      method: 'Bank Transfer',
+      reference: 'PAY-2023-012',
+      processingFee: 15000
+    },
+    {
+      id: 3,
+      date: '2023-11-15',
+      amount: 1450000,
+      status: 'completed',
+      method: 'Bank Transfer',
+      reference: 'PAY-2023-011',
+      processingFee: 15000
+    }
+  ];
+
+  const calculateGrowthPercentage = (current: number, previous: number) => {
+    if (previous === 0) return 0;
+    return ((current - previous) / previous * 100).toFixed(1);
+  };
+
+  const monthlyGrowth = calculateGrowthPercentage(earningsData.thisMonth, earningsData.lastMonth);
+  const goalProgress = (earningsData.thisMonth / earningsGoal * 100).toFixed(1);
 
   const generateTimeSlots = () => {
     const slots = [];
@@ -2289,6 +2442,576 @@ export default function TeacherDashboard() {
     );
   };
 
+  const renderEarningsManagement = () => {
+    const filteredPayments = paymentHistory.filter(payment =>
+      paymentFilter === 'all' || payment.status === paymentFilter
+    );
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Earnings & Payments</h1>
+            <p className="text-gray-600">Track your earnings and payment history</p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => setShowTaxModal(true)}>
+              <FileText className="h-4 w-4 mr-2" />
+              Tax Documents
+            </Button>
+            <Button variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Export Data
+            </Button>
+            <Button onClick={() => setShowPayoutModal(true)}>
+              <Wallet className="h-4 w-4 mr-2" />
+              Request Payout
+            </Button>
+          </div>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">Total Lifetime Earnings</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {(earningsData.totalLifetime / 1000000).toFixed(1)}M UZS
+                  </div>
+                  <div className="flex items-center text-sm text-green-600 mt-1">
+                    <TrendingUp className="h-3 w-3 mr-1" />
+                    Overall growth
+                  </div>
+                </div>
+                <Coins className="h-10 w-10 text-primary opacity-20" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">This Month</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {(earningsData.thisMonth / 1000000).toFixed(1)}M UZS
+                  </div>
+                  <div className="flex items-center text-sm text-green-600 mt-1">
+                    <ArrowUpRight className="h-3 w-3 mr-1" />
+                    +{monthlyGrowth}% vs last month
+                  </div>
+                </div>
+                <BarChart3 className="h-10 w-10 text-green-500 opacity-20" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">Pending Payments</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {(earningsData.pendingPayments / 1000).toFixed(0)}K UZS
+                  </div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Available for payout
+                  </div>
+                </div>
+                <Clock className="h-10 w-10 text-orange-500 opacity-20" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">Next Payout</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {new Date(earningsData.nextPayoutDate).toLocaleDateString()}
+                  </div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {(earningsData.nextPayoutAmount / 1000000).toFixed(1)}M UZS expected
+                  </div>
+                </div>
+                <CalendarIcon className="h-10 w-10 text-blue-500 opacity-20" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Earnings Chart and Analytics */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <ChartLine className="h-5 w-5" />
+                  Earnings Trend
+                </CardTitle>
+                <div className="flex border rounded-lg p-1">
+                  {(['week', 'month', 'year'] as const).map((period) => (
+                    <Button
+                      key={period}
+                      variant={earningsTimeframe === period ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setEarningsTimeframe(period)}
+                      className="capitalize"
+                    >
+                      {period}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="h-64 flex items-end justify-between gap-2">
+                  {earningsData.monthlyTrend.map((data, index) => {
+                    const height = (data.amount / Math.max(...earningsData.monthlyTrend.map(d => d.amount))) * 100;
+                    return (
+                      <div key={data.month} className="flex-1 flex flex-col items-center">
+                        <div className="text-xs text-gray-600 mb-2">
+                          {(data.amount / 1000000).toFixed(1)}M
+                        </div>
+                        <div
+                          className="w-full bg-primary rounded-t transition-all duration-500 hover:bg-primary/80"
+                          style={{ height: `${height}%`, minHeight: '20px' }}
+                        ></div>
+                        <div className="text-xs font-medium mt-2">{data.month}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary">{earningsData.averageHourlyRate.toLocaleString()}</div>
+                    <div className="text-sm text-gray-600">Avg. Hourly Rate</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{earningsData.platformFeeRate}%</div>
+                    <div className="text-sm text-gray-600">Platform Fee</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{goalProgress}%</div>
+                    <div className="text-sm text-gray-600">Goal Progress</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PieChart className="h-5 w-5" />
+                Subject Breakdown
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {earningsData.subjectBreakdown.map((subject) => (
+                  <div key={subject.subject} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">{subject.subject}</span>
+                      <span className="text-sm text-gray-600">{subject.percentage}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="h-2 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${subject.percentage}%`,
+                          backgroundColor: subject.color
+                        }}
+                      ></div>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {(subject.earnings / 1000000).toFixed(1)}M UZS
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Goal Tracking */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Monthly Goal Tracking
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-gray-600">Current Goal</div>
+                  <div className="text-xl font-bold">{(earningsGoal / 1000000).toFixed(1)}M UZS / month</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-gray-600">Progress</div>
+                  <div className="text-xl font-bold text-primary">{goalProgress}%</div>
+                </div>
+              </div>
+
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className="h-3 bg-gradient-to-r from-primary to-green-500 rounded-full transition-all duration-1000"
+                  style={{ width: `${Math.min(parseFloat(goalProgress), 100)}%` }}
+                ></div>
+              </div>
+
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Current: {(earningsData.thisMonth / 1000000).toFixed(1)}M UZS</span>
+                <span>Remaining: {((earningsGoal - earningsData.thisMonth) / 1000000).toFixed(1)}M UZS</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Payment History */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Receipt className="h-5 w-5" />
+                Payment History
+              </CardTitle>
+              <div className="flex gap-3">
+                <select
+                  value={paymentFilter}
+                  onChange={(e) => setPaymentFilter(e.target.value as any)}
+                  className="p-2 border rounded-md text-sm"
+                >
+                  <option value="all">All Payments</option>
+                  <option value="completed">Completed</option>
+                  <option value="pending">Pending</option>
+                  <option value="failed">Failed</option>
+                </select>
+                <Button variant="outline" size="sm">
+                  <Filter className="h-4 w-4 mr-2" />
+                  More Filters
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {filteredPayments.map((payment) => (
+                <div key={payment.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="w-12 h-12">
+                        <AvatarImage src={payment.student.image} alt={payment.student.name} />
+                        <AvatarFallback>
+                          {payment.student.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-semibold">{payment.student.name}</div>
+                        <div className="text-sm text-gray-600">{payment.subject}</div>
+                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                          <span>{new Date(payment.date).toLocaleDateString()}</span>
+                          <span>{payment.paymentMethod}</span>
+                          <span>ID: {payment.transactionId}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <div className="font-bold">{payment.netAmount.toLocaleString()} UZS</div>
+                          <div className="text-xs text-gray-500">
+                            Gross: {payment.amount.toLocaleString()}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            Fee: -{payment.platformFee.toLocaleString()}
+                          </div>
+                        </div>
+                        <Badge
+                          className={`${
+                            payment.status === 'completed'
+                              ? 'bg-green-100 text-green-800'
+                              : payment.status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
+                        >
+                          {payment.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Top Students and Payout History */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Top Earning Students
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {earningsData.topStudents.map((student, index) => (
+                  <div key={student.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-bold text-primary">#{index + 1}</span>
+                      </div>
+                      <div>
+                        <div className="font-medium">{student.name}</div>
+                        <div className="text-sm text-gray-600">{student.lessons} lessons</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-green-600">
+                        {(student.earnings / 1000).toFixed(0)}K UZS
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Banknote className="h-5 w-5" />
+                Recent Payouts
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {payoutHistory.map((payout) => (
+                  <div key={payout.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <BankCard className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium">{payout.method}</div>
+                        <div className="text-sm text-gray-600">
+                          {new Date(payout.date).toLocaleDateString()}
+                        </div>
+                        <div className="text-xs text-gray-500">{payout.reference}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-green-600">
+                        {(payout.amount / 1000000).toFixed(1)}M UZS
+                      </div>
+                      <Badge className="bg-green-100 text-green-800 text-xs">
+                        {payout.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Financial Insights */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calculator className="h-5 w-5" />
+              Financial Insights & Tips
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="h-5 w-5 text-blue-600" />
+                  <span className="font-medium text-blue-900">Growth Tip</span>
+                </div>
+                <p className="text-sm text-blue-700">
+                  Your IELTS lessons earn 23% more than average. Consider promoting this specialty.
+                </p>
+              </div>
+
+              <div className="p-4 bg-green-50 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <PiggyBank className="h-5 w-5 text-green-600" />
+                  <span className="font-medium text-green-900">Savings Goal</span>
+                </div>
+                <p className="text-sm text-green-700">
+                  You're on track to save 25% of earnings this month. Great financial discipline!
+                </p>
+              </div>
+
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <ShieldCheck className="h-5 w-5 text-purple-600" />
+                  <span className="font-medium text-purple-900">Tax Reminder</span>
+                </div>
+                <p className="text-sm text-purple-700">
+                  Q1 tax documents will be available March 1st. Set aside 20% for taxes.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Payout Modal */}
+        {showPayoutModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Request Payout</h2>
+                <Button variant="outline" size="sm" onClick={() => setShowPayoutModal(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-3 bg-green-50 rounded-lg">
+                  <div className="text-sm text-green-600">Available Balance</div>
+                  <div className="text-2xl font-bold text-green-700">
+                    {earningsData.pendingPayments.toLocaleString()} UZS
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Payout Method</label>
+                  <select
+                    value={selectedPaymentMethod}
+                    onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="bank">Bank Transfer (Free)</option>
+                    <option value="paypal">PayPal (2% fee)</option>
+                    <option value="wise">Wise (1.5% fee)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Amount</label>
+                  <input
+                    type="number"
+                    max={earningsData.pendingPayments}
+                    defaultValue={earningsData.pendingPayments}
+                    className="w-full p-2 border rounded-md"
+                  />
+                </div>
+
+                <div className="text-xs text-gray-500">
+                  • Minimum payout: 100,000 UZS<br/>
+                  • Processing time: 1-3 business days<br/>
+                  • You'll receive a confirmation email
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <Button variant="outline" onClick={() => setShowPayoutModal(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => setShowPayoutModal(false)}>
+                  <Wallet className="h-4 w-4 mr-2" />
+                  Request Payout
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tax Modal */}
+        {showTaxModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-lg">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Tax Information</h2>
+                <Button variant="outline" size="sm" onClick={() => setShowTaxModal(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <div className="text-sm text-blue-600">This Year (2024)</div>
+                    <div className="text-xl font-bold text-blue-700">
+                      {(earningsData.thisMonth * 12 / 1000000).toFixed(1)}M UZS
+                    </div>
+                  </div>
+                  <div className="p-3 bg-purple-50 rounded-lg">
+                    <div className="text-sm text-purple-600">Platform Fees</div>
+                    <div className="text-xl font-bold text-purple-700">
+                      {earningsData.totalPlatformFees.toLocaleString()} UZS
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="font-medium">Available Documents</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-5 w-5 text-gray-500" />
+                        <div>
+                          <div className="font-medium">2024 Tax Summary</div>
+                          <div className="text-sm text-gray-600">January - Current</div>
+                        </div>
+                      </div>
+                      <Button size="sm" variant="outline">
+                        <Download className="h-4 w-4 mr-1" />
+                        Download
+                      </Button>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Receipt className="h-5 w-5 text-gray-500" />
+                        <div>
+                          <div className="font-medium">Monthly Statements</div>
+                          <div className="text-sm text-gray-600">All months available</div>
+                        </div>
+                      </div>
+                      <Button size="sm" variant="outline">
+                        <Download className="h-4 w-4 mr-1" />
+                        Download
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="text-sm text-amber-800">
+                    <strong>Tax Note:</strong> These documents are for reference only.
+                    Please consult with a tax professional for official tax filing requirements in Uzbekistan.
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <Button variant="outline" onClick={() => setShowTaxModal(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderPlaceholderSection = (title: string, description: string) => (
     <div className="space-y-6">
       <div>
@@ -2323,7 +3046,7 @@ export default function TeacherDashboard() {
       case "bookings":
         return renderBookingsManagement();
       case "earnings":
-        return renderPlaceholderSection("Earnings & Payments", "Track your earnings and payment history");
+        return renderEarningsManagement();
       case "reviews":
         return renderPlaceholderSection("Reviews & Ratings", "Monitor student reviews and ratings");
       case "settings":
