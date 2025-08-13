@@ -52,6 +52,17 @@ export default function TeacherDashboard() {
     saturday: { enabled: false, start: '10:00', end: '16:00', breaks: [] },
     sunday: { enabled: false, start: '10:00', end: '16:00', breaks: [] }
   });
+
+  // Bookings management state
+  const [activeBookingTab, setActiveBookingTab] = useState<'pending' | 'today' | 'upcoming' | 'history'>('pending');
+  const [selectedBookings, setSelectedBookings] = useState<number[]>([]);
+  const [searchFilter, setSearchFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'cancelled' | 'completed'>('all');
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [messageText, setMessageText] = useState('');
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [profileData, setProfileData] = useState({
     firstName: "Aziza",
     lastName: "Karimova",
@@ -711,6 +722,76 @@ export default function TeacherDashboard() {
     );
   };
 
+  // Mock bookings data
+  const pendingBookingRequests = [
+    {
+      id: 1,
+      student: {
+        name: 'Maria Garcia',
+        image: '/placeholder.svg',
+        email: 'maria@example.com',
+        phone: '+998901234567',
+        rating: 4.8,
+        totalLessons: 25,
+        memberSince: '2023-08-15'
+      },
+      requestedDate: '2024-01-22',
+      requestedTime: '15:00',
+      duration: 60,
+      subject: 'English Conversation',
+      type: 'regular',
+      rate: 50000,
+      message: 'Hello! I would like to continue improving my conversational English skills. I\'m particularly interested in business communication.',
+      requestedAt: '2024-01-19T10:30:00',
+      paymentConfirmed: true,
+      specialRequirements: 'Prefers slower pace, beginner level'
+    },
+    {
+      id: 2,
+      student: {
+        name: 'David Wilson',
+        image: '/placeholder.svg',
+        email: 'david@example.com',
+        phone: '+998901234568',
+        rating: 4.9,
+        totalLessons: 45,
+        memberSince: '2023-06-10'
+      },
+      requestedDate: '2024-01-23',
+      requestedTime: '14:00',
+      duration: 90,
+      subject: 'IELTS Speaking',
+      type: 'intensive',
+      rate: 75000,
+      message: 'I need to prepare for IELTS speaking test next month. Can we focus on Part 2 and 3?',
+      requestedAt: '2024-01-19T09:15:00',
+      paymentConfirmed: true,
+      specialRequirements: 'IELTS preparation, advanced level'
+    },
+    {
+      id: 3,
+      student: {
+        name: 'Sophie Chen',
+        image: '/placeholder.svg',
+        email: 'sophie@example.com',
+        phone: '+998901234569',
+        rating: 5.0,
+        totalLessons: 5,
+        memberSince: '2024-01-05'
+      },
+      requestedDate: '2024-01-24',
+      requestedTime: '16:30',
+      duration: 30,
+      subject: 'Trial Lesson',
+      type: 'trial',
+      rate: 25000,
+      message: 'Hi! I\'m new to the platform and would like to try a lesson to see if we\'re a good match.',
+      requestedAt: '2024-01-19T14:45:00',
+      paymentConfirmed: false,
+      specialRequirements: 'New student, needs assessment'
+    }
+  ];
+
   // Mock schedule data
   const mockBookings = [
     {
@@ -747,6 +828,100 @@ export default function TeacherDashboard() {
       rate: 75000
     }
   ];
+
+  const completedLessons = [
+    {
+      id: 101,
+      date: '2024-01-18',
+      time: '14:00',
+      duration: 60,
+      student: { name: 'John Doe', image: '/placeholder.svg', rating: 5 },
+      subject: 'IELTS Preparation',
+      status: 'completed',
+      studentRating: 5,
+      studentFeedback: 'Excellent lesson! Very clear explanations and helpful practice exercises.',
+      teacherNotes: 'Student showed good progress in speaking. Focus on pronunciation next time.',
+      paymentStatus: 'paid',
+      earnings: 50000
+    },
+    {
+      id: 102,
+      date: '2024-01-17',
+      time: '16:00',
+      duration: 30,
+      student: { name: 'Sarah Smith', image: '/placeholder.svg', rating: 5 },
+      subject: 'Trial Lesson',
+      status: 'completed',
+      studentRating: 5,
+      studentFeedback: 'Great first lesson! Looking forward to more sessions.',
+      teacherNotes: 'Enthusiastic student, good foundation. Recommended regular package.',
+      paymentStatus: 'paid',
+      earnings: 25000
+    },
+    {
+      id: 103,
+      date: '2024-01-16',
+      time: '10:00',
+      duration: 90,
+      student: { name: 'Ahmad Karim', image: '/placeholder.svg', rating: 4 },
+      subject: 'Business English',
+      status: 'completed',
+      studentRating: 4,
+      studentFeedback: 'Good lesson, but would like more practical examples.',
+      teacherNotes: 'Student needs more real-world business scenarios. Prepare case studies.',
+      paymentStatus: 'paid',
+      earnings: 75000
+    }
+  ];
+
+  const todaysLessons = mockBookings.filter(booking =>
+    booking.date === new Date().toISOString().split('T')[0] &&
+    booking.status === 'confirmed'
+  );
+
+  const upcomingLessons = mockBookings.filter(booking =>
+    new Date(booking.date) > new Date() &&
+    booking.status === 'confirmed'
+  );
+
+  const recentMessages = [
+    {
+      id: 1,
+      student: { name: 'John Doe', image: '/placeholder.svg' },
+      message: 'Thank you for the great lesson yesterday! When can we schedule the next one?',
+      timestamp: '2024-01-19T15:30:00',
+      unread: true,
+      lessonRelated: true
+    },
+    {
+      id: 2,
+      student: { name: 'Maria Garcia', image: '/placeholder.svg' },
+      message: 'Hi! I have a question about the homework you assigned. Could you clarify the grammar exercise?',
+      timestamp: '2024-01-19T12:15:00',
+      unread: true,
+      lessonRelated: true
+    },
+    {
+      id: 3,
+      student: { name: 'David Wilson', image: '/placeholder.svg' },
+      message: 'I need to reschedule tomorrow\'s lesson. Is 4 PM available instead?',
+      timestamp: '2024-01-19T09:45:00',
+      unread: false,
+      lessonRelated: false
+    }
+  ];
+
+  const bookingStats = {
+    todayLessons: todaysLessons.length,
+    pendingRequests: pendingBookingRequests.length,
+    weeklyEarnings: 450000,
+    monthlyLessons: 42,
+    acceptanceRate: 89,
+    noShowRate: 3,
+    averageRating: 4.9,
+    totalStudents: 89,
+    completionRate: 97
+  };
 
   const scheduleAnalytics = {
     bookingRate: 78,
@@ -1395,6 +1570,744 @@ export default function TeacherDashboard() {
             </div>
           </div>
         )}
+
+        {/* Message Modal */}
+        {showMessageModal && selectedStudent && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Send Message</h2>
+                <Button variant="outline" size="sm" onClick={() => setShowMessageModal(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={selectedStudent.image} alt={selectedStudent.name} />
+                    <AvatarFallback>
+                      {selectedStudent.name.split(' ').map((n: string) => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="font-medium">{selectedStudent.name}</div>
+                    <div className="text-sm text-gray-600">{selectedStudent.email}</div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Message</label>
+                  <textarea
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    placeholder="Type your message here..."
+                    className="w-full p-3 border rounded-md min-h-[100px] resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <Button variant="outline" onClick={() => setShowMessageModal(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => { setShowMessageModal(false); setMessageText(''); }}>
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Send Message
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reschedule Modal */}
+        {showRescheduleModal && selectedBooking && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Reschedule Lesson</h2>
+                <Button variant="outline" size="sm" onClick={() => setShowRescheduleModal(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="font-medium">{selectedBooking.student.name}</div>
+                  <div className="text-sm text-gray-600">
+                    Current: {new Date(selectedBooking.date).toLocaleDateString()} at {selectedBooking.time}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">New Date</label>
+                  <input
+                    type="date"
+                    className="w-full p-2 border rounded-md"
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">New Time</label>
+                  <select className="w-full p-2 border rounded-md">
+                    <option value="09:00">09:00 AM</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="14:00">02:00 PM</option>
+                    <option value="15:00">03:00 PM</option>
+                    <option value="16:00">04:00 PM</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Reason (Optional)</label>
+                  <textarea
+                    placeholder="Let the student know why you're rescheduling..."
+                    className="w-full p-2 border rounded-md min-h-[60px] resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <Button variant="outline" onClick={() => setShowRescheduleModal(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => setShowRescheduleModal(false)}>
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Confirm Reschedule
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const handleAcceptBooking = (bookingId: number) => {
+    // Handle accepting booking
+    console.log('Accepting booking:', bookingId);
+  };
+
+  const handleDeclineBooking = (bookingId: number) => {
+    // Handle declining booking
+    console.log('Declining booking:', bookingId);
+  };
+
+  const handleBulkAction = (action: 'accept' | 'decline') => {
+    console.log(`Bulk ${action} for bookings:`, selectedBookings);
+    setSelectedBookings([]);
+  };
+
+  const renderBookingsManagement = () => {
+    const filteredLessons = (() => {
+      let lessons: any[] = [];
+
+      switch (activeBookingTab) {
+        case 'pending':
+          return pendingBookingRequests;
+        case 'today':
+          return todaysLessons;
+        case 'upcoming':
+          return upcomingLessons;
+        case 'history':
+          return completedLessons;
+        default:
+          return [];
+      }
+    })();
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Bookings & Lessons</h1>
+            <p className="text-gray-600">Manage student bookings and upcoming lessons</p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => setShowMessageModal(true)}>
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Send Message
+            </Button>
+            <Button variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Export Data
+            </Button>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Manual Booking
+            </Button>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{bookingStats.todayLessons}</div>
+                  <div className="text-sm text-gray-600">Today's Lessons</div>
+                </div>
+                <Sun className="h-8 w-8 text-yellow-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{bookingStats.pendingRequests}</div>
+                  <div className="text-sm text-gray-600">Pending Requests</div>
+                </div>
+                <Clock className="h-8 w-8 text-orange-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-primary">
+                    {(bookingStats.weeklyEarnings / 1000000).toFixed(1)}M
+                  </div>
+                  <div className="text-sm text-gray-600">This Week</div>
+                </div>
+                <DollarSign className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{bookingStats.acceptanceRate}%</div>
+                  <div className="text-sm text-gray-600">Acceptance Rate</div>
+                </div>
+                <TrendingUp className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Navigation Tabs */}
+        <Card>
+          <CardContent className="p-0">
+            <div className="flex border-b">
+              {([
+                { id: 'pending', label: 'Pending Requests', count: pendingBookingRequests.length },
+                { id: 'today', label: 'Today\'s Lessons', count: todaysLessons.length },
+                { id: 'upcoming', label: 'Upcoming', count: upcomingLessons.length },
+                { id: 'history', label: 'History', count: completedLessons.length }
+              ] as const).map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveBookingTab(tab.id)}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    activeBookingTab === tab.id
+                      ? 'border-b-2 border-primary text-primary bg-primary/5'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  {tab.label}
+                  {tab.count > 0 && (
+                    <Badge className="ml-2" variant="secondary">{tab.count}</Badge>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Filter and Search */}
+            <div className="p-4 border-b bg-gray-50">
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search students, subjects, or notes..."
+                      value={searchFilter}
+                      onChange={(e) => setSearchFilter(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border rounded-md"
+                    />
+                  </div>
+                </div>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as any)}
+                  className="p-2 border rounded-md"
+                >
+                  <option value="all">All Status</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="pending">Pending</option>
+                  <option value="cancelled">Cancelled</option>
+                  <option value="completed">Completed</option>
+                </select>
+                <Button variant="outline" size="sm">
+                  <Filter className="h-4 w-4 mr-2" />
+                  More Filters
+                </Button>
+              </div>
+
+              {/* Bulk Actions */}
+              {selectedBookings.length > 0 && (
+                <div className="flex items-center gap-3 mt-3 p-3 bg-blue-50 rounded-lg">
+                  <span className="text-sm font-medium">
+                    {selectedBookings.length} selected
+                  </span>
+                  {activeBookingTab === 'pending' && (
+                    <>
+                      <Button size="sm" onClick={() => handleBulkAction('accept')}>
+                        <Check className="h-4 w-4 mr-1" />
+                        Accept All
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleBulkAction('decline')}>
+                        <X className="h-4 w-4 mr-1" />
+                        Decline All
+                      </Button>
+                    </>
+                  )}
+                  <Button size="sm" variant="outline" onClick={() => setSelectedBookings([])}>
+                    Clear Selection
+                  </Button>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Content Based on Active Tab */}
+        <div className="space-y-4">
+          {activeBookingTab === 'pending' && (
+            <div className="space-y-4">
+              {pendingBookingRequests.map((request) => (
+                <Card key={request.id}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedBookings.includes(request.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedBookings([...selectedBookings, request.id]);
+                            } else {
+                              setSelectedBookings(selectedBookings.filter(id => id !== request.id));
+                            }
+                          }}
+                          className="mt-1"
+                        />
+                        <Avatar className="w-16 h-16">
+                          <AvatarImage src={request.student.image} alt={request.student.name} />
+                          <AvatarFallback>
+                            {request.student.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-semibold">{request.student.name}</h3>
+                            <Badge variant="outline">
+                              {request.student.totalLessons} lessons
+                            </Badge>
+                            <div className="flex items-center gap-1">
+                              <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                              <span className="text-sm">{request.student.rating}</span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4 mb-3">
+                            <div className="space-y-1">
+                              <div className="text-sm text-gray-600">Requested Date & Time</div>
+                              <div className="font-medium">
+                                {new Date(request.requestedDate).toLocaleDateString()} at {request.requestedTime}
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="text-sm text-gray-600">Subject & Duration</div>
+                              <div className="font-medium">{request.subject} ({request.duration} min)</div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2 mb-3">
+                            <div className="text-sm text-gray-600">Message from student:</div>
+                            <div className="text-sm bg-gray-50 p-3 rounded-lg">{request.message}</div>
+                          </div>
+
+                          {request.specialRequirements && (
+                            <div className="space-y-1 mb-3">
+                              <div className="text-sm text-gray-600">Special Requirements:</div>
+                              <Badge variant="secondary">{request.specialRequirements}</Badge>
+                            </div>
+                          )}
+
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              Requested {new Date(request.requestedAt).toLocaleString()}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <DollarSign className="h-3 w-3" />
+                              {request.rate.toLocaleString()} UZS
+                            </span>
+                            <span className="flex items-center gap-1">
+                              {request.paymentConfirmed ? (
+                                <><CheckCircle className="h-3 w-3 text-green-500" /> Payment Confirmed</>
+                              ) : (
+                                <><AlertTriangle className="h-3 w-3 text-yellow-500" /> Payment Pending</>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedStudent(request.student);
+                            setShowMessageModal(true);
+                          }}
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDeclineBooking(request.id)}
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Decline
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => handleAcceptBooking(request.id)}
+                        >
+                          <Check className="h-4 w-4 mr-1" />
+                          Accept
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {activeBookingTab === 'today' && (
+            <div className="space-y-4">
+              {todaysLessons.length > 0 ? (
+                todaysLessons.map((lesson) => (
+                  <Card key={lesson.id}>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <Avatar className="w-14 h-14">
+                            <AvatarImage src={lesson.student.image} alt={lesson.student.name} />
+                            <AvatarFallback>
+                              {lesson.student.name.split(' ').map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h3 className="text-lg font-semibold">{lesson.student.name}</h3>
+                            <div className="text-gray-600">{lesson.subject}</div>
+                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {lesson.time} ({lesson.duration} min)
+                              </span>
+                              <Badge className="bg-green-100 text-green-800">{lesson.status}</Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Button variant="outline" size="sm">
+                            <Phone className="h-4 w-4 mr-2" />
+                            Call
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Message
+                          </Button>
+                          <Button size="sm">
+                            <Video className="h-4 w-4 mr-2" />
+                            Start Lesson
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <Sun className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No lessons today</h3>
+                    <p className="text-gray-600">Enjoy your free day or set your availability for tomorrow!</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {activeBookingTab === 'upcoming' && (
+            <div className="space-y-4">
+              {upcomingLessons.map((lesson) => (
+                <Card key={lesson.id}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="w-14 h-14">
+                          <AvatarImage src={lesson.student.image} alt={lesson.student.name} />
+                          <AvatarFallback>
+                            {lesson.student.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="text-lg font-semibold">{lesson.student.name}</h3>
+                          <div className="text-gray-600">{lesson.subject}</div>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <CalendarIcon className="h-3 w-3" />
+                              {new Date(lesson.date).toLocaleDateString()}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {lesson.time} ({lesson.duration} min)
+                            </span>
+                            <Badge className="bg-blue-100 text-blue-800">{lesson.status}</Badge>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => {
+                              setSelectedStudent(lesson.student);
+                              setShowMessageModal(true);
+                            }}>
+                              <MessageCircle className="h-4 w-4 mr-2" />
+                              Send Message
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              setSelectedBooking(lesson);
+                              setShowRescheduleModal(true);
+                            }}>
+                              <Calendar className="h-4 w-4 mr-2" />
+                              Reschedule
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600">
+                              <X className="h-4 w-4 mr-2" />
+                              Cancel Lesson
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {activeBookingTab === 'history' && (
+            <div className="space-y-4">
+              {completedLessons.map((lesson) => (
+                <Card key={lesson.id}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-4">
+                        <Avatar className="w-14 h-14">
+                          <AvatarImage src={lesson.student.image} alt={lesson.student.name} />
+                          <AvatarFallback>
+                            {lesson.student.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-semibold">{lesson.student.name}</h3>
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-4 w-4 ${
+                                    i < lesson.studentRating
+                                      ? 'text-yellow-500 fill-current'
+                                      : 'text-gray-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-4 mb-3">
+                            <div className="space-y-1">
+                              <div className="text-sm text-gray-600">Date & Time</div>
+                              <div className="text-sm font-medium">
+                                {new Date(lesson.date).toLocaleDateString()} at {lesson.time}
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="text-sm text-gray-600">Subject</div>
+                              <div className="text-sm font-medium">{lesson.subject}</div>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="text-sm text-gray-600">Earnings</div>
+                              <div className="text-sm font-medium text-green-600">
+                                {lesson.earnings.toLocaleString()} UZS
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div>
+                              <div className="text-sm text-gray-600 mb-1">Student Feedback:</div>
+                              <div className="text-sm bg-blue-50 p-3 rounded-lg">{lesson.studentFeedback}</div>
+                            </div>
+
+                            {lesson.teacherNotes && (
+                              <div>
+                                <div className="text-sm text-gray-600 mb-1">Your Notes:</div>
+                                <div className="text-sm bg-gray-50 p-3 rounded-lg">{lesson.teacherNotes}</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-end gap-2">
+                        <Badge
+                          className={`${
+                            lesson.paymentStatus === 'paid'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
+                        >
+                          {lesson.paymentStatus}
+                        </Badge>
+                        <Button variant="outline" size="sm">
+                          <Download className="h-4 w-4 mr-2" />
+                          Export
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Recent Messages */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5" />
+                Recent Messages
+              </span>
+              <Button variant="outline" size="sm">
+                View All Messages
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentMessages.map((message) => (
+                <div key={message.id} className="flex items-start gap-3 p-3 border rounded-lg hover:bg-gray-50">
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={message.student.image} alt={message.student.name} />
+                    <AvatarFallback>
+                      {message.student.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium">{message.student.name}</span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(message.timestamp).toLocaleString()}
+                      </span>
+                      {message.unread && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
+                    </div>
+                    <p className="text-sm text-gray-600">{message.message}</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    Reply
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Performance Analytics */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Performance Metrics
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Acceptance Rate</span>
+                <span className="font-semibold text-green-600">{bookingStats.acceptanceRate}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">No-Show Rate</span>
+                <span className="font-semibold">{bookingStats.noShowRate}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Completion Rate</span>
+                <span className="font-semibold text-green-600">{bookingStats.completionRate}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Average Rating</span>
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                  <span className="font-semibold">{bookingStats.averageRating}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PieChart className="h-5 w-5" />
+                Monthly Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Total Lessons</span>
+                <span className="font-semibold">{bookingStats.monthlyLessons}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Active Students</span>
+                <span className="font-semibold">{bookingStats.totalStudents}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">New Bookings</span>
+                <span className="font-semibold text-blue-600">+15</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Total Earnings</span>
+                <span className="font-semibold text-green-600">
+                  {(bookingStats.weeklyEarnings * 4 / 1000000).toFixed(1)}M UZS
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   };
@@ -1431,7 +2344,7 @@ export default function TeacherDashboard() {
       case "schedule":
         return renderScheduleManagement();
       case "bookings":
-        return renderPlaceholderSection("Bookings & Lessons", "Manage student bookings and upcoming lessons");
+        return renderBookingsManagement();
       case "earnings":
         return renderPlaceholderSection("Earnings & Payments", "Track your earnings and payment history");
       case "reviews":
