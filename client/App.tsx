@@ -56,7 +56,7 @@ const App = () => {
           <Route path="/subjects" element={<PlaceholderPage title="Subjects" description="Browse all available subjects and find the perfect tutor for your learning goals." />} />
           <Route path="/how-it-works" element={<PlaceholderPage title="How It Works" description="Learn how our platform connects students with expert teachers for effective online learning." />} />
           <Route path="/pricing" element={<PlaceholderPage title="Pricing" description="Transparent pricing with no hidden fees. Pay as you learn with flexible payment options." />} />
-          <Route path="/login" element={<PlaceholderPage title="Login" description="Sign in to your account to access your lessons and connect with teachers." />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<StudentRegister />} />
           <Route path="/teacher-signup" element={<TeacherRegister />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
