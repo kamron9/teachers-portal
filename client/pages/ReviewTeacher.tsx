@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Star, Send, Loader2, CheckCircle, BookOpen, Clock, User } from "lucide-react";
+import { ArrowLeft, Star, Send, Loader2, CheckCircle, BookOpen, Clock, User, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
