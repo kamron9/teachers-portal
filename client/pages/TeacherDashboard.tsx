@@ -107,29 +107,6 @@ export default function TeacherDashboard() {
     { id: "settings", label: "Settings", icon: Settings }
   ];
 
-  // Mock upcoming lessons
-  const upcomingLessons = [
-    {
-      id: 1,
-      student: { name: "John Doe", image: "/placeholder.svg" },
-      date: "2024-01-20",
-      time: "14:00",
-      duration: 60,
-      type: "IELTS Preparation",
-      status: "confirmed",
-      meetingLink: "https://meet.tutoruz.com/room123"
-    },
-    {
-      id: 2,
-      student: { name: "Sarah Smith", image: "/placeholder.svg" },
-      date: "2024-01-20",
-      time: "16:00",
-      duration: 30,
-      type: "Trial Lesson",
-      status: "pending",
-      meetingLink: null
-    }
-  ];
 
   // Mock recent bookings
   const recentBookings = [
