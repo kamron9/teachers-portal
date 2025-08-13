@@ -33,6 +33,10 @@ const App = () => (
         <Route path="/" element={<Index />} />
         <Route path="/teachers" element={<Teachers />} />
         <Route path="/teacher/:id" element={<TeacherProfile />} />
+        <Route path="/teacher-register" element={<TeacherRegister />} />
+        <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+        <Route path="/teacher-profile" element={<TeacherProfile />} />
+        <Route path="/teacher-schedule" element={<TeacherSchedule />} />
         <Route path="/student-register" element={<StudentRegister />} />
         <Route path="/student-profile" element={<StudentProfile />} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
@@ -44,7 +48,7 @@ const App = () => (
         <Route path="/pricing" element={<PlaceholderPage title="Pricing" description="Transparent pricing with no hidden fees. Pay as you learn with flexible payment options." />} />
         <Route path="/login" element={<PlaceholderPage title="Login" description="Sign in to your account to access your lessons and connect with teachers." />} />
         <Route path="/register" element={<StudentRegister />} />
-        <Route path="/teacher-signup" element={<PlaceholderPage title="Become a Teacher" description="Join our community of expert educators and start teaching students worldwide." />} />
+        <Route path="/teacher-signup" element={<TeacherRegister />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
