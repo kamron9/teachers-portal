@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { 
-  LayoutDashboard, User, Calendar, BookOpen, DollarSign, Star, Settings, 
-  Bell, MessageCircle, Video, Clock, TrendingUp, Users, CheckCircle, 
-  AlertCircle, ChevronRight, Play, Download, MoreHorizontal, Edit3, LogOut
+import {
+  LayoutDashboard, User, Calendar, BookOpen, DollarSign, Star, Settings,
+  Bell, MessageCircle, Video, Clock, TrendingUp, Users, CheckCircle,
+  AlertCircle, ChevronRight, Play, Download, MoreHorizontal, Edit3, LogOut,
+  Camera, Upload, Award, GraduationCap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
