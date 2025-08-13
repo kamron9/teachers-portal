@@ -141,16 +141,6 @@ export default function TeacherDashboard() {
     }
   ];
 
-  // Mock earnings data
-  const earningsData = {
-    thisWeek: 450000,
-    thisMonth: 1800000,
-    totalPending: 275000,
-    recentPayments: [
-      { date: "2024-01-15", amount: 350000, student: "John Doe", type: "Lesson Payment" },
-      { date: "2024-01-12", amount: 175000, student: "Sarah Smith", type: "Package Payment" }
-    ]
-  };
 
   // Mock reviews
   const recentReviews = [
