@@ -12,7 +12,7 @@ import {
   ArrowUpRight, ArrowDownRight, Banknote, Building, CreditCard as BankCard,
   Smartphone, ChartLine, Coins, PiggyBank, ShieldCheck, Heart, ThumbsUp,
   ThumbsDown, MessageSquare, Flag, TrendingUp as TrendingUpIcon, Quote,
-  Verified, Shield, FilterX, SortAsc, SortDesc, Reply, Send
+  Verified, Shield, FilterX, SortAsc, SortDesc, Reply, Send, Share
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
