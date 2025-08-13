@@ -4,7 +4,10 @@ import {
   LayoutDashboard, User, Calendar, BookOpen, DollarSign, Star, Settings,
   Bell, MessageCircle, Video, Clock, TrendingUp, Users, CheckCircle,
   AlertCircle, ChevronRight, Play, Download, MoreHorizontal, Edit3, LogOut,
-  Camera, Upload, Award, GraduationCap
+  Camera, Upload, Award, GraduationCap, Plus, Minus, ChevronLeft, ChevronDown,
+  Eye, Filter, Search, RefreshCw, Printer, Globe, Save, X, Check, AlertTriangle,
+  BarChart3, PieChart, Calendar as CalendarIcon, Timer, MapPin, Phone, Mail,
+  ZoomIn, ZoomOut, Grid3X3, List, Sun, Moon, Coffee, BookOpenCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +30,28 @@ export default function TeacherDashboard() {
 
   // Profile management state - moved to top level to follow Rules of Hooks
   const [isEditing, setIsEditing] = useState(false);
+
+  // Schedule management state
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [calendarView, setCalendarView] = useState<'month' | 'week' | 'day'>('month');
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]);
+  const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
+  const [scheduleTemplate, setScheduleTemplate] = useState('default');
+  const [autoApproval, setAutoApproval] = useState(false);
+  const [minAdvanceBooking, setMinAdvanceBooking] = useState('2h');
+  const [maxFutureBooking, setMaxFutureBooking] = useState('1m');
+  const [bufferTime, setBufferTime] = useState(15);
+  const [maxLessonsPerDay, setMaxLessonsPerDay] = useState(8);
+  const [defaultLessonDuration, setDefaultLessonDuration] = useState(60);
+  const [weeklyAvailability, setWeeklyAvailability] = useState({
+    monday: { enabled: true, start: '09:00', end: '17:00', breaks: [] },
+    tuesday: { enabled: true, start: '09:00', end: '17:00', breaks: [] },
+    wednesday: { enabled: true, start: '09:00', end: '17:00', breaks: [] },
+    thursday: { enabled: true, start: '09:00', end: '17:00', breaks: [] },
+    friday: { enabled: true, start: '09:00', end: '17:00', breaks: [] },
+    saturday: { enabled: false, start: '10:00', end: '16:00', breaks: [] },
+    sunday: { enabled: false, start: '10:00', end: '16:00', breaks: [] }
+  });
   const [profileData, setProfileData] = useState({
     firstName: "Aziza",
     lastName: "Karimova",
@@ -686,6 +711,694 @@ export default function TeacherDashboard() {
     );
   };
 
+  // Mock schedule data
+  const mockBookings = [
+    {
+      id: 1,
+      date: '2024-01-20',
+      time: '14:00',
+      duration: 60,
+      student: { name: 'John Doe', image: '/placeholder.svg', phone: '+998901234567' },
+      subject: 'IELTS Preparation',
+      status: 'confirmed',
+      type: 'regular',
+      rate: 50000
+    },
+    {
+      id: 2,
+      date: '2024-01-20',
+      time: '16:00',
+      duration: 30,
+      student: { name: 'Sarah Smith', image: '/placeholder.svg', phone: '+998901234568' },
+      subject: 'Trial Lesson',
+      status: 'pending',
+      type: 'trial',
+      rate: 25000
+    },
+    {
+      id: 3,
+      date: '2024-01-21',
+      time: '10:00',
+      duration: 90,
+      student: { name: 'Ahmad Karim', image: '/placeholder.svg', phone: '+998901234569' },
+      subject: 'Business English',
+      status: 'confirmed',
+      type: 'regular',
+      rate: 75000
+    }
+  ];
+
+  const scheduleAnalytics = {
+    bookingRate: 78,
+    peakHours: ['14:00-16:00', '19:00-21:00'],
+    utilizationRate: 65,
+    avgBookingAdvance: '2.5 days',
+    monthlyProjection: 2850000,
+    popularTimeSlots: ['10:00', '14:00', '16:00', '19:00']
+  };
+
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 8; hour <= 22; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        slots.push(time);
+      }
+    }
+    return slots;
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days = [];
+
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+
+    // Add days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+
+    return days;
+  };
+
+  const getBookingForSlot = (date: Date, time: string) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return mockBookings.find(booking =>
+      booking.date === dateStr && booking.time === time
+    );
+  };
+
+  const isTimeSlotAvailable = (date: Date, time: string) => {
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const dayAvailability = weeklyAvailability[dayName as keyof typeof weeklyAvailability];
+
+    if (!dayAvailability?.enabled) return false;
+
+    const [hours, minutes] = time.split(':').map(Number);
+    const timeInMinutes = hours * 60 + minutes;
+    const [startHours, startMinutes] = dayAvailability.start.split(':').map(Number);
+    const [endHours, endMinutes] = dayAvailability.end.split(':').map(Number);
+    const startInMinutes = startHours * 60 + startMinutes;
+    const endInMinutes = endHours * 60 + endMinutes;
+
+    return timeInMinutes >= startInMinutes && timeInMinutes <= endInMinutes;
+  };
+
+  const renderScheduleManagement = () => {
+    const timeSlots = generateTimeSlots();
+    const daysInMonth = getDaysInMonth(currentDate);
+    const today = new Date();
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Schedule & Availability</h1>
+            <p className="text-gray-600">Set your availability and manage your teaching schedule</p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => setShowAvailabilityModal(true)}>
+              <Settings className="h-4 w-4 mr-2" />
+              Set Availability
+            </Button>
+            <Button variant="outline">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Break
+            </Button>
+            <Button>
+              <Eye className="h-4 w-4 mr-2" />
+              View Bookings
+            </Button>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{scheduleAnalytics.bookingRate}%</div>
+                  <div className="text-sm text-gray-600">Booking Rate</div>
+                </div>
+                <TrendingUp className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{scheduleAnalytics.utilizationRate}%</div>
+                  <div className="text-sm text-gray-600">Utilization</div>
+                </div>
+                <BarChart3 className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{mockBookings.filter(b => b.status === 'pending').length}</div>
+                  <div className="text-sm text-gray-600">Pending Bookings</div>
+                </div>
+                <Clock className="h-8 w-8 text-orange-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-primary">
+                    {(scheduleAnalytics.monthlyProjection / 1000000).toFixed(1)}M
+                  </div>
+                  <div className="text-sm text-gray-600">Monthly Projection</div>
+                </div>
+                <DollarSign className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Calendar Controls */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const newDate = new Date(currentDate);
+                      if (calendarView === 'month') {
+                        newDate.setMonth(newDate.getMonth() - 1);
+                      } else if (calendarView === 'week') {
+                        newDate.setDate(newDate.getDate() - 7);
+                      } else {
+                        newDate.setDate(newDate.getDate() - 1);
+                      }
+                      setCurrentDate(newDate);
+                    }}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const newDate = new Date(currentDate);
+                      if (calendarView === 'month') {
+                        newDate.setMonth(newDate.getMonth() + 1);
+                      } else if (calendarView === 'week') {
+                        newDate.setDate(newDate.getDate() + 7);
+                      } else {
+                        newDate.setDate(newDate.getDate() + 1);
+                      }
+                      setCurrentDate(newDate);
+                    }}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                  <h3 className="text-lg font-semibold">
+                    {currentDate.toLocaleDateString('en-US', {
+                      month: 'long',
+                      year: 'numeric',
+                      ...(calendarView !== 'month' && { day: 'numeric' })
+                    })}
+                  </h3>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
+                  Today
+                </Button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex border rounded-lg p-1">
+                  {(['month', 'week', 'day'] as const).map((view) => (
+                    <Button
+                      key={view}
+                      variant={calendarView === view ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setCalendarView(view)}
+                      className="capitalize"
+                    >
+                      {view}
+                    </Button>
+                  ))}
+                </div>
+
+                <Button variant="outline" size="sm">
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+
+        {/* Calendar Display */}
+        {calendarView === 'month' && (
+          <Card>
+            <CardContent className="p-0">
+              {/* Calendar Header */}
+              <div className="grid grid-cols-7 border-b">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                  <div key={day} className="p-4 text-center font-medium text-gray-600 bg-gray-50">
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              {/* Calendar Body */}
+              <div className="grid grid-cols-7">
+                {daysInMonth.map((day, index) => {
+                  const isToday = day && day.toDateString() === today.toDateString();
+                  const dayBookings = day ? mockBookings.filter(booking =>
+                    booking.date === day.toISOString().split('T')[0]
+                  ) : [];
+
+                  return (
+                    <div
+                      key={index}
+                      className={`min-h-[120px] border-r border-b p-2 ${
+                        !day ? 'bg-gray-50' : 'hover:bg-gray-50 cursor-pointer'
+                      } ${isToday ? 'bg-blue-50 border-blue-200' : ''}`}
+                    >
+                      {day && (
+                        <>
+                          <div className={`text-sm font-medium mb-2 ${
+                            isToday ? 'text-blue-600' : 'text-gray-900'
+                          }`}>
+                            {day.getDate()}
+                          </div>
+                          <div className="space-y-1">
+                            {dayBookings.slice(0, 3).map((booking) => (
+                              <div
+                                key={booking.id}
+                                className={`text-xs p-1 rounded truncate ${
+                                  booking.status === 'confirmed'
+                                    ? 'bg-green-100 text-green-800'
+                                    : booking.status === 'pending'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-red-100 text-red-800'
+                                }`}
+                              >
+                                {booking.time} - {booking.student.name}
+                              </div>
+                            ))}
+                            {dayBookings.length > 3 && (
+                              <div className="text-xs text-gray-500 font-medium">
+                                +{dayBookings.length - 3} more
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Day/Week View */}
+        {(calendarView === 'day' || calendarView === 'week') && (
+          <Card>
+            <CardContent className="p-0">
+              <div className="flex">
+                {/* Time column */}
+                <div className="w-20 border-r">
+                  <div className="h-12 border-b"></div>
+                  {timeSlots.filter((_, index) => index % 2 === 0).map((time) => (
+                    <div key={time} className="h-16 border-b flex items-center justify-center text-sm text-gray-600">
+                      {time}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar days */}
+                <div className="flex-1">
+                  <div className="grid grid-cols-1 h-12 border-b">
+                    <div className="flex items-center justify-center font-medium">
+                      {formatDate(currentDate)}
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    {timeSlots.filter((_, index) => index % 2 === 0).map((time, index) => {
+                      const booking = getBookingForSlot(currentDate, time);
+                      const isAvailable = isTimeSlotAvailable(currentDate, time);
+
+                      return (
+                        <div
+                          key={time}
+                          className={`h-16 border-b flex items-center px-4 cursor-pointer ${
+                            booking
+                              ? booking.status === 'confirmed'
+                                ? 'bg-blue-100 hover:bg-blue-200'
+                                : 'bg-yellow-100 hover:bg-yellow-200'
+                              : isAvailable
+                              ? 'hover:bg-green-50'
+                              : 'bg-gray-50'
+                          }`}
+                        >
+                          {booking ? (
+                            <div className="flex-1">
+                              <div className="font-medium text-sm">{booking.student.name}</div>
+                              <div className="text-xs text-gray-600">{booking.subject}</div>
+                              <Badge
+                                variant={booking.status === 'confirmed' ? 'default' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {booking.status}
+                              </Badge>
+                            </div>
+                          ) : isAvailable ? (
+                            <div className="text-sm text-gray-500">Available</div>
+                          ) : (
+                            <div className="text-sm text-gray-400">Unavailable</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Current Bookings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Current Bookings
+              </span>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filter
+                </Button>
+                <Button variant="outline" size="sm">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh
+                </Button>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {mockBookings.map((booking) => (
+                <div key={booking.id} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="w-12 h-12">
+                        <AvatarImage src={booking.student.image} alt={booking.student.name} />
+                        <AvatarFallback>
+                          {booking.student.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-semibold">{booking.student.name}</div>
+                        <div className="text-sm text-gray-600">{booking.subject}</div>
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <CalendarIcon className="h-3 w-3" />
+                            {new Date(booking.date).toLocaleDateString()}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {booking.time} ({booking.duration} min)
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <DollarSign className="h-3 w-3" />
+                            {booking.rate.toLocaleString()} UZS
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge
+                        className={`${
+                          booking.status === 'confirmed'
+                            ? 'bg-green-100 text-green-800'
+                            : booking.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {booking.status}
+                      </Badge>
+
+                      {booking.status === 'pending' && (
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline">
+                            <X className="h-4 w-4 mr-1" />
+                            Decline
+                          </Button>
+                          <Button size="sm">
+                            <Check className="h-4 w-4 mr-1" />
+                            Accept
+                          </Button>
+                        </div>
+                      )}
+
+                      {booking.status === 'confirmed' && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem>
+                              <Phone className="h-4 w-4 mr-2" />
+                              Call Student
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <MessageCircle className="h-4 w-4 mr-2" />
+                              Send Message
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Calendar className="h-4 w-4 mr-2" />
+                              Reschedule
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600">
+                              <X className="h-4 w-4 mr-2" />
+                              Cancel
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Schedule Analytics */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Schedule Performance
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Peak Hours</span>
+                <div className="flex gap-2">
+                  {scheduleAnalytics.peakHours.map((hour) => (
+                    <Badge key={hour} variant="outline">{hour}</Badge>
+                  ))}
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Avg Booking Advance</span>
+                <span className="font-semibold">{scheduleAnalytics.avgBookingAdvance}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Utilization Rate</span>
+                <span className="font-semibold text-green-600">{scheduleAnalytics.utilizationRate}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Popular Time Slots</span>
+                <div className="flex gap-1">
+                  {scheduleAnalytics.popularTimeSlots.slice(0, 3).map((slot) => (
+                    <Badge key={slot} variant="secondary" className="text-xs">{slot}</Badge>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Quick Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">Auto-approve bookings</div>
+                  <div className="text-sm text-gray-600">Automatically accept bookings from regular students</div>
+                </div>
+                <Button
+                  variant={autoApproval ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setAutoApproval(!autoApproval)}
+                >
+                  {autoApproval ? 'On' : 'Off'}
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Minimum advance booking</label>
+                <select
+                  value={minAdvanceBooking}
+                  onChange={(e) => setMinAdvanceBooking(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="2h">2 hours</option>
+                  <option value="4h">4 hours</option>
+                  <option value="24h">24 hours</option>
+                  <option value="48h">48 hours</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Buffer time between lessons</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="range"
+                    min="5"
+                    max="30"
+                    step="5"
+                    value={bufferTime}
+                    onChange={(e) => setBufferTime(parseInt(e.target.value))}
+                    className="flex-1"
+                  />
+                  <span className="text-sm font-medium w-12">{bufferTime} min</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Availability Settings Modal */}
+        {showAvailabilityModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold">Set Weekly Availability</h2>
+                <Button variant="outline" size="sm" onClick={() => setShowAvailabilityModal(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                {Object.entries(weeklyAvailability).map(([day, schedule]) => (
+                  <div key={day} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={schedule.enabled}
+                          onChange={(e) => {
+                            setWeeklyAvailability(prev => ({
+                              ...prev,
+                              [day]: { ...prev[day as keyof typeof prev], enabled: e.target.checked }
+                            }));
+                          }}
+                          className="w-4 h-4"
+                        />
+                        <span className="font-medium capitalize">{day}</span>
+                      </div>
+                    </div>
+
+                    {schedule.enabled && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Start Time</label>
+                          <input
+                            type="time"
+                            value={schedule.start}
+                            onChange={(e) => {
+                              setWeeklyAvailability(prev => ({
+                                ...prev,
+                                [day]: { ...prev[day as keyof typeof prev], start: e.target.value }
+                              }));
+                            }}
+                            className="w-full p-2 border rounded-md"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">End Time</label>
+                          <input
+                            type="time"
+                            value={schedule.end}
+                            onChange={(e) => {
+                              setWeeklyAvailability(prev => ({
+                                ...prev,
+                                [day]: { ...prev[day as keyof typeof prev], end: e.target.value }
+                              }));
+                            }}
+                            className="w-full p-2 border rounded-md"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <Button variant="outline" onClick={() => setShowAvailabilityModal(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => setShowAvailabilityModal(false)}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Availability
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderPlaceholderSection = (title: string, description: string) => (
     <div className="space-y-6">
       <div>
@@ -716,7 +1429,7 @@ export default function TeacherDashboard() {
       case "profile":
         return renderProfileManagement();
       case "schedule":
-        return renderPlaceholderSection("Schedule & Availability", "Set your availability and manage your teaching schedule");
+        return renderScheduleManagement();
       case "bookings":
         return renderPlaceholderSection("Bookings & Lessons", "Manage student bookings and upcoming lessons");
       case "earnings":
