@@ -10,7 +10,9 @@ import {
   ZoomIn, ZoomOut, Grid3X3, List, Sun, Moon, Coffee, BookOpenCheck, CreditCard,
   Wallet, Receipt, TrendingDown, Target, Percent, Calculator, FileText,
   ArrowUpRight, ArrowDownRight, Banknote, Building, CreditCard as BankCard,
-  Smartphone, ChartLine, Coins, PiggyBank, ShieldCheck
+  Smartphone, ChartLine, Coins, PiggyBank, ShieldCheck, Heart, ThumbsUp,
+  ThumbsDown, MessageSquare, Flag, TrendingUp as TrendingUpIcon, Quote,
+  Verified, Shield, FilterX, SortAsc, SortDesc, Reply, Send
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,6 +76,15 @@ export default function TeacherDashboard() {
   const [showTaxModal, setShowTaxModal] = useState(false);
   const [paymentFilter, setPaymentFilter] = useState<'all' | 'completed' | 'pending' | 'failed'>('all');
   const [earningsGoal, setEarningsGoal] = useState(3000000); // 3M UZS
+
+  // Reviews management state
+  const [reviewsTab, setReviewsTab] = useState<'recent' | 'all' | 'analytics'>('recent');
+  const [reviewFilter, setReviewFilter] = useState<'all' | '5' | '4' | '3' | '2' | '1'>('all');
+  const [reviewSort, setReviewSort] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<any>(null);
+  const [replyText, setReplyText] = useState('');
+  const [searchReviews, setSearchReviews] = useState('');
   const [profileData, setProfileData] = useState({
     firstName: "Aziza",
     lastName: "Karimova",
@@ -1051,6 +1062,252 @@ export default function TeacherDashboard() {
 
   const monthlyGrowth = calculateGrowthPercentage(earningsData.thisMonth, earningsData.lastMonth);
   const goalProgress = (earningsData.thisMonth / earningsGoal * 100).toFixed(1);
+
+  // Reviews and ratings data
+  const reviewsData = {
+    overallRating: 4.8,
+    totalReviews: 287,
+    recentRating: 4.9, // last 30 days
+    ratingTrend: '+0.2', // improvement
+    ranking: 12, // position among teachers
+    responseRate: 89,
+
+    ratingDistribution: [
+      { stars: 5, count: 201, percentage: 70 },
+      { stars: 4, count: 57, percentage: 20 },
+      { stars: 3, count: 20, percentage: 7 },
+      { stars: 2, count: 6, percentage: 2 },
+      { stars: 1, count: 3, percentage: 1 }
+    ],
+
+    monthlyTrend: [
+      { month: 'Jul', rating: 4.6 },
+      { month: 'Aug', rating: 4.7 },
+      { month: 'Sep', rating: 4.7 },
+      { month: 'Oct', rating: 4.8 },
+      { month: 'Nov', rating: 4.8 },
+      { month: 'Dec', rating: 4.9 }
+    ],
+
+    subjectRatings: [
+      { subject: 'English', rating: 4.9, reviews: 120 },
+      { subject: 'IELTS', rating: 4.8, reviews: 95 },
+      { subject: 'Business English', rating: 4.7, reviews: 45 },
+      { subject: 'Conversation', rating: 4.9, reviews: 27 }
+    ],
+
+    commonKeywords: [
+      { word: 'patient', count: 89 },
+      { word: 'helpful', count: 76 },
+      { word: 'clear', count: 71 },
+      { word: 'professional', count: 65 },
+      { word: 'encouraging', count: 52 }
+    ]
+  };
+
+  const recentReviews = [
+    {
+      id: 1,
+      student: {
+        name: 'John Doe',
+        image: '/placeholder.svg',
+        level: 'Intermediate',
+        verified: true
+      },
+      rating: 5,
+      date: '2024-01-18',
+      lesson: {
+        subject: 'IELTS Preparation',
+        date: '2024-01-17',
+        duration: 60
+      },
+      review: 'Excellent teacher! Aziza explains complex grammar concepts in a very clear and understandable way. Her IELTS preparation methods are highly effective and she provides great practice materials. I\'ve seen significant improvement in my speaking and writing scores.',
+      helpful: 12,
+      replied: true,
+      response: 'Thank you so much, John! I\'m thrilled to hear about your progress. Keep practicing and you\'ll achieve your target score soon!'
+    },
+    {
+      id: 2,
+      student: {
+        name: 'Sarah Smith',
+        image: '/placeholder.svg',
+        level: 'Beginner',
+        verified: true
+      },
+      rating: 5,
+      date: '2024-01-17',
+      lesson: {
+        subject: 'Trial Lesson',
+        date: '2024-01-16',
+        duration: 30
+      },
+      review: 'Amazing first lesson! Aziza was very patient with me as a beginner and made me feel comfortable speaking English. She quickly identified my learning needs and created a personalized plan. Looking forward to more lessons!',
+      helpful: 8,
+      replied: false,
+      response: null
+    },
+    {
+      id: 3,
+      student: {
+        name: 'Ahmad Karim',
+        image: '/placeholder.svg',
+        level: 'Advanced',
+        verified: true
+      },
+      rating: 4,
+      date: '2024-01-16',
+      lesson: {
+        subject: 'Business English',
+        date: '2024-01-15',
+        duration: 90
+      },
+      review: 'Good lesson with practical business scenarios. Aziza has strong knowledge of business English terminology. However, I would appreciate more real-world case studies and interactive exercises during the lesson.',
+      helpful: 5,
+      replied: true,
+      response: 'Thank you for the feedback, Ahmad! I\'ll incorporate more case studies in our next sessions. Your suggestions help me improve my teaching methods.'
+    },
+    {
+      id: 4,
+      student: {
+        name: 'Maria Garcia',
+        image: '/placeholder.svg',
+        level: 'Intermediate',
+        verified: false
+      },
+      rating: 5,
+      date: '2024-01-15',
+      lesson: {
+        subject: 'English Conversation',
+        date: '2024-01-14',
+        duration: 60
+      },
+      review: 'Perfect conversation practice! Aziza creates a relaxed environment where I feel confident to speak. She corrects my mistakes gently and provides useful phrases for everyday situations.',
+      helpful: 15,
+      replied: false,
+      response: null
+    },
+    {
+      id: 5,
+      student: {
+        name: 'David Wilson',
+        image: '/placeholder.svg',
+        level: 'Intermediate',
+        verified: true
+      },
+      rating: 5,
+      date: '2024-01-14',
+      lesson: {
+        subject: 'IELTS Speaking',
+        date: '2024-01-13',
+        duration: 60
+      },
+      review: 'Outstanding IELTS speaking preparation! Aziza simulates real exam conditions and provides detailed feedback on pronunciation, fluency, and vocabulary. Her tips are invaluable for exam success.',
+      helpful: 9,
+      replied: true,
+      response: 'I\'m so happy to help you prepare for IELTS, David! Your dedication to practice is impressive. You\'re going to do great on the exam!'
+    }
+  ];
+
+  const allReviews = [
+    ...recentReviews,
+    {
+      id: 6,
+      student: {
+        name: 'Lisa Chen',
+        image: '/placeholder.svg',
+        level: 'Beginner',
+        verified: true
+      },
+      rating: 4,
+      date: '2024-01-12',
+      lesson: {
+        subject: 'English Basics',
+        date: '2024-01-11',
+        duration: 45
+      },
+      review: 'Great teacher for beginners. Very patient and encouraging. Sometimes the pace is a bit fast for me, but overall very helpful.',
+      helpful: 7,
+      replied: false,
+      response: null
+    },
+    {
+      id: 7,
+      student: {
+        name: 'Robert Johnson',
+        image: '/placeholder.svg',
+        level: 'Advanced',
+        verified: true
+      },
+      rating: 5,
+      date: '2024-01-10',
+      lesson: {
+        subject: 'Business English',
+        date: '2024-01-09',
+        duration: 90
+      },
+      review: 'Exceptional business English training. Aziza understands corporate communication needs and provides relevant examples. Highly recommend for professionals.',
+      helpful: 11,
+      replied: true,
+      response: 'Thank you, Robert! It\'s wonderful working with professionals like you who are committed to excellence in communication.'
+    }
+  ];
+
+  const filterReviews = (reviews: any[]) => {
+    let filtered = reviews;
+
+    if (reviewFilter !== 'all') {
+      filtered = filtered.filter(review => review.rating === parseInt(reviewFilter));
+    }
+
+    if (searchReviews) {
+      filtered = filtered.filter(review =>
+        review.student.name.toLowerCase().includes(searchReviews.toLowerCase()) ||
+        review.review.toLowerCase().includes(searchReviews.toLowerCase()) ||
+        review.lesson.subject.toLowerCase().includes(searchReviews.toLowerCase())
+      );
+    }
+
+    // Sort reviews
+    filtered.sort((a, b) => {
+      switch (reviewSort) {
+        case 'newest':
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        case 'oldest':
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        case 'highest':
+          return b.rating - a.rating;
+        case 'lowest':
+          return a.rating - b.rating;
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  };
+
+  const renderStars = (rating: number, size: 'sm' | 'md' | 'lg' = 'md') => {
+    const sizeClasses = {
+      sm: 'h-3 w-3',
+      md: 'h-4 w-4',
+      lg: 'h-5 w-5'
+    };
+
+    return (
+      <div className="flex items-center gap-1">
+        {[...Array(5)].map((_, i) => (
+          <Star
+            key={i}
+            className={`${sizeClasses[size]} ${
+              i < rating
+                ? 'text-yellow-500 fill-current'
+                : 'text-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
 
   const generateTimeSlots = () => {
     const slots = [];
@@ -3002,6 +3259,471 @@ export default function TeacherDashboard() {
     );
   };
 
+  const renderReviewsManagement = () => {
+    const displayReviews = reviewsTab === 'recent' ? recentReviews : filterReviews(allReviews);
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Reviews & Ratings</h1>
+            <p className="text-gray-600">Monitor student reviews and ratings</p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Export Reviews
+            </Button>
+            <Button variant="outline">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Quick Response
+            </Button>
+            <Button>
+              <TrendingUpIcon className="h-4 w-4 mr-2" />
+              Improve Rating
+            </Button>
+          </div>
+        </div>
+
+        {/* Rating Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="flex items-center justify-center mb-2">
+                {renderStars(Math.floor(reviewsData.overallRating), 'lg')}
+              </div>
+              <div className="text-3xl font-bold text-primary mb-1">
+                {reviewsData.overallRating}
+              </div>
+              <div className="text-sm text-gray-600">Overall Rating</div>
+              <div className="text-xs text-green-600 mt-1">
+                {reviewsData.ratingTrend} this month
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-primary mb-2">
+                {reviewsData.totalReviews}
+              </div>
+              <div className="text-sm text-gray-600">Total Reviews</div>
+              <div className="flex items-center justify-center text-xs text-gray-500 mt-1">
+                <ArrowUpRight className="h-3 w-3 mr-1" />
+                +12 this month
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-primary mb-2">
+                {reviewsData.recentRating}
+              </div>
+              <div className="text-sm text-gray-600">Recent Rating</div>
+              <div className="text-xs text-gray-500 mt-1">
+                Last 30 days
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-primary mb-2">
+                #{reviewsData.ranking}
+              </div>
+              <div className="text-sm text-gray-600">Subject Ranking</div>
+              <div className="text-xs text-green-600 mt-1">
+                Top 5% in English
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Rating Analytics and Breakdown */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Rating Trends
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="h-48 flex items-end justify-between gap-2">
+                  {reviewsData.monthlyTrend.map((data, index) => {
+                    const height = (data.rating / 5) * 100;
+                    return (
+                      <div key={data.month} className="flex-1 flex flex-col items-center">
+                        <div className="text-xs text-gray-600 mb-2">
+                          {data.rating}
+                        </div>
+                        <div
+                          className="w-full bg-primary rounded-t transition-all duration-500 hover:bg-primary/80"
+                          style={{ height: `${height}%`, minHeight: '20px' }}
+                        ></div>
+                        <div className="text-xs font-medium mt-2">{data.month}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-green-600">{reviewsData.responseRate}%</div>
+                    <div className="text-sm text-gray-600">Response Rate</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-blue-600">4.2</div>
+                    <div className="text-sm text-gray-600">Avg. Platform</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-purple-600">+15%</div>
+                    <div className="text-sm text-gray-600">Above Average</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className="h-5 w-5" />
+                Rating Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {reviewsData.ratingDistribution.map((dist) => (
+                  <div key={dist.stars} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{dist.stars}</span>
+                        <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                      </div>
+                      <span className="text-sm text-gray-600">{dist.count}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="h-2 bg-yellow-500 rounded-full transition-all duration-500"
+                        style={{ width: `${dist.percentage}%` }}
+                      ></div>
+                    </div>
+                    <div className="text-xs text-gray-500">{dist.percentage}%</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Subject Ratings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Subject Performance
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {reviewsData.subjectRatings.map((subject) => (
+                <div key={subject.subject} className="p-4 border rounded-lg">
+                  <div className="text-center space-y-2">
+                    <h3 className="font-semibold">{subject.subject}</h3>
+                    <div className="flex items-center justify-center">
+                      {renderStars(Math.floor(subject.rating))}
+                    </div>
+                    <div className="text-2xl font-bold text-primary">{subject.rating}</div>
+                    <div className="text-sm text-gray-600">{subject.reviews} reviews</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Navigation Tabs */}
+        <Card>
+          <CardContent className="p-0">
+            <div className="flex border-b">
+              {([
+                { id: 'recent', label: 'Recent Reviews', count: recentReviews.length },
+                { id: 'all', label: 'All Reviews', count: allReviews.length },
+                { id: 'analytics', label: 'Analytics', count: 0 }
+              ] as const).map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setReviewsTab(tab.id)}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    reviewsTab === tab.id
+                      ? 'border-b-2 border-primary text-primary bg-primary/5'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  {tab.label}
+                  {tab.count > 0 && (
+                    <Badge className="ml-2" variant="secondary">{tab.count}</Badge>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Filters and Search */}
+            {reviewsTab !== 'analytics' && (
+              <div className="p-4 border-b bg-gray-50">
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Search reviews by student, content, or subject..."
+                        value={searchReviews}
+                        onChange={(e) => setSearchReviews(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border rounded-md"
+                      />
+                    </div>
+                  </div>
+                  <select
+                    value={reviewFilter}
+                    onChange={(e) => setReviewFilter(e.target.value as any)}
+                    className="p-2 border rounded-md"
+                  >
+                    <option value="all">All Ratings</option>
+                    <option value="5">5 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="2">2 Stars</option>
+                    <option value="1">1 Star</option>
+                  </select>
+                  <select
+                    value={reviewSort}
+                    onChange={(e) => setReviewSort(e.target.value as any)}
+                    className="p-2 border rounded-md"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="highest">Highest Rated</option>
+                    <option value="lowest">Lowest Rated</option>
+                  </select>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Reviews Content */}
+        {reviewsTab === 'analytics' ? (
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Quote className="h-5 w-5" />
+                  Common Keywords
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {reviewsData.commonKeywords.map((keyword, index) => (
+                    <div key={keyword.word} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-bold text-blue-600">#{index + 1}</span>
+                        </div>
+                        <span className="font-medium capitalize">{keyword.word}</span>
+                      </div>
+                      <Badge variant="outline">{keyword.count} mentions</Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Review Quality
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Verified Reviews</span>
+                  <span className="font-semibold text-green-600">94%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Average Review Length</span>
+                  <span className="font-semibold">127 words</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Response Rate</span>
+                  <span className="font-semibold text-blue-600">{reviewsData.responseRate}%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Helpful Votes</span>
+                  <span className="font-semibold">156 total</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {displayReviews.map((review) => (
+              <Card key={review.id}>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-4">
+                        <Avatar className="w-12 h-12">
+                          <AvatarImage src={review.student.image} alt={review.student.name} />
+                          <AvatarFallback>
+                            {review.student.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-semibold">{review.student.name}</h3>
+                            {review.student.verified && (
+                              <Verified className="h-4 w-4 text-blue-500" />
+                            )}
+                            <Badge variant="outline" className="text-xs">
+                              {review.student.level}
+                            </Badge>
+                          </div>
+
+                          <div className="flex items-center gap-4 mb-3">
+                            {renderStars(review.rating)}
+                            <span className="text-sm text-gray-600">
+                              {new Date(review.date).toLocaleDateString()}
+                            </span>
+                            <span className="text-sm text-gray-600">
+                              {review.lesson.subject} • {review.lesson.duration} min
+                            </span>
+                          </div>
+
+                          <div className="text-gray-700 mb-3">
+                            {review.review}
+                          </div>
+
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <button className="flex items-center gap-1 hover:text-blue-600">
+                              <ThumbsUp className="h-3 w-3" />
+                              <span>{review.helpful} helpful</span>
+                            </button>
+                            <span>•</span>
+                            <span>Lesson: {new Date(review.lesson.date).toLocaleDateString()}</span>
+                          </div>
+
+                          {review.replied && review.response && (
+                            <div className="mt-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Reply className="h-4 w-4 text-blue-600" />
+                                <span className="text-sm font-medium text-blue-900">Your Response</span>
+                              </div>
+                              <p className="text-sm text-blue-800">{review.response}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        {!review.replied && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedReview(review);
+                              setShowReplyModal(true);
+                            }}
+                          >
+                            <Reply className="h-4 w-4 mr-1" />
+                            Reply
+                          </Button>
+                        )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem>
+                              <Flag className="h-4 w-4 mr-2" />
+                              Report Review
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <MessageCircle className="h-4 w-4 mr-2" />
+                              Message Student
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Share className="h-4 w-4 mr-2" />
+                              Share Review
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Reply Modal */}
+        {showReplyModal && selectedReview && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-lg">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Reply to Review</h2>
+                <Button variant="outline" size="sm" onClick={() => setShowReplyModal(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-medium">{selectedReview.student.name}</span>
+                    {renderStars(selectedReview.rating, 'sm')}
+                  </div>
+                  <p className="text-sm text-gray-700">{selectedReview.review}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Your Response</label>
+                  <textarea
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    placeholder="Thank the student for their feedback and address any points they mentioned..."
+                    className="w-full p-3 border rounded-md min-h-[100px] resize-none"
+                  />
+                  <div className="text-xs text-gray-500">
+                    Keep your response professional, positive, and helpful. Students can see all replies.
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <Button variant="outline" onClick={() => setShowReplyModal(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => { setShowReplyModal(false); setReplyText(''); }}>
+                  <Send className="h-4 w-4 mr-2" />
+                  Send Reply
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderPlaceholderSection = (title: string, description: string) => (
     <div className="space-y-6">
       <div>
@@ -3038,7 +3760,7 @@ export default function TeacherDashboard() {
       case "earnings":
         return renderEarningsManagement();
       case "reviews":
-        return renderPlaceholderSection("Reviews & Ratings", "Monitor student reviews and ratings");
+        return renderReviewsManagement();
       case "settings":
         return renderPlaceholderSection("Settings", "Manage your account settings and preferences");
       default:
