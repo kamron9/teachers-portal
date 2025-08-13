@@ -246,9 +246,9 @@ export default function TeacherDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {upcomingLessons.length > 0 ? (
+          {mockBookings.filter(b => b.status === 'confirmed').length > 0 ? (
             <div className="space-y-4">
-              {upcomingLessons.map((lesson) => (
+              {mockBookings.filter(b => b.status === 'confirmed').map((lesson) => (
                 <div key={lesson.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center gap-4">
                     <Avatar className="w-12 h-12">
