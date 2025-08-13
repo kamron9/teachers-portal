@@ -25,6 +25,25 @@ export default function TeacherDashboard() {
   const [activeSection, setActiveSection] = useState("overview");
   const navigate = useNavigate();
 
+  // Profile management state - moved to top level to follow Rules of Hooks
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState({
+    firstName: "Aziza",
+    lastName: "Karimova",
+    email: "aziza@example.com",
+    phone: "+998901234567",
+    location: "Tashkent, Uzbekistan",
+    title: "English Language Expert & IELTS Specialist",
+    bio: "Certified English teacher with extensive experience in IELTS preparation and business communication. I help students achieve their language goals through personalized lessons and proven methodologies.",
+    experience: "5+ years",
+    education: "Masters in English Literature - National University of Uzbekistan\nTESOL Certification - British Council\nIELTS Teacher Training Certificate",
+    subjects: ["English", "IELTS", "Business English", "Conversation Practice"],
+    hourlyRate: "50000",
+    languages: ["Uzbek", "English", "Russian"]
+  });
+  const [profileImage, setProfileImage] = useState("/placeholder.svg");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
   // Mock teacher data
   const teacher = {
     name: "Aziza Karimova",
