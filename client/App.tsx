@@ -26,37 +26,44 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/teachers" element={<Teachers />} />
-        <Route path="/teacher/:id" element={<TeacherProfile />} />
-        <Route path="/teacher-register" element={<TeacherRegister />} />
-        <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
-        <Route path="/teacher-profile" element={<TeacherProfile />} />
-        <Route path="/teacher-schedule" element={<TeacherSchedule />} />
-        <Route path="/student-register" element={<StudentRegister />} />
-        <Route path="/student-profile" element={<StudentProfile />} />
-        <Route path="/student-dashboard" element={<StudentDashboard />} />
-        <Route path="/book-lesson/:teacherId" element={<BookLesson />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/review/:lessonId" element={<ReviewTeacher />} />
-        <Route path="/subjects" element={<PlaceholderPage title="Subjects" description="Browse all available subjects and find the perfect tutor for your learning goals." />} />
-        <Route path="/how-it-works" element={<PlaceholderPage title="How It Works" description="Learn how our platform connects students with expert teachers for effective online learning." />} />
-        <Route path="/pricing" element={<PlaceholderPage title="Pricing" description="Transparent pricing with no hidden fees. Pay as you learn with flexible payment options." />} />
-        <Route path="/login" element={<PlaceholderPage title="Login" description="Sign in to your account to access your lessons and connect with teachers." />} />
-        <Route path="/register" element={<StudentRegister />} />
-        <Route path="/teacher-signup" element={<TeacherRegister />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+const App = () => {
+  const isAdminRoute = window.location.pathname.startsWith('/admin');
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        {!isAdminRoute && <Header />}
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/teachers" element={<Teachers />} />
+          <Route path="/teacher/:id" element={<TeacherProfile />} />
+          <Route path="/teacher-register" element={<TeacherRegister />} />
+          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+          <Route path="/teacher-profile" element={<TeacherProfile />} />
+          <Route path="/teacher-schedule" element={<TeacherSchedule />} />
+          <Route path="/student-register" element={<StudentRegister />} />
+          <Route path="/student-profile" element={<StudentProfile />} />
+          <Route path="/student-dashboard" element={<StudentDashboard />} />
+          <Route path="/book-lesson/:teacherId" element={<BookLesson />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/review/:lessonId" element={<ReviewTeacher />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admin-users" element={<AdminUsers />} />
+          <Route path="/subjects" element={<PlaceholderPage title="Subjects" description="Browse all available subjects and find the perfect tutor for your learning goals." />} />
+          <Route path="/how-it-works" element={<PlaceholderPage title="How It Works" description="Learn how our platform connects students with expert teachers for effective online learning." />} />
+          <Route path="/pricing" element={<PlaceholderPage title="Pricing" description="Transparent pricing with no hidden fees. Pay as you learn with flexible payment options." />} />
+          <Route path="/login" element={<PlaceholderPage title="Login" description="Sign in to your account to access your lessons and connect with teachers." />} />
+          <Route path="/register" element={<StudentRegister />} />
+          <Route path="/teacher-signup" element={<TeacherRegister />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
 
 createRoot(document.getElementById("root")!).render(<App />);
