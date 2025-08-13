@@ -18,6 +18,9 @@ import StudentDashboard from "./pages/StudentDashboard";
 import BookLesson from "./pages/BookLesson";
 import Payment from "./pages/Payment";
 import ReviewTeacher from "./pages/ReviewTeacher";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 
