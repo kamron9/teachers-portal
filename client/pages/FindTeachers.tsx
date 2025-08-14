@@ -316,11 +316,11 @@ export default function FindTeachers() {
           <Breadcrumb className="mb-4">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                <BCLink href="/">Home</BCLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/subjects">Subjects</BreadcrumbLink>
+                <BCLink href="/subjects">Subjects</BCLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
