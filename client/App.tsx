@@ -61,7 +61,7 @@ const App = () => {
           <Route path="/admin-users" element={<AdminUsers />} />
           <Route path="/subjects" element={<Subjects />} />
           <Route path="/how-it-works" element={<PlaceholderPage title="How It Works" description="Learn how our platform connects students with expert teachers for effective online learning." />} />
-          <Route path="/pricing" element={<PlaceholderPage title="Pricing" description="Transparent pricing with no hidden fees. Pay as you learn with flexible payment options." />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<StudentRegister />} />
           <Route path="/teacher-signup" element={<TeacherRegister />} />
