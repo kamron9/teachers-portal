@@ -454,9 +454,11 @@ export default function Subjects() {
         </div>
 
         <div className="mt-6 flex gap-2">
-          <Button className="flex-1">
-            Find Teachers
-          </Button>
+          <Link to={`/find-teachers/${subject.id}`} className="flex-1">
+            <Button className="w-full">
+              Find Teachers
+            </Button>
+          </Link>
           <Button variant="outline" size="sm">
             <Heart className="h-4 w-4" />
           </Button>
