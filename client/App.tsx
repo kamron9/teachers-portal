@@ -15,6 +15,7 @@ import TeacherSchedule from "./pages/TeacherSchedule";
 import StudentRegister from "./pages/StudentRegister";
 import StudentProfile from "./pages/StudentProfile";
 import StudentDashboard from "./pages/StudentDashboard";
+import StudentReviews from "./pages/StudentReviews";
 import BookLesson from "./pages/BookLesson";
 import Payment from "./pages/Payment";
 import ReviewTeacher from "./pages/ReviewTeacher";
