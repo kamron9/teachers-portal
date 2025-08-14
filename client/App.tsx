@@ -54,7 +54,7 @@ const App = () => {
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/admin-users" element={<AdminUsers />} />
-          <Route path="/subjects" element={<PlaceholderPage title="Subjects" description="Browse all available subjects and find the perfect tutor for your learning goals." />} />
+          <Route path="/subjects" element={<Subjects />} />
           <Route path="/how-it-works" element={<PlaceholderPage title="How It Works" description="Learn how our platform connects students with expert teachers for effective online learning." />} />
           <Route path="/pricing" element={<PlaceholderPage title="Pricing" description="Transparent pricing with no hidden fees. Pay as you learn with flexible payment options." />} />
           <Route path="/login" element={<Login />} />
