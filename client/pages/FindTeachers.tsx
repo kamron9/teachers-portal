@@ -1,17 +1,48 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
-  Star, MapPin, Clock, Filter, Search, ChevronDown, Heart, MessageCircle,
-  CheckCircle, Globe, Award, Calendar, DollarSign, Users, ArrowLeft,
-  BookOpen, Video, Zap, Target, SortAsc, SortDesc
+  Star,
+  MapPin,
+  Clock,
+  Filter,
+  Search,
+  ChevronDown,
+  Heart,
+  MessageCircle,
+  CheckCircle,
+  Globe,
+  Award,
+  Calendar,
+  DollarSign,
+  Users,
+  ArrowLeft,
+  BookOpen,
+  Video,
+  Zap,
+  Target,
+  SortAsc,
+  SortDesc,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink as BCLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink as BCLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +53,7 @@ import {
 export default function FindTeachers() {
   const { subject } = useParams<{ subject: string }>();
   const navigate = useNavigate();
-  
+
   // Filter and search state
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState("all");
@@ -37,51 +68,54 @@ export default function FindTeachers() {
     algebra: {
       name: "Algebra",
       category: "Mathematics",
-      description: "Master algebraic equations, functions, and problem-solving techniques",
-      icon: "🔢"
+      description:
+        "Master algebraic equations, functions, and problem-solving techniques",
+      icon: "🔢",
     },
     calculus: {
       name: "Calculus",
-      category: "Mathematics", 
-      description: "Differential and integral calculus for advanced mathematics",
-      icon: "📊"
+      category: "Mathematics",
+      description:
+        "Differential and integral calculus for advanced mathematics",
+      icon: "📊",
     },
     geometry: {
       name: "Geometry",
       category: "Mathematics",
-      description: "Shapes, angles, proofs, and spatial reasoning", 
-      icon: "📐"
+      description: "Shapes, angles, proofs, and spatial reasoning",
+      icon: "📐",
     },
     physics: {
       name: "Physics",
       category: "Sciences",
-      description: "Mechanics, thermodynamics, electromagnetism, and quantum physics",
-      icon: "⚛️"
+      description:
+        "Mechanics, thermodynamics, electromagnetism, and quantum physics",
+      icon: "⚛️",
     },
     chemistry: {
-      name: "Chemistry", 
+      name: "Chemistry",
       category: "Sciences",
       description: "Organic, inorganic, and physical chemistry concepts",
-      icon: "🧪"
+      icon: "🧪",
     },
     biology: {
       name: "Biology",
-      category: "Sciences", 
+      category: "Sciences",
       description: "Cell biology, genetics, ecology, and human anatomy",
-      icon: "🧬"
+      icon: "🧬",
     },
     english: {
       name: "English",
       category: "Languages",
       description: "Grammar, literature, writing, and communication skills",
-      icon: "📚"
+      icon: "📚",
     },
     spanish: {
       name: "Spanish",
       category: "Languages",
       description: "Conversational Spanish, grammar, and cultural immersion",
-      icon: "🇪🇸"
-    }
+      icon: "🇪🇸",
+    },
   };
 
   // Mock teachers data - in real app this would come from API
@@ -104,12 +138,16 @@ export default function FindTeachers() {
       responseTime: "Usually responds within 1 hour",
       completedLessons: 450,
       badges: ["Top Rated", "Quick Responder"],
-      specializations: ["Exam Preparation", "University Level", "Problem Solving"]
+      specializations: [
+        "Exam Preparation",
+        "University Level",
+        "Problem Solving",
+      ],
     },
     {
       id: 2,
       name: "Prof. Ahmed Hassan",
-      image: "/placeholder.svg", 
+      image: "/placeholder.svg",
       rating: 4.8,
       totalStudents: 98,
       subjects: ["physics", "chemistry"],
@@ -124,7 +162,7 @@ export default function FindTeachers() {
       responseTime: "Usually responds within 2 hours",
       completedLessons: 380,
       badges: ["Expert", "University Professor"],
-      specializations: ["Research Methods", "Advanced Topics", "Lab Work"]
+      specializations: ["Research Methods", "Advanced Topics", "Lab Work"],
     },
     {
       id: 3,
@@ -135,7 +173,7 @@ export default function FindTeachers() {
       subjects: ["biology", "chemistry"],
       hourlyRate: 55000,
       experience: 6,
-      location: "Tashkent", 
+      location: "Tashkent",
       languages: ["English", "Spanish", "Uzbek"],
       verified: true,
       online: true,
@@ -144,7 +182,7 @@ export default function FindTeachers() {
       responseTime: "Usually responds within 30 minutes",
       completedLessons: 320,
       badges: ["Fast Responder", "Medical Background"],
-      specializations: ["Medical Prep", "Life Sciences", "Lab Techniques"]
+      specializations: ["Medical Prep", "Life Sciences", "Lab Techniques"],
     },
     {
       id: 4,
@@ -161,10 +199,10 @@ export default function FindTeachers() {
       online: true,
       bio: "Native English speaker with TESOL certification. Specializes in conversational practice and exam preparation.",
       availability: "Available today",
-      responseTime: "Usually responds within 1 hour", 
+      responseTime: "Usually responds within 1 hour",
       completedLessons: 520,
       badges: ["Native Speaker", "TESOL Certified"],
-      specializations: ["Conversation", "IELTS Prep", "Business English"]
+      specializations: ["Conversation", "IELTS Prep", "Business English"],
     },
     {
       id: 5,
@@ -184,7 +222,7 @@ export default function FindTeachers() {
       responseTime: "Usually responds within 3 hours",
       completedLessons: 280,
       badges: ["Patient Teacher", "Foundation Builder"],
-      specializations: ["Basic Math", "Confidence Building", "School Support"]
+      specializations: ["Basic Math", "Confidence Building", "School Support"],
     },
     {
       id: 6,
@@ -204,23 +242,26 @@ export default function FindTeachers() {
       responseTime: "Usually responds within 1 hour",
       completedLessons: 410,
       badges: ["PhD Holder", "Industry Expert"],
-      specializations: ["Applied Physics", "Engineering Prep", "Research"]
-    }
+      specializations: ["Applied Physics", "Engineering Prep", "Research"],
+    },
   ];
 
   // Get current subject info
   const currentSubject = subject ? subjectInfo[subject] : null;
 
   // Filter teachers based on subject and other criteria
-  const filteredTeachers = allTeachers.filter(teacher => {
+  const filteredTeachers = allTeachers.filter((teacher) => {
     // Filter by subject
     if (subject && !teacher.subjects.includes(subject)) {
       return false;
     }
 
     // Filter by search query
-    if (searchQuery && !teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) && 
-        !teacher.bio.toLowerCase().includes(searchQuery.toLowerCase())) {
+    if (
+      searchQuery &&
+      !teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !teacher.bio.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
       return false;
     }
 
@@ -253,7 +294,11 @@ export default function FindTeachers() {
       if (availability === "online" && !teacher.online) {
         return false;
       }
-      if (availability === "today" && !teacher.availability.includes("today") && !teacher.availability.includes("now")) {
+      if (
+        availability === "today" &&
+        !teacher.availability.includes("today") &&
+        !teacher.availability.includes("now")
+      ) {
         return false;
       }
     }
@@ -264,7 +309,7 @@ export default function FindTeachers() {
   // Sort teachers
   const sortedTeachers = [...filteredTeachers].sort((a, b) => {
     let aValue, bValue;
-    
+
     switch (sortBy) {
       case "rating":
         aValue = a.rating;
@@ -294,8 +339,12 @@ export default function FindTeachers() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Subject Not Found</h1>
-          <p className="text-gray-600 mb-6">The subject you're looking for doesn't exist.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Subject Not Found
+          </h1>
+          <p className="text-gray-600 mb-6">
+            The subject you're looking for doesn't exist.
+          </p>
           <Link to="/subjects">
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -333,12 +382,20 @@ export default function FindTeachers() {
           <div className="flex items-center gap-4 mb-6">
             <div className="text-4xl">{currentSubject.icon}</div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{currentSubject.name} Teachers</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {currentSubject.name} Teachers
+              </h1>
               <p className="text-gray-600">{currentSubject.description}</p>
               <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                 <span>{sortedTeachers.length} teachers available</span>
                 <span>•</span>
-                <span>Starting from {Math.min(...sortedTeachers.map(t => t.hourlyRate)).toLocaleString()} UZS/hour</span>
+                <span>
+                  Starting from{" "}
+                  {Math.min(
+                    ...sortedTeachers.map((t) => t.hourlyRate),
+                  ).toLocaleString()}{" "}
+                  UZS/hour
+                </span>
               </div>
             </div>
           </div>
@@ -359,7 +416,9 @@ export default function FindTeachers() {
               <CardContent className="space-y-6">
                 {/* Search */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Search Teachers</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Search Teachers
+                  </label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
@@ -373,7 +432,9 @@ export default function FindTeachers() {
 
                 {/* Price Range */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Price Range (UZS/hour)</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Price Range (UZS/hour)
+                  </label>
                   <Select value={priceRange} onValueChange={setPriceRange}>
                     <SelectTrigger>
                       <SelectValue placeholder="Any Price" />
@@ -381,8 +442,12 @@ export default function FindTeachers() {
                     <SelectContent>
                       <SelectItem value="all">Any Price</SelectItem>
                       <SelectItem value="0-40000">Under 40,000</SelectItem>
-                      <SelectItem value="40000-60000">40,000 - 60,000</SelectItem>
-                      <SelectItem value="60000-80000">60,000 - 80,000</SelectItem>
+                      <SelectItem value="40000-60000">
+                        40,000 - 60,000
+                      </SelectItem>
+                      <SelectItem value="60000-80000">
+                        60,000 - 80,000
+                      </SelectItem>
                       <SelectItem value="80000-999999">Above 80,000</SelectItem>
                     </SelectContent>
                   </Select>
@@ -390,7 +455,9 @@ export default function FindTeachers() {
 
                 {/* Experience */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Experience</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Experience
+                  </label>
                   <Select value={experience} onValueChange={setExperience}>
                     <SelectTrigger>
                       <SelectValue placeholder="Any Experience" />
@@ -406,7 +473,9 @@ export default function FindTeachers() {
 
                 {/* Rating */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Minimum Rating</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Minimum Rating
+                  </label>
                   <Select value={rating} onValueChange={setRating}>
                     <SelectTrigger>
                       <SelectValue placeholder="Any Rating" />
@@ -422,7 +491,9 @@ export default function FindTeachers() {
 
                 {/* Availability */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Availability</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Availability
+                  </label>
                   <Select value={availability} onValueChange={setAvailability}>
                     <SelectTrigger>
                       <SelectValue placeholder="Any Time" />
@@ -436,8 +507,8 @@ export default function FindTeachers() {
                 </div>
 
                 {/* Clear Filters */}
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full"
                   onClick={() => {
                     setSearchQuery("");
@@ -458,7 +529,12 @@ export default function FindTeachers() {
             {/* Sort Controls */}
             <div className="flex items-center justify-between mb-6">
               <div className="text-sm text-gray-600">
-                Showing {sortedTeachers.length} of {allTeachers.filter(t => t.subjects.includes(subject || "")).length} teachers
+                Showing {sortedTeachers.length} of{" "}
+                {
+                  allTeachers.filter((t) => t.subjects.includes(subject || ""))
+                    .length
+                }{" "}
+                teachers
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Sort by:</span>
@@ -476,9 +552,15 @@ export default function FindTeachers() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
                 >
-                  {sortOrder === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+                  {sortOrder === "asc" ? (
+                    <SortAsc className="h-4 w-4" />
+                  ) : (
+                    <SortDesc className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -486,7 +568,10 @@ export default function FindTeachers() {
             {/* Teachers Grid */}
             <div className="space-y-6">
               {sortedTeachers.map((teacher) => (
-                <Card key={teacher.id} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={teacher.id}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardContent className="p-6">
                     <div className="flex gap-6">
                       {/* Teacher Avatar */}
@@ -494,7 +579,10 @@ export default function FindTeachers() {
                         <Avatar className="w-20 h-20">
                           <AvatarImage src={teacher.image} alt={teacher.name} />
                           <AvatarFallback>
-                            {teacher.name.split(' ').map(n => n[0]).join('')}
+                            {teacher.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
                           </AvatarFallback>
                         </Avatar>
                         {teacher.online && (
@@ -509,7 +597,9 @@ export default function FindTeachers() {
                         <div className="flex items-start justify-between mb-3">
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className="text-xl font-semibold text-gray-900">{teacher.name}</h3>
+                              <h3 className="text-xl font-semibold text-gray-900">
+                                {teacher.name}
+                              </h3>
                               {teacher.verified && (
                                 <CheckCircle className="h-5 w-5 text-blue-500" />
                               )}
@@ -517,7 +607,9 @@ export default function FindTeachers() {
                             <div className="flex items-center gap-4 text-sm text-gray-600">
                               <div className="flex items-center gap-1">
                                 <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                                <span className="font-medium">{teacher.rating}</span>
+                                <span className="font-medium">
+                                  {teacher.rating}
+                                </span>
                                 <span>({teacher.totalStudents} students)</span>
                               </div>
                               <div className="flex items-center gap-1">
@@ -534,26 +626,38 @@ export default function FindTeachers() {
                             <div className="text-2xl font-bold text-primary">
                               {teacher.hourlyRate.toLocaleString()} UZS
                             </div>
-                            <div className="text-sm text-gray-600">per hour</div>
+                            <div className="text-sm text-gray-600">
+                              per hour
+                            </div>
                           </div>
                         </div>
 
                         {/* Badges */}
                         <div className="flex flex-wrap gap-1 mb-3">
                           {teacher.badges.map((badge, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
+                            <Badge
+                              key={index}
+                              variant="secondary"
+                              className="text-xs"
+                            >
                               {badge}
                             </Badge>
                           ))}
                         </div>
 
                         {/* Bio */}
-                        <p className="text-gray-700 mb-3 line-clamp-2">{teacher.bio}</p>
+                        <p className="text-gray-700 mb-3 line-clamp-2">
+                          {teacher.bio}
+                        </p>
 
                         {/* Specializations */}
                         <div className="flex flex-wrap gap-1 mb-4">
                           {teacher.specializations.map((spec, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {spec}
                             </Badge>
                           ))}
@@ -581,7 +685,10 @@ export default function FindTeachers() {
 
                         {/* Action Buttons */}
                         <div className="flex gap-3">
-                          <Link to={`/book-lesson/${teacher.id}`} className="flex-1">
+                          <Link
+                            to={`/book-lesson/${teacher.id}`}
+                            className="flex-1"
+                          >
                             <Button className="w-full">
                               <Video className="h-4 w-4 mr-2" />
                               Book Trial Lesson
@@ -608,11 +715,14 @@ export default function FindTeachers() {
                 <div className="text-gray-400 mb-4">
                   <Users className="h-16 w-16 mx-auto" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No teachers found</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  No teachers found
+                </h3>
                 <p className="text-gray-600 mb-4">
-                  Try adjusting your filters or search terms to find more teachers.
+                  Try adjusting your filters or search terms to find more
+                  teachers.
                 </p>
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => {
                     setSearchQuery("");
