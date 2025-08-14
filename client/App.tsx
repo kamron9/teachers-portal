@@ -32,7 +32,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const isAdminRoute = window.location.pathname.startsWith('/admin');
+  const isAdminRoute = window.location.pathname.startsWith("/admin");
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -60,7 +60,15 @@ const App = () => {
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/admin-users" element={<AdminUsers />} />
           <Route path="/subjects" element={<Subjects />} />
-          <Route path="/how-it-works" element={<PlaceholderPage title="How It Works" description="Learn how our platform connects students with expert teachers for effective online learning." />} />
+          <Route
+            path="/how-it-works"
+            element={
+              <PlaceholderPage
+                title="How It Works"
+                description="Learn how our platform connects students with expert teachers for effective online learning."
+              />
+            }
+          />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<StudentRegister />} />
