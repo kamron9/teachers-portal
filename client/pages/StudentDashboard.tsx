@@ -567,6 +567,405 @@ export default function StudentDashboard() {
     </div>
   );
 
+  const renderBookings = () => (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">My Bookings</h1>
+          <p className="text-gray-600">Manage your lesson bookings and schedule</p>
+        </div>
+        <div className="flex gap-3">
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Export Schedule
+          </Button>
+          <Button onClick={() => setActiveSection("find-teachers")}>
+            <Plus className="h-4 w-4 mr-2" />
+            Book New Lesson
+          </Button>
+        </div>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary mb-1">{upcomingBookings.length}</div>
+            <div className="text-sm text-gray-600">Upcoming Lessons</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary mb-1">{student.totalLessons}</div>
+            <div className="text-sm text-gray-600">Total Lessons</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary mb-1">2</div>
+            <div className="text-sm text-gray-600">This Week</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary mb-1">1</div>
+            <div className="text-sm text-gray-600">Pending Confirmation</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Upcoming Bookings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Upcoming Lessons
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {upcomingBookings.map((booking) => (
+              <div key={booking.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="w-14 h-14">
+                      <AvatarImage src={booking.teacher.image} alt={booking.teacher.name} />
+                      <AvatarFallback>
+                        {booking.teacher.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg">{booking.teacher.name}</h3>
+                      <div className="text-gray-600">{booking.subject}</div>
+                      <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(booking.date).toLocaleDateString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {booking.time} ({booking.duration} min)
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <DollarSign className="h-3 w-3" />
+                          {booking.price.toLocaleString()} UZS
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Badge className={`${
+                      booking.status === 'confirmed'
+                        ? 'bg-green-100 text-green-800'
+                        : booking.status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {booking.status}
+                    </Badge>
+
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <MessageCircle className="h-4 w-4 mr-1" />
+                        Message
+                      </Button>
+
+                      {booking.status === 'confirmed' && booking.meetingLink && (
+                        <Button size="sm">
+                          <Video className="h-4 w-4 mr-1" />
+                          Join Lesson
+                        </Button>
+                      )}
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>
+                            <Calendar className="h-4 w-4 mr-2" />
+                            Reschedule
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Download className="h-4 w-4 mr-2" />
+                            Download Receipt
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600">
+                            <X className="h-4 w-4 mr-2" />
+                            Cancel Booking
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <History className="h-5 w-5" />
+            Recent Activity
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+              <CheckCircle className="h-5 w-5 text-blue-600" />
+              <div className="flex-1">
+                <div className="font-medium">Lesson completed with Aziza Karimova</div>
+                <div className="text-sm text-gray-600">IELTS Preparation • 2 hours ago</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+              <Calendar className="h-5 w-5 text-green-600" />
+              <div className="flex-1">
+                <div className="font-medium">New lesson booked with Bobur Umarov</div>
+                <div className="text-sm text-gray-600">Mathematics • Tomorrow at 4:00 PM</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
+              <Clock className="h-5 w-5 text-yellow-600" />
+              <div className="flex-1">
+                <div className="font-medium">Payment processed</div>
+                <div className="text-sm text-gray-600">67,500 UZS for Mathematics lesson</div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderLessonHistory = () => (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Lesson History</h1>
+          <p className="text-gray-600">View your completed lessons and progress</p>
+        </div>
+        <div className="flex gap-3">
+          <Button variant="outline">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Export History
+          </Button>
+        </div>
+      </div>
+
+      {/* Progress Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary mb-1">{lessonHistory.length}</div>
+            <div className="text-sm text-gray-600">Completed Lessons</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary mb-1">32.5</div>
+            <div className="text-sm text-gray-600">Total Hours</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary mb-1">4.9</div>
+            <div className="text-sm text-gray-600">Avg. Rating Given</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary mb-1">{student.favoriteTeachers}</div>
+            <div className="text-sm text-gray-600">Teachers Worked With</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Lesson History */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <History className="h-5 w-5" />
+            Completed Lessons
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {lessonHistory.map((lesson) => (
+              <div key={lesson.id} className="border rounded-lg p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-4">
+                    <Avatar className="w-14 h-14">
+                      <AvatarImage src={lesson.teacher.image} alt={lesson.teacher.name} />
+                      <AvatarFallback>
+                        {lesson.teacher.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg">{lesson.teacher.name}</h3>
+                      <div className="text-gray-600 mb-2">{lesson.subject}</div>
+
+                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(lesson.date).toLocaleDateString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {lesson.time} ({lesson.duration} min)
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <DollarSign className="h-3 w-3" />
+                          {lesson.price.toLocaleString()} UZS
+                        </span>
+                      </div>
+
+                      {lesson.review && (
+                        <div className="bg-gray-50 p-3 rounded-lg mb-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-4 w-4 ${
+                                    i < lesson.rating
+                                      ? 'text-yellow-500 fill-current'
+                                      : 'text-gray-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm font-medium">Your Review</span>
+                          </div>
+                          <p className="text-sm text-gray-700">{lesson.review}</p>
+                        </div>
+                      )}
+
+                      {lesson.materials && lesson.materials.length > 0 && (
+                        <div className="space-y-2">
+                          <div className="text-sm font-medium text-gray-700">Lesson Materials:</div>
+                          <div className="flex flex-wrap gap-2">
+                            {lesson.materials.map((material, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {material}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-end gap-2">
+                    <Badge className="bg-green-100 text-green-800">
+                      {lesson.status}
+                    </Badge>
+
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-1" />
+                        Receipt
+                      </Button>
+
+                      <Button variant="outline" size="sm">
+                        <MessageCircle className="h-4 w-4 mr-1" />
+                        Message
+                      </Button>
+
+                      {!lesson.review && (
+                        <Button size="sm">
+                          <Star className="h-4 w-4 mr-1" />
+                          Review
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Learning Progress */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            Learning Progress
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h3 className="font-semibold">Subject Progress</h3>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>English</span>
+                    <span>75%</span>
+                  </div>
+                  <Progress value={75} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>IELTS Preparation</span>
+                    <span>60%</span>
+                  </div>
+                  <Progress value={60} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Business English</span>
+                    <span>45%</span>
+                  </div>
+                  <Progress value={45} className="h-2" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">Monthly Stats</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Hours This Month</span>
+                  <span className="font-medium">12.5 hours</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Lessons Completed</span>
+                  <span className="font-medium">8 lessons</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Average Rating</span>
+                  <span className="font-medium">4.9 ⭐</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Goal Progress</span>
+                  <span className="font-medium text-green-600">75%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   const renderProfile = () => (
     <div className="space-y-6">
       {/* Header */}
@@ -746,9 +1145,9 @@ export default function StudentDashboard() {
       case "profile":
         return renderProfile();
       case "bookings":
-        return renderPlaceholderSection("My Bookings", "Manage your lesson bookings and schedule");
+        return renderBookings();
       case "history":
-        return renderPlaceholderSection("Lesson History", "View your completed lessons and progress");
+        return renderLessonHistory();
       case "payments":
         return renderPlaceholderSection("Payments & Billing", "Manage your payment methods and billing");
       case "reviews":
