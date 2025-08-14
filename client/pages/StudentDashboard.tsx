@@ -1187,7 +1187,15 @@ export default function StudentDashboard() {
               return (
                 <li key={item.id}>
                   <button
-                    onClick={() => setActiveSection(item.id)}
+                    onClick={() => {
+                      if (item.id === "payments") {
+                        navigate("/student-payments");
+                      } else if (item.id === "reviews") {
+                        navigate("/student-reviews");
+                      } else {
+                        setActiveSection(item.id);
+                      }
+                    }}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
                       isActive
                         ? 'bg-primary text-white'
