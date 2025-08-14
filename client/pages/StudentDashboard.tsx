@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Search, Calendar, History, CreditCard, Star, Settings,
   User, BookOpen, Filter, MapPin, Clock, DollarSign, Heart, MessageCircle,
   Phone, Mail, ChevronRight, Award, CheckCircle, AlertCircle, Eye, Edit3,
-  LogOut, Upload, Plus, X, Download, Video, Bell, Users, TrendingUp
+  LogOut, Upload, Plus, X, Download, Video, Bell, Users, TrendingUp, MoreHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
