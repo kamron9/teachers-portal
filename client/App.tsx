@@ -18,6 +18,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import StudentReviews from "./pages/StudentReviews";
 import StudentPayments from "./pages/StudentPayments";
 import BookLesson from "./pages/BookLesson";
+import Pricing from "./pages/Pricing";
 import Payment from "./pages/Payment";
 import ReviewTeacher from "./pages/ReviewTeacher";
 import AdminLogin from "./pages/AdminLogin";
