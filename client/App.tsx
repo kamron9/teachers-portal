@@ -61,48 +61,150 @@ const App = () => {
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        {!isAdminRoute && <Header />}
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/teachers" element={<Teachers />} />
-          <Route path="/teacher/:id" element={<TeacherDetails />} />
-          <Route path="/tutor/:id" element={<TeacherDetails />} />
-          <Route path="/teacher-profile" element={<TeacherProfile />} />
-          <Route path="/teacher-register" element={<TeacherRegister />} />
-          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
-          <Route path="/teacher-schedule" element={<TeacherSchedule />} />
-          <Route path="/student-register" element={<StudentRegister />} />
-          <Route path="/student-profile" element={<StudentProfile />} />
-          <Route path="/student-dashboard" element={<StudentDashboard />} />
-          <Route path="/student-reviews" element={<StudentReviews />} />
-          <Route path="/student-payments" element={<StudentPayments />} />
-          <Route path="/book-lesson/:teacherId" element={<BookLesson />} />
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/review/:lessonId" element={<ReviewTeacher />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/admin-users" element={<AdminUsers />} />
-          <Route path="/subjects" element={<Subjects />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/find-teachers/:subject" element={<FindTeachers />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route
-            path="/how-it-works"
-            element={
-              <PlaceholderPage
-                title="How It Works"
-                description="Learn how our platform connects students with expert teachers for effective online learning."
-              />
-            }
-          />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<StudentRegister />} />
-          <Route path="/auth/register" element={<StudentRegister />} />
-          <Route path="/teacher-signup" element={<TeacherRegister />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          {!isAdminRoute && <Header />}
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/teachers" element={<Teachers />} />
+            <Route path="/teacher/:id" element={<TeacherDetails />} />
+            <Route path="/tutor/:id" element={<TeacherDetails />} />
+            <Route path="/subjects" element={<Subjects />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/find-teachers/:subject" element={<FindTeachers />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<StudentRegister />} />
+            <Route path="/auth/register" element={<StudentRegister />} />
+            <Route path="/teacher-register" element={<TeacherRegister />} />
+            <Route path="/teacher-signup" element={<TeacherRegister />} />
+            <Route
+              path="/how-it-works"
+              element={
+                <PlaceholderPage
+                  title="How It Works"
+                  description="Learn how our platform connects students with expert teachers for effective online learning."
+                />
+              }
+            />
+
+            {/* Teacher-only routes */}
+            <Route
+              path="/teacher-profile"
+              element={
+                <ProtectedRoute roles={['TEACHER']}>
+                  <TeacherProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher-dashboard"
+              element={
+                <ProtectedRoute roles={['TEACHER']}>
+                  <TeacherDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher-schedule"
+              element={
+                <ProtectedRoute roles={['TEACHER']}>
+                  <TeacherSchedule />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Student-only routes */}
+            <Route
+              path="/student-profile"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <StudentProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student-dashboard"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <StudentDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student-reviews"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <StudentReviews />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student-payments"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <StudentPayments />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Authenticated routes (any role) */}
+            <Route
+              path="/book-lesson/:teacherId"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <BookLesson />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment"
+              element={
+                <ProtectedRoute>
+                  <Payment />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/review/:lessonId"
+              element={
+                <ProtectedRoute roles={['STUDENT']}>
+                  <ReviewTeacher />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/booking"
+              element={
+                <ProtectedRoute>
+                  <Booking />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin routes */}
+            <Route path="/admin-login" element={<AdminLogin />} />
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute roles={['ADMIN']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-users"
+              element={
+                <ProtectedRoute roles={['ADMIN']}>
+                  <AdminUsers />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );
