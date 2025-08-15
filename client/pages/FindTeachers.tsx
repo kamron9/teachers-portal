@@ -134,37 +134,47 @@ export default function FindTeachers() {
           <Breadcrumb className="mb-4">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BCLink href="/">Home</BCLink>
+                <BCLink href="/">Bosh sahifa</BCLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BCLink href="/subjects">Subjects</BCLink>
+                <BCLink href="/teachers">O'qituvchilar</BCLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{currentSubject.name} Teachers</BreadcrumbPage>
-              </BreadcrumbItem>
+              {currentSubject && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{currentSubject.name}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </>
+              )}
             </BreadcrumbList>
           </Breadcrumb>
 
-          {/* Subject Header */}
+          {/* Page Header */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="text-4xl">{currentSubject.icon}</div>
+            <div className="text-4xl">{currentSubject ? '📚' : '👨‍🏫'}</div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                {currentSubject.name} Teachers
+                {pageTitle}
               </h1>
-              <p className="text-gray-600">{currentSubject.description}</p>
+              <p className="text-gray-600">{pageDescription}</p>
               <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                <span>{sortedTeachers.length} teachers available</span>
-                <span>•</span>
-                <span>
-                  Starting from{" "}
-                  {Math.min(
-                    ...sortedTeachers.map((t) => t.hourlyRate),
-                  ).toLocaleString()}{" "}
-                  UZS/hour
-                </span>
+                <span>{teachers.length} o'qituvchi mavjud</span>
+                {teachers.length > 0 && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      Boshlang'ich narx{" "}
+                      {formatPrice(
+                        Math.min(
+                          ...teachers.map((t) => t.subjectOfferings?.[0]?.pricePerHour || 0)
+                        )
+                      )}
+                      /soat
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -186,12 +196,12 @@ export default function FindTeachers() {
                 {/* Search */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Search Teachers
+                    O'qituvchi qidirish
                   </label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                      placeholder="Search by name or description..."
+                      placeholder="Ism yoki tavsif bo'yicha qidirish..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10"
@@ -199,25 +209,63 @@ export default function FindTeachers() {
                   </div>
                 </div>
 
+                {/* Subject Filter */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Fan
+                  </label>
+                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Fanni tanlang" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Barcha fanlar</SelectItem>
+                      {subjects.map((subject) => (
+                        <SelectItem key={subject.id} value={subject.id}>
+                          {subject.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Language Filter */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Til
+                  </label>
+                  <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tilni tanlang" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Barcha tillar</SelectItem>
+                      <SelectItem value="uzbek">O'zbek</SelectItem>
+                      <SelectItem value="russian">Rus</SelectItem>
+                      <SelectItem value="english">Ingliz</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Price Range */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Price Range (UZS/hour)
+                    Narx oralig'i (so'm/soat)
                   </label>
                   <Select value={priceRange} onValueChange={setPriceRange}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Any Price" />
+                      <SelectValue placeholder="Har qanday narx" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Any Price</SelectItem>
-                      <SelectItem value="0-40000">Under 40,000</SelectItem>
+                      <SelectItem value="all">Har qanday narx</SelectItem>
+                      <SelectItem value="0-40000">40,000 gacha</SelectItem>
                       <SelectItem value="40000-60000">
                         40,000 - 60,000
                       </SelectItem>
                       <SelectItem value="60000-80000">
                         60,000 - 80,000
                       </SelectItem>
-                      <SelectItem value="80000-999999">Above 80,000</SelectItem>
+                      <SelectItem value="80000-999999">80,000 dan yuqori</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -225,17 +273,17 @@ export default function FindTeachers() {
                 {/* Experience */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Experience
+                    Tajriba
                   </label>
                   <Select value={experience} onValueChange={setExperience}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Any Experience" />
+                      <SelectValue placeholder="Har qanday tajriba" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Any Experience</SelectItem>
-                      <SelectItem value="2">2+ Years</SelectItem>
-                      <SelectItem value="5">5+ Years</SelectItem>
-                      <SelectItem value="10">10+ Years</SelectItem>
+                      <SelectItem value="all">Har qanday tajriba</SelectItem>
+                      <SelectItem value="2">2+ yil</SelectItem>
+                      <SelectItem value="5">5+ yil</SelectItem>
+                      <SelectItem value="10">10+ yil</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -243,17 +291,17 @@ export default function FindTeachers() {
                 {/* Rating */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Minimum Rating
+                    Minimal reyting
                   </label>
                   <Select value={rating} onValueChange={setRating}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Any Rating" />
+                      <SelectValue placeholder="Har qanday reyting" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Any Rating</SelectItem>
-                      <SelectItem value="4.5">4.5+ Stars</SelectItem>
-                      <SelectItem value="4.7">4.7+ Stars</SelectItem>
-                      <SelectItem value="4.9">4.9+ Stars</SelectItem>
+                      <SelectItem value="all">Har qanday reyting</SelectItem>
+                      <SelectItem value="4.5">4.5+ yulduz</SelectItem>
+                      <SelectItem value="4.7">4.7+ yulduz</SelectItem>
+                      <SelectItem value="4.9">4.9+ yulduz</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -261,16 +309,16 @@ export default function FindTeachers() {
                 {/* Availability */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Availability
+                    Mavjudlik
                   </label>
                   <Select value={availability} onValueChange={setAvailability}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Any Time" />
+                      <SelectValue placeholder="Har qanday vaqt" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Any Time</SelectItem>
-                      <SelectItem value="online">Online Now</SelectItem>
-                      <SelectItem value="today">Available Today</SelectItem>
+                      <SelectItem value="all">Har qanday vaqt</SelectItem>
+                      <SelectItem value="online">Hozir onlayn</SelectItem>
+                      <SelectItem value="today">Bugun mavjud</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -281,13 +329,15 @@ export default function FindTeachers() {
                   className="w-full"
                   onClick={() => {
                     setSearchQuery("");
+                    setSelectedSubject("");
+                    setSelectedLanguage("");
                     setPriceRange("all");
                     setExperience("all");
                     setRating("all");
                     setAvailability("all");
                   }}
                 >
-                  Clear All Filters
+                  Barcha filtrlarni tozalash
                 </Button>
               </CardContent>
             </Card>
