@@ -35,6 +35,7 @@ interface SidebarItem {
 export default function TeacherDashboard() {
   const [activeSection, setActiveSection] = useState("overview");
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Profile management state - moved to top level to follow Rules of Hooks
   const [isEditing, setIsEditing] = useState(false);
@@ -3633,7 +3634,7 @@ export default function TeacherDashboard() {
                 </div>
 
                 <div className="text-xs text-gray-500">
-                  ��� Minimum payout: 100,000 UZS<br/>
+                  • Minimum payout: 100,000 UZS<br/>
                   • Processing time: 1-3 business days<br/>
                   • You'll receive a confirmation email
                 </div>
