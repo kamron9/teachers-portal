@@ -282,9 +282,9 @@ export default function Search() {
   // URL sync - TZ talabi
   useEffect(() => {
     const params = new URLSearchParams();
-    
-    if (filters.subject) params.set('subject', filters.subject);
-    if (filters.language) params.set('language', filters.language);
+
+    if (filters.subject && filters.subject !== 'all') params.set('subject', filters.subject);
+    if (filters.language && filters.language !== 'all') params.set('language', filters.language);
     if (filters.priceFrom > 0) params.set('priceFrom', filters.priceFrom.toString());
     if (filters.priceTo < 100000) params.set('priceTo', filters.priceTo.toString());
     if (filters.rating > 0) params.set('rating', filters.rating.toString());
@@ -292,7 +292,7 @@ export default function Search() {
     if (sortBy !== 'relevance') params.set('sort', sortBy);
     if (currentPage > 1) params.set('page', currentPage.toString());
     if (pageSize !== 6) params.set('pageSize', pageSize.toString());
-    
+
     setSearchParams(params);
   }, [filters, sortBy, currentPage, pageSize, setSearchParams]);
 
