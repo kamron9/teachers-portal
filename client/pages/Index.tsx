@@ -75,7 +75,7 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
 
 export default function Index() {
   const navigate = useNavigate();
-  
+
   // Search state - TZ bo'yicha SearchBar (Subject, Language, PriceFrom/To)
   const [searchData, setSearchData] = useState({
     subject: "",
@@ -83,39 +83,18 @@ export default function Index() {
     priceFrom: "",
     priceTo: ""
   });
-  
-  // Loading states - TZ talabi
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [tutors, setTutors] = useState(featuredTutors);
 
-  // Mock API call - TZ bo'yicha GET /tutors?limit=6&sort=rating_desc
-  useEffect(() => {
-    const fetchTutors = async () => {
-      try {
-        setIsLoading(true);
-        // Mock API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock error for demo (10% chance)
-        if (Math.random() < 0.1) {
-          throw new Error('API Error');
-        }
-        
-        setTutors(featuredTutors);
-        setError(false);
-      } catch (err) {
-        setError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Fetch featured teachers - TZ bo'yicha GET /teachers?limit=6&sort=rating_desc
+  const { data: teachersData, isLoading, error } = useTeacherSearch(
+    { limit: 6, sortBy: 'rating', sortOrder: 'desc' },
+    { staleTime: 1000 * 60 * 5 } // 5 minutes
+  );
 
-    fetchTutors();
-    
-    // Analytics - TZ bo'yicha home_view
-    // analytics.track('home_view');
-  }, []);
+  // Fetch subjects for search dropdown
+  const { data: subjectsData } = useSubjects({}, { staleTime: 1000 * 60 * 10 }); // 10 minutes
+
+  const tutors = teachersData?.teachers || [];
+  const subjects = subjectsData?.subjects || [];
 
   // Search handler - TZ bo'yicha /search?subject=&language=&priceFrom=&priceTo=
   const handleSearch = () => {
