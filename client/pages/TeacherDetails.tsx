@@ -56,208 +56,32 @@ import {
 
 // Interface is imported from API client
 
-const mockTeacher: TeacherData = {
-  id: "1",
-  name: "Aziza Karimova",
-  title: "English Language Expert & IELTS Specialist",
-  profileImage: "/placeholder.svg",
-  isOnline: true,
-  isVerified: true,
-  location: "Tashkent, Uzbekistan",
-  countryFlag: "🇺🇿",
-  languages: [
-    { language: "English", proficiency: "Native" },
-    { language: "Uzbek", proficiency: "Native" },
-    { language: "Russian", proficiency: "Fluent" },
-  ],
-  responseTime: "Usually responds in 2 hours",
-  rating: 4.9,
-  totalReviews: 234,
-  totalLessons: 1247,
-  studentsCount: 156,
-  experienceYears: 5,
-
-  bio: "Hello! I'm Aziza, a passionate English teacher with over 5 years of experience helping students achieve their language goals. I specialize in IELTS preparation, business English, and conversation practice. My interactive teaching style combines proven methodologies with modern technology to create engaging and effective lessons.",
-
-  teachingPhilosophy:
-    "I believe that language learning should be fun, practical, and tailored to each student's needs. My approach focuses on building confidence through real-world applications and interactive practice.",
-
-  whyITeach:
-    "Teaching allows me to share my passion for languages while helping students unlock new opportunities. There's nothing more rewarding than seeing a student achieve their language goals and gain confidence in communication.",
-
-  subjects: [
-    {
-      name: "General English",
-      price: 50000,
-      level: "All Levels",
-      format: "Online",
-      icon: "🇬🇧",
-    },
-    {
-      name: "IELTS Preparation",
-      price: 65000,
-      level: "Intermediate+",
-      format: "Online",
-      icon: "📊",
-    },
-    {
-      name: "Business English",
-      price: 70000,
-      level: "Intermediate+",
-      format: "Online",
-      icon: "💼",
-    },
-    {
-      name: "Conversation Practice",
-      price: 40000,
-      level: "All Levels",
-      format: "Online",
-      icon: "💬",
-    },
-  ],
-
-  teachingLevels: [
-    "Beginner",
-    "Elementary",
-    "Intermediate",
-    "Upper-Intermediate",
-    "Advanced",
-  ],
-  examPrep: [
-    "IELTS",
-    "TOEFL",
-    "Cambridge English",
-    "Business English Certificate",
-  ],
-
-  education: [
-    {
-      degree: "Master's in English Literature",
-      institution: "National University of Uzbekistan",
-      year: "2018",
-      verified: true,
-    },
-    {
-      degree: "Bachelor's in English Language",
-      institution: "Tashkent State University",
-      year: "2016",
-      verified: true,
-    },
-  ],
-
-  certifications: [
-    {
-      name: "TESOL Certificate",
-      issuer: "British Council",
-      year: "2019",
-      verified: true,
-    },
-    {
-      name: "IELTS Teacher Training",
-      issuer: "IDP Education",
-      year: "2020",
-      verified: true,
-    },
-    {
-      name: "Business English Certification",
-      issuer: "Cambridge English",
-      year: "2021",
-      verified: false,
-    },
-  ],
-
-  schedule: {
-    timezone: "Asia/Tashkent (UTC+5)",
-    nextAvailable: "Today at 14:00",
-    recurringSlots: [
-      "Mon 09:00-17:00",
-      "Tue 09:00-17:00",
-      "Wed 09:00-17:00",
-      "Thu 09:00-17:00",
-      "Fri 09:00-17:00",
-    ],
-  },
-
-  reviews: [
-    {
-      id: "1",
-      studentName: "John Smith",
-      studentAvatar: "/placeholder.svg",
-      rating: 5,
-      comment:
-        "Aziza is an excellent teacher! Her IELTS preparation course helped me achieve band 7.5. She's patient, knowledgeable, and always prepared with engaging materials.",
-      date: "2024-01-15",
-      subject: "IELTS Preparation",
-      lessonCount: 20,
-      helpful: 12,
-      teacherResponse:
-        "Thank you so much, John! I'm thrilled to hear about your success. Keep up the great work!",
-    },
-    {
-      id: "2",
-      studentName: "Maria Garcia",
-      studentAvatar: "/placeholder.svg",
-      rating: 5,
-      comment:
-        "Amazing teacher for business English. Really helped me improve my presentation skills and confidence in meetings.",
-      date: "2024-01-10",
-      subject: "Business English",
-      lessonCount: 15,
-      helpful: 8,
-    },
-    {
-      id: "3",
-      studentName: "Ahmed Hassan",
-      studentAvatar: "/placeholder.svg",
-      rating: 4,
-      comment:
-        "Good teacher, clear explanations. Sometimes the lessons feel a bit rushed but overall very helpful.",
-      date: "2024-01-05",
-      subject: "General English",
-      lessonCount: 8,
-      helpful: 3,
-    },
-  ],
-
-  materials: {
-    introVideo: "/sample-intro.mp4",
-    sampleLessons: ["/sample-lesson-1.mp4", "/sample-lesson-2.mp4"],
-    resources: [
-      { name: "IELTS Writing Guide", type: "PDF", url: "/ielts-guide.pdf" },
-      {
-        name: "Business English Vocabulary",
-        type: "PDF",
-        url: "/business-vocab.pdf",
-      },
-      { name: "Grammar Reference", type: "PDF", url: "/grammar-ref.pdf" },
-    ],
-  },
-
-  pricing: {
-    trialPrice: 25000,
-    regularPrice: 50000,
-    packages: [
-      { lessons: 5, price: 225000, discount: 10 },
-      { lessons: 10, price: 425000, discount: 15 },
-      { lessons: 20, price: 800000, discount: 20 },
-    ],
-  },
-};
-
 const TeacherDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [teacher, setTeacher] = useState<TeacherData | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [reviewFilter, setReviewFilter] = useState("all");
   const [isSaved, setIsSaved] = useState(false);
 
+  // Fetch teacher data
+  const { data: teacher, isLoading, error } = useTeacherById(id || '', !!id);
+
+  // Fetch teacher reviews
+  const { data: reviewsData } = useTeacherReviews(
+    id || '',
+    {
+      rating: reviewFilter !== "all" ? [parseInt(reviewFilter)] : undefined,
+      limit: 20
+    },
+    { enabled: !!id }
+  );
+
   useEffect(() => {
-    // Simulate API call
-    setTeacher(mockTeacher);
-    setSelectedSubject(mockTeacher.subjects[0]?.name || "");
-  }, [id]);
+    if (teacher?.subjectOfferings?.[0]) {
+      setSelectedSubject(teacher.subjectOfferings[0].subjectName);
+    }
+  }, [teacher]);
 
   const handleBookTrial = () => {
     if (!teacher) return;
@@ -827,7 +651,7 @@ const TeacherDetails: React.FC = () => {
                               size="sm"
                               className="mt-2 p-0 h-auto"
                             >
-                              �� Helpful ({review.helpful})
+                              👍 Helpful ({review.helpful})
                             </Button>
                           </div>
                         </div>
