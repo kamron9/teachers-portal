@@ -440,7 +440,7 @@ export default function Search() {
                           <SelectValue placeholder="Fanni tanlang" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Barcha fanlar</SelectItem>
+                          <SelectItem value="all">Barcha fanlar</SelectItem>
                           <SelectItem value="english">Ingliz tili</SelectItem>
                           <SelectItem value="math">Matematika</SelectItem>
                           <SelectItem value="physics">Fizika</SelectItem>
