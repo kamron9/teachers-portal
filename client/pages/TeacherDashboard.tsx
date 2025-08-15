@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 interface SidebarItem {
   id: string;
@@ -3632,7 +3633,7 @@ export default function TeacherDashboard() {
                 </div>
 
                 <div className="text-xs text-gray-500">
-                  • Minimum payout: 100,000 UZS<br/>
+                  ��� Minimum payout: 100,000 UZS<br/>
                   • Processing time: 1-3 business days<br/>
                   • You'll receive a confirmation email
                 </div>
