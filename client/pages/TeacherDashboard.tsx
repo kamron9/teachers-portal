@@ -233,7 +233,23 @@ export default function TeacherDashboard() {
   };
 
   const addSubject = () => {
-    if (!newSubject.name.trim()) return;
+    if (!newSubject.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Subject name is required.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (newSubject.price <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Price must be greater than 0.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     const subject = {
       ...newSubject,
@@ -249,6 +265,11 @@ export default function TeacherDashboard() {
     });
     setShowAddSubject(false);
     setHasUnsavedChanges(true);
+
+    toast({
+      title: "Subject Added",
+      description: `${subject.name} has been added to your offerings.`
+    });
   };
 
   const updateSubject = (id: string, updates: any) => {
