@@ -149,6 +149,25 @@ export function useTeacherSearch(params: {
   });
 }
 
+// Subjects Hooks
+export function useSubjects(params?: {
+  query?: string;
+  category?: string;
+  isActive?: boolean;
+  includeTeacherCount?: boolean;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}, options?: Partial<UseQueryOptions>) {
+  return useQuery({
+    queryKey: queryKeys.subjects(params),
+    queryFn: () => apiClient.getSubjects(params),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    ...options,
+  });
+}
+
 // Subject Offerings Hooks
 export function useSubjectOfferings() {
   return useQuery({
