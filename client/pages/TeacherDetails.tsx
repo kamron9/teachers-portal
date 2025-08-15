@@ -54,83 +54,7 @@ import {
   SelectValue,
 } from "../components/ui/select";
 
-interface TeacherData {
-  id: string;
-  name: string;
-  title: string;
-  profileImage: string;
-  isOnline: boolean;
-  isVerified: boolean;
-  location: string;
-  countryFlag: string;
-  languages: Array<{ language: string; proficiency: string }>;
-  responseTime: string;
-  rating: number;
-  totalReviews: number;
-  totalLessons: number;
-  studentsCount: number;
-  experienceYears: number;
-
-  bio: string;
-  teachingPhilosophy: string;
-  whyITeach: string;
-
-  subjects: Array<{
-    name: string;
-    price: number;
-    level: string;
-    format: string;
-    icon: string;
-  }>;
-
-  teachingLevels: string[];
-  examPrep: string[];
-
-  education: Array<{
-    degree: string;
-    institution: string;
-    year: string;
-    verified: boolean;
-  }>;
-
-  certifications: Array<{
-    name: string;
-    issuer: string;
-    year: string;
-    verified: boolean;
-  }>;
-
-  schedule: {
-    timezone: string;
-    nextAvailable: string;
-    recurringSlots: string[];
-  };
-
-  reviews: Array<{
-    id: string;
-    studentName: string;
-    studentAvatar: string;
-    rating: number;
-    comment: string;
-    date: string;
-    subject: string;
-    lessonCount: number;
-    helpful: number;
-    teacherResponse?: string;
-  }>;
-
-  materials: {
-    introVideo: string;
-    sampleLessons: string[];
-    resources: Array<{ name: string; type: string; url: string }>;
-  };
-
-  pricing: {
-    trialPrice: number;
-    regularPrice: number;
-    packages: Array<{ lessons: number; price: number; discount: number }>;
-  };
-}
+// Interface is imported from API client
 
 const mockTeacher: TeacherData = {
   id: "1",
@@ -903,7 +827,7 @@ const TeacherDetails: React.FC = () => {
                               size="sm"
                               className="mt-2 p-0 h-auto"
                             >
-                              👍 Helpful ({review.helpful})
+                              �� Helpful ({review.helpful})
                             </Button>
                           </div>
                         </div>
