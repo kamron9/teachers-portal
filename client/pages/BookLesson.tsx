@@ -93,17 +93,25 @@ export default function BookLesson() {
     return days;
   };
 
-  const availableSlots = {
-    "2024-01-15": ["09:00", "10:00", "14:00", "15:00", "16:00"],
-    "2024-01-16": ["09:00", "11:00", "13:00", "15:00"],
-    "2024-01-17": ["10:00", "14:00", "16:00", "17:00"],
-    "2024-01-18": ["09:00", "10:00", "11:00", "15:00", "16:00"],
-    "2024-01-19": ["14:00", "15:00", "16:00", "17:00"]
-  };
+  // Process available slots from API
+  const availableSlotsByDate = slotsData?.slots?.reduce((acc: any, slot: any) => {
+    const date = new Date(slot.startAt).toISOString().split('T')[0];
+    const time = new Date(slot.startAt).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push({ time, slot });
+    return acc;
+  }, {}) || {};
 
   const isDateAvailable = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
-    return availableSlots[dateStr]?.length > 0;
+    return availableSlotsByDate[dateStr]?.length > 0;
   };
 
   const isDateInCurrentMonth = (date: Date) => {
