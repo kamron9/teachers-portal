@@ -14,11 +14,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 const navigation = [
-  { name: "Home", href: "/" },
-  { name: "Find Teachers", href: "/teachers" },
-  { name: "Subjects", href: "/subjects" },
-  { name: "How It Works", href: "/how-it-works" },
-  { name: "Pricing", href: "/pricing" },
+  { name: "Bosh sahifa", href: "/" },
+  { name: "O'qituvchilar", href: "/teachers" },
+  { name: "Fanlar", href: "/subjects" },
+  { name: "Qanday ishlaydi", href: "/how-it-works" },
+  { name: "Narxlar", href: "/pricing" },
 ];
 
 export default function Header() {
