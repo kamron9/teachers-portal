@@ -777,55 +777,360 @@ export default function TeacherDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5" />
-              Subjects & Expertise
+              <DollarSign className="h-5 w-5" />
+              Subjects & Pricing
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="space-y-3">
-              <label className="text-sm font-medium">Languages You Teach In</label>
-              <div className="flex flex-wrap gap-2">
-                {languages.map((language) => (
-                  <Badge
-                    key={language}
-                    variant={profileData.languages.includes(language) ? "default" : "outline"}
-                    className={`cursor-pointer ${!isEditing ? 'pointer-events-none' : ''}`}
+            {/* Subject Cards Editor */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium">Subject Offerings</h4>
+                  <p className="text-sm text-muted-foreground">Add subjects you teach with individual pricing</p>
+                </div>
+                {isEditing && (
+                  <Button
+                    onClick={() => setShowAddSubject(true)}
+                    size="sm"
                   >
-                    {language}
-                  </Badge>
-                ))}
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Subject
+                  </Button>
+                )}
               </div>
+
+              {/* Subject Cards Grid */}
+              {subjectCards.length === 0 ? (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                  <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No subjects added yet</h3>
+                  <p className="text-gray-600 mb-4">
+                    Add your first subject to show students what you teach and your hourly rate.
+                  </p>
+                  {isEditing && (
+                    <Button onClick={() => setShowAddSubject(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Subject
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                  {subjectCards.map((subject, index) => (
+                    <Card
+                      key={subject.id}
+                      className="relative group hover:shadow-md transition-shadow"
+                      draggable={isEditing}
+                      onDragStart={() => setDraggedSubject(subject.id)}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={() => {
+                        if (draggedSubject && draggedSubject !== subject.id) {
+                          const dragIndex = subjectCards.findIndex(s => s.id === draggedSubject);
+                          moveSubject(dragIndex, index);
+                          setDraggedSubject(null);
+                        }
+                      }}
+                    >
+                      <CardContent className="p-4">
+                        {/* Card Header */}
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="text-2xl">
+                              {getIconEmoji(subject.icon)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              {editingSubjectId === subject.id ? (
+                                <input
+                                  className="font-medium text-base w-full border rounded px-2 py-1"
+                                  value={subject.name}
+                                  onChange={(e) => updateSubject(subject.id, { name: e.target.value })}
+                                  onBlur={() => setEditingSubjectId(null)}
+                                  onKeyPress={(e) => e.key === 'Enter' && setEditingSubjectId(null)}
+                                  autoFocus
+                                />
+                              ) : (
+                                <h4
+                                  className="font-medium text-base cursor-pointer hover:text-primary"
+                                  onClick={() => isEditing && setEditingSubjectId(subject.id)}
+                                >
+                                  {subject.name}
+                                </h4>
+                              )}
+                              <p className="text-sm text-muted-foreground">{subject.level}</p>
+                            </div>
+                          </div>
+                          {isEditing && (
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setEditingSubjectId(subject.id)}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Edit3 className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  if (confirm('Remove this subject?')) {
+                                    deleteSubject(subject.id);
+                                  }
+                                }}
+                                className="h-6 w-6 p-0 text-red-500 hover:text-red-600"
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Price */}
+                        <div className="text-right mb-3">
+                          {editingSubjectId === subject.id ? (
+                            <input
+                              type="number"
+                              className="text-lg font-bold text-right border rounded px-2 py-1 w-24"
+                              value={subject.price}
+                              onChange={(e) => updateSubject(subject.id, { price: parseInt(e.target.value) || 0 })}
+                            />
+                          ) : (
+                            <div className="text-lg font-bold">{formatPrice(subject.price)}</div>
+                          )}
+                          <div className="text-xs text-muted-foreground">per hour</div>
+                        </div>
+
+                        {/* Delivery Badge */}
+                        <div className="flex justify-between items-center">
+                          {editingSubjectId === subject.id ? (
+                            <select
+                              value={subject.delivery}
+                              onChange={(e) => updateSubject(subject.id, { delivery: e.target.value })}
+                              className="text-xs border rounded px-2 py-1"
+                            >
+                              {deliveryOptions.map(option => (
+                                <option key={option} value={option}>{option}</option>
+                              ))}
+                            </select>
+                          ) : (
+                            <Badge variant="secondary" className="text-xs">
+                              {subject.delivery}
+                            </Badge>
+                          )}
+
+                          {editingSubjectId === subject.id && (
+                            <select
+                              value={subject.icon}
+                              onChange={(e) => updateSubject(subject.id, { icon: e.target.value })}
+                              className="text-xs border rounded px-2 py-1 ml-2"
+                            >
+                              {iconOptions.map(option => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {/* Add Subject Form */}
+              {showAddSubject && isEditing && (
+                <Card className="border-2 border-primary">
+                  <CardContent className="p-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">Add New Subject</h4>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowAddSubject(false)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-sm font-medium">Subject Name *</label>
+                          <input
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            placeholder="e.g., General English"
+                            value={newSubject.name}
+                            onChange={(e) => setNewSubject(prev => ({ ...prev, name: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Level *</label>
+                          <select
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            value={newSubject.level}
+                            onChange={(e) => setNewSubject(prev => ({ ...prev, level: e.target.value }))}
+                          >
+                            {levelOptions.map(level => (
+                              <option key={level} value={level}>{level}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Price per hour (UZS) *</label>
+                          <input
+                            type="number"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            placeholder="50000"
+                            value={newSubject.price}
+                            onChange={(e) => setNewSubject(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Delivery *</label>
+                          <select
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            value={newSubject.delivery}
+                            onChange={(e) => setNewSubject(prev => ({ ...prev, delivery: e.target.value }))}
+                          >
+                            {deliveryOptions.map(option => (
+                              <option key={option} value={option}>{option}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium">Icon</label>
+                        <div className="flex gap-2 mt-2">
+                          {iconOptions.map(option => (
+                            <button
+                              key={option.value}
+                              type="button"
+                              className={`p-2 border rounded ${newSubject.icon === option.value ? 'border-primary bg-primary/10' : 'border-gray-300'}`}
+                              onClick={() => setNewSubject(prev => ({ ...prev, icon: option.value }))}
+                            >
+                              {getIconEmoji(option.value)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button onClick={addSubject} disabled={!newSubject.name.trim()}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Subject
+                        </Button>
+                        <Button variant="outline" onClick={() => setShowAddSubject(false)}>
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
-            <div className="space-y-3">
-              <label className="text-sm font-medium">Subjects You Teach</label>
-              <div className="flex flex-wrap gap-2">
-                {subjects.map((subject) => (
-                  <Badge
-                    key={subject}
-                    variant={profileData.subjects.includes(subject) ? "default" : "outline"}
-                    className={`cursor-pointer ${!isEditing ? 'pointer-events-none' : ''}`}
-                  >
-                    {subject}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            {/* Global Settings */}
+            {isEditing && (
+              <>
+                <div className="border-t pt-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium mb-3">Teaching Levels</h4>
+                      <p className="text-sm text-muted-foreground mb-3">Select all levels you can teach (shown below subject grid)</p>
+                      <div className="flex flex-wrap gap-2">
+                        {allTeachingLevels.map(level => (
+                          <Badge
+                            key={level}
+                            variant={teachingLevels.includes(level) ? "default" : "outline"}
+                            className="cursor-pointer"
+                            onClick={() => toggleTeachingLevel(level)}
+                          >
+                            {level}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Hourly Rate (UZS)</label>
-              <div className="relative">
-                <input
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm pr-12"
-                  type="number"
-                  value={profileData.hourlyRate}
-                  disabled={!isEditing}
-                  onChange={(e) => {
-                    setProfileData(prev => ({...prev, hourlyRate: e.target.value}));
-                    setHasUnsavedChanges(true);
-                  }}
-                />
-                <span className="absolute right-3 top-3 text-sm text-gray-500">UZS</span>
+                    <div>
+                      <h4 className="font-medium mb-3">Exam Preparation</h4>
+                      <p className="text-sm text-muted-foreground mb-3">Select exams you can prepare students for</p>
+                      <div className="flex flex-wrap gap-2">
+                        {allExamPreparations.map(exam => (
+                          <Badge
+                            key={exam}
+                            variant={examPreparation.includes(exam) ? "default" : "outline"}
+                            className="cursor-pointer"
+                            onClick={() => toggleExamPreparation(exam)}
+                          >
+                            {exam}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Live Preview */}
+            <div className="border-t pt-6">
+              <h4 className="font-medium mb-4">📍 Public Profile Preview</h4>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                {/* Preview Subject Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 mb-6">
+                  {subjectCards.map(subject => (
+                    <Card key={subject.id} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{getIconEmoji(subject.icon)}</span>
+                            <div>
+                              <h4 className="font-medium">{subject.name}</h4>
+                              <p className="text-sm text-muted-foreground">{subject.level}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold">{formatPrice(subject.price)}</div>
+                            <div className="text-xs text-muted-foreground">per hour</div>
+                          </div>
+                        </div>
+                        <Badge variant="secondary" className="text-xs">
+                          {subject.delivery}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Preview Chip Groups */}
+                {(teachingLevels.length > 0 || examPreparation.length > 0) && (
+                  <div className="space-y-4">
+                    {teachingLevels.length > 0 && (
+                      <div>
+                        <h4 className="font-medium mb-2">Teaching Levels</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {teachingLevels.map(level => (
+                            <Badge key={level} variant="outline">{level}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {examPreparation.length > 0 && (
+                      <div>
+                        <h4 className="font-medium mb-2">Exam Preparation</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {examPreparation.map(exam => (
+                            <Badge key={exam} variant="outline">{exam}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
