@@ -8,6 +8,7 @@ import Header from "./components/Header";
 import Index from "./pages/Index";
 import Teachers from "./pages/Teachers";
 import TeacherProfile from "./pages/TeacherProfile";
+import TeacherDetails from "./pages/TeacherDetails";
 import TeacherRegister from "./pages/TeacherRegister";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import TeacherSchedule from "./pages/TeacherSchedule";
@@ -26,6 +27,8 @@ import AdminUsers from "./pages/AdminUsers";
 import Login from "./pages/Login";
 import Subjects from "./pages/Subjects";
 import FindTeachers from "./pages/FindTeachers";
+import Search from "./pages/Search";
+import Booking from "./pages/Booking";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 
@@ -43,10 +46,11 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/teachers" element={<Teachers />} />
-          <Route path="/teacher/:id" element={<TeacherProfile />} />
+          <Route path="/teacher/:id" element={<TeacherDetails />} />
+          <Route path="/tutor/:id" element={<TeacherDetails />} />
+          <Route path="/teacher-profile" element={<TeacherProfile />} />
           <Route path="/teacher-register" element={<TeacherRegister />} />
           <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
-          <Route path="/teacher-profile" element={<TeacherProfile />} />
           <Route path="/teacher-schedule" element={<TeacherSchedule />} />
           <Route path="/student-register" element={<StudentRegister />} />
           <Route path="/student-profile" element={<StudentProfile />} />
@@ -60,7 +64,9 @@ const App = () => {
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/admin-users" element={<AdminUsers />} />
           <Route path="/subjects" element={<Subjects />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/find-teachers/:subject" element={<FindTeachers />} />
+          <Route path="/booking" element={<Booking />} />
           <Route
             path="/how-it-works"
             element={
@@ -73,6 +79,7 @@ const App = () => {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<StudentRegister />} />
+          <Route path="/auth/register" element={<StudentRegister />} />
           <Route path="/teacher-signup" element={<TeacherRegister />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -11,13 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const navigation = [
-  { name: "Home", href: "/" },
-  { name: "Find Teachers", href: "/teachers" },
-  { name: "Subjects", href: "/subjects" },
-  { name: "How It Works", href: "/how-it-works" },
-  { name: "Pricing", href: "/pricing" },
+  { name: "Bosh sahifa", href: "/" },
+  { name: "O'qituvchilar", href: "/teachers" },
+  { name: "Fanlar", href: "/subjects" },
+  { name: "Qanday ishlaydi", href: "/how-it-works" },
+  { name: "Narxlar", href: "/pricing" },
 ];
 
 export default function Header() {
@@ -54,8 +55,9 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Right side - Auth buttons or user menu */}
+          {/* Right side - Language switcher and Auth buttons or user menu */}
           <div className="hidden md:flex items-center space-x-4">
+            <LanguageSwitcher />
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -102,13 +104,13 @@ export default function Header() {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost">Log in</Button>
+                  <Button variant="ghost">Kirish</Button>
                 </Link>
                 <Link to="/register">
-                  <Button>Sign up</Button>
+                  <Button>Ro'yxatdan o'tish</Button>
                 </Link>
                 <Link to="/teacher-signup">
-                  <Button variant="outline">Teach on TutorUZ</Button>
+                  <Button variant="outline">O'qituvchi bo'ling</Button>
                 </Link>
               </>
             )}

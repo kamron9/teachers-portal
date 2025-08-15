@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, Filter, Star, Video, MessageCircle, Heart, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,6 +117,7 @@ const subjects = [
 const languages = ["All Languages", "Uzbek", "English", "Russian", "Arabic"];
 
 export default function Teachers() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("All Subjects");
   const [selectedLanguage, setSelectedLanguage] = useState("All Languages");
@@ -328,7 +330,23 @@ export default function Teachers() {
                           <MessageCircle className="h-4 w-4 mr-1" />
                           Message
                         </Button>
-                        <Button size="sm">
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            const params = new URLSearchParams({
+                              tutorId: teacher.id.toString(),
+                              tutorName: teacher.name,
+                              tutorAvatar: teacher.avatar || '',
+                              tutorRating: teacher.rating.toString(),
+                              subject: teacher.subject,
+                              slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+                              slotEnd: new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString(), // +1 hour
+                              price: teacher.price.toString(),
+                              serviceFee: '0'
+                            });
+                            navigate(`/booking?${params.toString()}`);
+                          }}
+                        >
                           <Video className="h-4 w-4 mr-1" />
                           Book Trial
                         </Button>
