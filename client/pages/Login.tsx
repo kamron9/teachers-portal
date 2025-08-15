@@ -20,6 +20,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const navigate = useNavigate();
+  const { login } = useAuth();
   
   const [credentials, setCredentials] = useState({
     email: '',
