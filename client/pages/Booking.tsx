@@ -161,34 +161,33 @@ const Booking: React.FC = () => {
     }
 
     // Analytics: payment_redirect
-    console.log('Analytics: payment_redirect', { 
-      bookingId: bookingState.bookingId, 
-      provider: bookingState.selectedProvider 
+    console.log('Analytics: payment_redirect', {
+      bookingId: bookingState.bookingId,
+      provider: bookingState.selectedProvider
     });
-    
+
     setBookingState(prev => ({ ...prev, isLoading: true, error: null }));
-    
+
     try {
-      const response = await fetch('/api/payment/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          bookingId: bookingState.bookingId,
-          provider: bookingState.selectedProvider
-        })
-      });
+      // Mock API call - simulating payment redirect
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'To\'lov sahifasiga o\'tishda xatolik');
-      }
+      // Mock payment URLs for different providers
+      const mockPaymentUrls = {
+        click: 'https://my.click.uz/services/pay?service_id=mock_service',
+        payme: 'https://checkout.paycom.uz/mock_merchant',
+        stripe: 'https://checkout.stripe.com/pay/mock_session'
+      };
 
-      // Redirect to payment provider
-      window.location.href = data.redirectUrl;
+      const redirectUrl = mockPaymentUrls[bookingState.selectedProvider as keyof typeof mockPaymentUrls];
+
+      // Show success message instead of redirecting (for demo)
+      alert(`To'lov sahifasiga yo'naltirilmoqda: ${bookingState.selectedProvider.toUpperCase()}\n\nDemo maqsadida redirect o'rniga alert ko'rsatildi.`);
+
+      // In real app, you would redirect:
+      // window.location.href = redirectUrl;
+
+      setBookingState(prev => ({ ...prev, isLoading: false }));
     } catch (error) {
       setBookingState(prev => ({
         ...prev,
