@@ -117,6 +117,7 @@ const subjects = [
 const languages = ["All Languages", "Uzbek", "English", "Russian", "Arabic"];
 
 export default function Teachers() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("All Subjects");
   const [selectedLanguage, setSelectedLanguage] = useState("All Languages");
