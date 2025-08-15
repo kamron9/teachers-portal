@@ -257,8 +257,8 @@ export default function Search() {
   
   // Filter states - TZ bo'yicha FilterBar
   const [filters, setFilters] = useState({
-    subject: searchParams.get('subject') || '',
-    language: searchParams.get('language') || '',
+    subject: searchParams.get('subject') || 'all',
+    language: searchParams.get('language') || 'all',
     priceFrom: parseInt(searchParams.get('priceFrom') || '0'),
     priceTo: parseInt(searchParams.get('priceTo') || '100000'),
     rating: parseFloat(searchParams.get('rating') || '0'),
