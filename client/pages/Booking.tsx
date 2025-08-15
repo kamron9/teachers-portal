@@ -595,6 +595,18 @@ const Booking: React.FC = () => {
 
         {/* Step Content */}
         {renderStepContent()}
+
+        {/* Login Modal */}
+        <LoginModal
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          onSuccess={() => {
+            setIsAuthenticated(true);
+            setShowLoginModal(false);
+            // Continue with booking confirmation
+            handleBookingConfirm();
+          }}
+        />
       </div>
     </div>
   );
