@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Star, MapPin, Users, ArrowRight, BookOpen, Heart, MessageCircle, Calculator, Atom, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTeacherSearch, useSubjects } from "@/hooks/useApi";
+import { formatPrice } from "@/lib/api";
 
 // Mock data - TZ bo'yicha API GET /tutors?limit=6&sort=rating_desc
 const featuredTutors = [
