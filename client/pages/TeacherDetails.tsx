@@ -195,7 +195,7 @@ const TeacherDetails: React.FC = () => {
                   Teachers
                 </Link>
                 <ChevronRight className="h-4 w-4 mx-2" />
-                <span className="text-foreground">{teacher.name}</span>
+                <span className="text-foreground">{teacher.firstName} {teacher.lastName}</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
