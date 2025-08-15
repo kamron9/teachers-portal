@@ -17,9 +17,9 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
       <div className="flex items-start gap-4">
         <div className="relative">
           <Avatar className="w-16 h-16">
-            <AvatarImage src={tutor.avatar} alt={tutor.name} />
+            <AvatarImage src={tutor.profileImage || "/placeholder.svg"} alt={`${tutor.firstName} ${tutor.lastName}`} />
             <AvatarFallback>
-              {tutor.name.split(' ').map(n => n[0]).join('')}
+              {tutor.firstName?.[0]}{tutor.lastName?.[0]}
             </AvatarFallback>
           </Avatar>
           {tutor.isVerified && (
@@ -30,30 +30,34 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
         </div>
         
         <div className="flex-1">
-          <h3 className="font-semibold text-lg text-gray-900">{tutor.name}</h3>
-          <p className="text-primary font-medium">{tutor.subject}</p>
+          <h3 className="font-semibold text-lg text-gray-900">{tutor.firstName} {tutor.lastName}</h3>
+          <p className="text-primary font-medium">{tutor.subjects?.[0]?.name || 'Fan belgilanmagan'}</p>
           
           <div className="flex items-center gap-2 mt-2">
             <div className="flex items-center gap-1">
               <Star className="h-4 w-4 text-yellow-500 fill-current" />
-              <span className="font-medium">{tutor.rating}</span>
+              <span className="font-medium">{tutor.averageRating?.toFixed(1) || 'N/A'}</span>
             </div>
             <span className="text-gray-400">•</span>
-            <span className="text-sm text-gray-600">{tutor.totalStudents} o'quvchi</span>
+            <span className="text-sm text-gray-600">{tutor.totalStudents || 0} o'quvchi</span>
           </div>
           
           <div className="flex flex-wrap gap-1 mt-2">
-            {tutor.languages.slice(0, 2).map((lang) => (
-              <Badge key={lang} variant="secondary" className="text-xs">
+            {tutor.languages?.slice(0, 2).map((lang: string, index: number) => (
+              <Badge key={index} variant="secondary" className="text-xs">
                 {lang}
               </Badge>
-            ))}
+            )) || (
+              <Badge variant="secondary" className="text-xs">
+                O'zbek
+              </Badge>
+            )}
           </div>
           
           <div className="flex items-center justify-between mt-4">
             <div>
               <span className="text-xl font-bold text-gray-900">
-                {tutor.pricePerHour.toLocaleString()} so'm
+                {formatPrice(tutor.hourlyRate)}
               </span>
               <span className="text-gray-600 text-sm">/soat</span>
             </div>
