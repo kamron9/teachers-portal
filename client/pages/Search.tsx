@@ -520,13 +520,13 @@ export default function Search() {
                     </div>
 
                     {/* Clear filters */}
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="w-full"
                       onClick={() => {
                         setFilters({
-                          subject: '',
-                          language: '',
+                          subject: 'all',
+                          language: 'all',
                           priceFrom: 0,
                           priceTo: 100000,
                           rating: 0,
