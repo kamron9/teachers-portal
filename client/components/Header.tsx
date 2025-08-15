@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, User, BookOpen, MessageCircle, Settings, LogOut } from "lucide-react";
+import { Menu, X, User, BookOpen, MessageCircle, Settings, LogOut, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,7 +11,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useAuth, useRole } from "@/hooks/useAuth";
+import { useNotifications } from "@/hooks/useApi";
 
 const navigation = [
   { name: "Bosh sahifa", href: "/" },
