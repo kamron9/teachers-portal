@@ -59,6 +59,20 @@ export interface TeacherProfile {
   teacherChips?: TeacherChips;
 }
 
+export interface Subject {
+  id: string;
+  name: string;
+  nameUz?: string;
+  nameRu?: string;
+  nameEn?: string;
+  description?: string;
+  category?: string;
+  isActive: boolean;
+  teacherCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface SubjectOffering {
   id: string;
   teacherId: string;
