@@ -8,6 +8,7 @@ import Header from "./components/Header";
 import Index from "./pages/Index";
 import Teachers from "./pages/Teachers";
 import TeacherProfile from "./pages/TeacherProfile";
+import TeacherDetails from "./pages/TeacherDetails";
 import TeacherRegister from "./pages/TeacherRegister";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import TeacherSchedule from "./pages/TeacherSchedule";
