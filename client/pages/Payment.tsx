@@ -96,20 +96,38 @@ export default function Payment() {
 
   const handlePayment = async () => {
     if (!agreedToTerms) {
-      alert("Please agree to the terms and conditions");
+      alert("Iltimos, shartlar va qoidalarni qabul qiling");
       return;
     }
 
     setIsProcessing(true);
-    
+
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Redirect to success page
-      window.location.href = `/payment-success?booking=${Date.now()}`;
-    } catch (error) {
-      alert("Payment failed. Please try again.");
+      const bookingId = searchParams.get("bookingId");
+      const amount = searchParams.get("amount");
+
+      if (!bookingId || !amount) {
+        throw new Error("To'lov ma'lumotlari topilmadi");
+      }
+
+      const paymentData = {
+        bookingId,
+        provider: paymentMethod,
+        returnUrl: `${window.location.origin}/payment-success`,
+        cancelUrl: `${window.location.origin}/payment-cancel`
+      };
+
+      const result = await createPaymentMutation.mutateAsync(paymentData);
+
+      if (result.paymentUrl) {
+        // Redirect to payment provider
+        window.location.href = result.paymentUrl;
+      } else {
+        // Navigate to success page for local payments
+        navigate(`/payment-success?payment=${result.id}`);
+      }
+    } catch (error: any) {
+      alert(error?.message || "To'lov amalga oshmadi. Qayta urinib ko'ring.");
     } finally {
       setIsProcessing(false);
     }
