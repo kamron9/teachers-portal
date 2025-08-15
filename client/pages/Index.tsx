@@ -57,7 +57,7 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
           <div className="flex items-center justify-between mt-4">
             <div>
               <span className="text-xl font-bold text-gray-900">
-                {formatPrice(tutor.hourlyRate)}
+                {formatPrice(tutor.subjectOfferings?.[0]?.pricePerHour || 0)}
               </span>
               <span className="text-gray-600 text-sm">/soat</span>
             </div>
