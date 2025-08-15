@@ -316,8 +316,8 @@ export default function Search() {
         
         // Filter tutors
         let filteredTutors = mockTutors.filter(tutor => {
-          if (filters.subject && tutor.subject !== filters.subject) return false;
-          if (filters.language && !tutor.languages.some(lang => 
+          if (filters.subject && filters.subject !== 'all' && tutor.subject !== filters.subject) return false;
+          if (filters.language && filters.language !== 'all' && !tutor.languages.some(lang =>
             lang.toLowerCase().includes(filters.language.toLowerCase()))) return false;
           if (tutor.pricePerHour < filters.priceFrom || tutor.pricePerHour > filters.priceTo) return false;
           if (tutor.rating < filters.rating) return false;
