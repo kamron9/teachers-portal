@@ -22,6 +22,7 @@ import {
   Target,
   SortAsc,
   SortDesc,
+  User,
 } from "lucide-react";
 import { useTeacherSearch, useSubjects } from "@/hooks/useApi";
 import { formatPrice } from "@/lib/api";
