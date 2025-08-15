@@ -99,222 +99,26 @@ export default function FindTeachers() {
 
   const { data: teachersData, isLoading, error } = useTeacherSearch(searchApiParams);
 
-  // Mock teachers data - in real app this would come from API
-  const allTeachers = [
-    {
-      id: 1,
-      name: "Dr. Sarah Johnson",
-      image: "/placeholder.svg",
-      rating: 4.9,
-      totalStudents: 127,
-      subjects: ["algebra", "calculus", "geometry"],
-      hourlyRate: 65000,
-      experience: 8,
-      location: "Tashkent",
-      languages: ["English", "Uzbek"],
-      verified: true,
-      online: true,
-      bio: "Mathematics PhD with 8+ years of teaching experience. Specializes in making complex concepts easy to understand.",
-      availability: "Available today",
-      responseTime: "Usually responds within 1 hour",
-      completedLessons: 450,
-      badges: ["Top Rated", "Quick Responder"],
-      specializations: [
-        "Exam Preparation",
-        "University Level",
-        "Problem Solving",
-      ],
-    },
-    {
-      id: 2,
-      name: "Prof. Ahmed Hassan",
-      image: "/placeholder.svg",
-      rating: 4.8,
-      totalStudents: 98,
-      subjects: ["physics", "chemistry"],
-      hourlyRate: 70000,
-      experience: 12,
-      location: "Samarkand",
-      languages: ["English", "Arabic", "Uzbek"],
-      verified: true,
-      online: false,
-      bio: "Former university professor with expertise in advanced physics and chemistry. Published researcher.",
-      availability: "Available tomorrow",
-      responseTime: "Usually responds within 2 hours",
-      completedLessons: 380,
-      badges: ["Expert", "University Professor"],
-      specializations: ["Research Methods", "Advanced Topics", "Lab Work"],
-    },
-    {
-      id: 3,
-      name: "Maria Rodriguez",
-      image: "/placeholder.svg",
-      rating: 5.0,
-      totalStudents: 85,
-      subjects: ["biology", "chemistry"],
-      hourlyRate: 55000,
-      experience: 6,
-      location: "Tashkent",
-      languages: ["English", "Spanish", "Uzbek"],
-      verified: true,
-      online: true,
-      bio: "Biology specialist with medical background. Excellent at explaining life sciences concepts.",
-      availability: "Available now",
-      responseTime: "Usually responds within 30 minutes",
-      completedLessons: 320,
-      badges: ["Fast Responder", "Medical Background"],
-      specializations: ["Medical Prep", "Life Sciences", "Lab Techniques"],
-    },
-    {
-      id: 4,
-      name: "John Smith",
-      image: "/placeholder.svg",
-      rating: 4.7,
-      totalStudents: 156,
-      subjects: ["english", "spanish"],
-      hourlyRate: 45000,
-      experience: 5,
-      location: "Tashkent",
-      languages: ["English", "Spanish"],
-      verified: true,
-      online: true,
-      bio: "Native English speaker with TESOL certification. Specializes in conversational practice and exam preparation.",
-      availability: "Available today",
-      responseTime: "Usually responds within 1 hour",
-      completedLessons: 520,
-      badges: ["Native Speaker", "TESOL Certified"],
-      specializations: ["Conversation", "IELTS Prep", "Business English"],
-    },
-    {
-      id: 5,
-      name: "Elena Petrov",
-      image: "/placeholder.svg",
-      rating: 4.6,
-      totalStudents: 72,
-      subjects: ["algebra", "geometry"],
-      hourlyRate: 40000,
-      experience: 4,
-      location: "Bukhara",
-      languages: ["Russian", "Uzbek", "English"],
-      verified: true,
-      online: true,
-      bio: "Mathematics teacher with focus on foundational concepts. Great with students who struggle with math.",
-      availability: "Available this week",
-      responseTime: "Usually responds within 3 hours",
-      completedLessons: 280,
-      badges: ["Patient Teacher", "Foundation Builder"],
-      specializations: ["Basic Math", "Confidence Building", "School Support"],
-    },
-    {
-      id: 6,
-      name: "Dr. Carlos Martinez",
-      image: "/placeholder.svg",
-      rating: 4.9,
-      totalStudents: 103,
-      subjects: ["physics", "calculus"],
-      hourlyRate: 80000,
-      experience: 10,
-      location: "Tashkent",
-      languages: ["Spanish", "English", "Uzbek"],
-      verified: true,
-      online: true,
-      bio: "Physics PhD with industry experience. Combines theoretical knowledge with practical applications.",
-      availability: "Available today",
-      responseTime: "Usually responds within 1 hour",
-      completedLessons: 410,
-      badges: ["PhD Holder", "Industry Expert"],
-      specializations: ["Applied Physics", "Engineering Prep", "Research"],
-    },
-  ];
+  const teachers = teachersData?.teachers || [];
+  const currentSubject = subjects.find(s => s.id === selectedSubject);
 
-  // Get current subject info
-  const currentSubject = subject ? subjectInfo[subject] : null;
-
-  // Filter teachers based on subject and other criteria
-  const filteredTeachers = allTeachers.filter((teacher) => {
-    // Filter by subject
-    if (subject && !teacher.subjects.includes(subject)) {
-      return false;
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('query', searchQuery);
+    if (selectedSubject) params.set('subject', selectedSubject);
+    if (selectedLanguage) params.set('language', selectedLanguage);
+    if (priceRange !== 'all') {
+      const [min, max] = priceRange.split('-');
+      params.set('priceFrom', min);
+      params.set('priceTo', max);
     }
 
-    // Filter by search query
-    if (
-      searchQuery &&
-      !teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !teacher.bio.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
+    const newSearch = params.toString();
+    if (newSearch !== searchParams.toString()) {
+      setSearchParams(params);
     }
-
-    // Filter by price range
-    if (priceRange !== "all") {
-      const [min, max] = priceRange.split("-").map(Number);
-      if (teacher.hourlyRate < min || teacher.hourlyRate > max) {
-        return false;
-      }
-    }
-
-    // Filter by experience
-    if (experience !== "all") {
-      const expNum = parseInt(experience);
-      if (teacher.experience < expNum) {
-        return false;
-      }
-    }
-
-    // Filter by rating
-    if (rating !== "all") {
-      const ratingNum = parseFloat(rating);
-      if (teacher.rating < ratingNum) {
-        return false;
-      }
-    }
-
-    // Filter by availability
-    if (availability !== "all") {
-      if (availability === "online" && !teacher.online) {
-        return false;
-      }
-      if (
-        availability === "today" &&
-        !teacher.availability.includes("today") &&
-        !teacher.availability.includes("now")
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-
-  // Sort teachers
-  const sortedTeachers = [...filteredTeachers].sort((a, b) => {
-    let aValue, bValue;
-
-    switch (sortBy) {
-      case "rating":
-        aValue = a.rating;
-        bValue = b.rating;
-        break;
-      case "price":
-        aValue = a.hourlyRate;
-        bValue = b.hourlyRate;
-        break;
-      case "experience":
-        aValue = a.experience;
-        bValue = b.experience;
-        break;
-      case "students":
-        aValue = a.totalStudents;
-        bValue = b.totalStudents;
-        break;
-      default:
-        aValue = a.rating;
-        bValue = b.rating;
-    }
-
-    return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
-  });
+  }, [searchQuery, selectedSubject, selectedLanguage, priceRange, searchParams, setSearchParams]);
 
   if (!currentSubject) {
     return (
