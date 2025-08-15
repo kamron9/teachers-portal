@@ -304,13 +304,13 @@ export default function Login() {
                 </Button>
               </form>
 
-              {/* Demo Credentials */}
+              {/* Security Notice */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <div className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-blue-600 mt-0.5" />
                   <div className="text-blue-800 text-sm">
-                    <div className="font-medium mb-1">Demo Login:</div>
-                    <div>Use any valid email/phone + password: <code className="bg-blue-100 px-1 rounded">demo123</code></div>
+                    <div className="font-medium mb-1">Xavfsizlik:</div>
+                    <div>Hisobingiz himoyalangan va barcha ma'lumotlar shifrlangan</div>
                   </div>
                 </div>
               </div>
