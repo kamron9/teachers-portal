@@ -93,49 +93,102 @@ export default function Header() {
           {/* Right side - Language switcher and Auth buttons or user menu */}
           <div className="hidden md:flex items-center space-x-4">
             <LanguageSwitcher />
-            {isLoggedIn ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg" alt="User" />
-                      <AvatarFallback>U</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">John Doe</p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        john@example.com
-                      </p>
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-3">
+                {/* Notification Bell */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="relative">
+                      <Bell className="h-5 w-5" />
+                      {unreadCount > 0 && (
+                        <Badge
+                          variant="destructive"
+                          className="absolute -top-2 -right-2 h-5 w-5 text-xs p-0 flex items-center justify-center"
+                        >
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-80" align="end">
+                    <DropdownMenuLabel>Bildirishnomalar</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <div className="p-2">
+                      {unreadCount === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          Yangi bildirishnomalar yo'q
+                        </p>
+                      ) : (
+                        <Link to="/notifications" className="block">
+                          <Button variant="ghost" className="w-full justify-start">
+                            Barcha bildirishnomalarni ko'rish ({unreadCount})
+                          </Button>
+                        </Link>
+                      )}
                     </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    <span>My Lessons</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    <span>Messages</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* User Avatar */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user?.profileImage || "/placeholder.svg"} alt={getUserDisplayName()} />
+                        <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{getUserDisplayName()}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to={getDashboardLink()}>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Bosh sahifa</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profil</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    {(isTeacher || isStudent) && (
+                      <DropdownMenuItem asChild>
+                        <Link to={isTeacher ? "/teacher/lessons" : "/student/lessons"}>
+                          <BookOpen className="mr-2 h-4 w-4" />
+                          <span>Darslarim</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem asChild>
+                      <Link to="/messages">
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        <span>Xabarlar</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Sozlamalar</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Chiqish</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
               <>
                 <Link to="/login">
@@ -186,19 +239,19 @@ export default function Header() {
                 </Link>
               ))}
               
-              {!isLoggedIn && (
+              {!isAuthenticated && (
                 <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start">
-                      Log in
+                      Kirish
                     </Button>
                   </Link>
                   <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full">Sign up</Button>
+                    <Button className="w-full">Ro'yxatdan o'tish</Button>
                   </Link>
                   <Link to="/teacher-signup" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full">
-                      Teach on TutorUZ
+                      O'qituvchi bo'ling
                     </Button>
                   </Link>
                 </div>
