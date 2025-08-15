@@ -476,6 +476,29 @@ class ApiClient {
     return this.request<PaginatedResponse<TeacherProfile> & { appliedFilters: any }>(`/search/teachers?${searchParams}`);
   }
 
+  // Subjects methods
+  async getSubjects(params?: {
+    query?: string;
+    category?: string;
+    isActive?: boolean;
+    includeTeacherCount?: boolean;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<PaginatedResponse<Subject> & { categories: string[] }> {
+    const searchParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.set(key, value.toString());
+        }
+      });
+    }
+
+    return this.request<PaginatedResponse<Subject> & { categories: string[] }>(`/subjects?${searchParams}`);
+  }
+
   // Subject offerings methods
   async getSubjectOfferings(): Promise<SubjectOffering[]> {
     return this.request<SubjectOffering[]>('/teachers/subject-offerings');
