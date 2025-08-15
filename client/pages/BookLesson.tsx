@@ -165,11 +165,37 @@ export default function BookLesson() {
   };
 
   const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
+    "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
   ];
 
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const dayNames = ["Yak", "Dush", "Sesh", "Chor", "Pay", "Jum", "Shan"];
+
+  if (teacherLoading) {
+    return (
+      <div className="pt-16 min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (teacherError || !teacher) {
+    return (
+      <div className="pt-16 min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            O'qituvchi topilmadi
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Siz qidirayotgan o'qituvchi mavjud emas.
+          </p>
+          <Button onClick={() => navigate('/teachers')}>
+            O'qituvchilar ro'yxatiga qaytish
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-16 min-h-screen bg-gray-50">
@@ -181,8 +207,8 @@ export default function BookLesson() {
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Book a Lesson</h1>
-              <p className="text-gray-600">Schedule your lesson with {teacher.name}</p>
+              <h1 className="text-3xl font-bold text-gray-900">Dars buyurtma qilish</h1>
+              <p className="text-gray-600">{teacher.firstName} {teacher.lastName} bilan dars rejalashtiring</p>
             </div>
           </div>
 
@@ -194,18 +220,18 @@ export default function BookLesson() {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
                     <Avatar className="w-16 h-16">
-                      <AvatarImage src={teacher.image} alt={teacher.name} />
+                      <AvatarImage src={teacher.profileImage || '/placeholder.svg'} alt={`${teacher.firstName} ${teacher.lastName}`} />
                       <AvatarFallback>
-                        {teacher.name.split(' ').map(n => n[0]).join('')}
+                        {teacher.firstName?.[0]}{teacher.lastName?.[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h2 className="text-xl font-semibold text-gray-900">{teacher.name}</h2>
-                      <p className="text-gray-600">{teacher.title}</p>
+                      <h2 className="text-xl font-semibold text-gray-900">{teacher.firstName} {teacher.lastName}</h2>
+                      <p className="text-gray-600">{teacher.subjectOfferings?.[0]?.subjectName || 'O\'qituvchi'} mutaxassisi</p>
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {teacher.subjects.map((subject) => (
-                          <Badge key={subject} variant="secondary" className="text-xs">
-                            {subject}
+                        {teacher.subjectOfferings?.slice(0, 3).map((offering, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {offering.subjectName}
                           </Badge>
                         ))}
                       </div>
@@ -219,7 +245,7 @@ export default function BookLesson() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Video className="h-5 w-5" />
-                    Choose Lesson Package
+                    Dars paketini tanlang
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -242,7 +268,7 @@ export default function BookLesson() {
                           )}
                         </div>
                         <div className="text-right">
-                          <div className="font-bold text-lg">{pkg.price.toLocaleString()} UZS</div>
+                          <div className="font-bold text-lg">{formatPrice(pkg.price)}</div>
                           {pkg.discount && (
                             <div className="text-sm text-green-600">{pkg.discount}</div>
                           )}
@@ -258,7 +284,7 @@ export default function BookLesson() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calendar className="h-5 w-5" />
-                    Select Date
+                    Sanani tanlang
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -345,23 +371,23 @@ export default function BookLesson() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Clock className="h-5 w-5" />
-                      Select Time
+                      Vaqtni tanlang
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-sm text-gray-600 mb-4">
-                      Available slots for {selectedDate.toLocaleDateString()} ({teacher.timezone})
+                      {selectedDate.toLocaleDateString()} kuni mavjud vaqtlar (Toshkent vaqti)
                     </div>
                     <div className="grid grid-cols-3 gap-2">
-                      {getAvailableSlots().map((time) => (
+                      {getAvailableSlots().map((timeSlot) => (
                         <Button
-                          key={time}
-                          variant={selectedTime === time ? "default" : "outline"}
+                          key={timeSlot.time}
+                          variant={selectedTime === timeSlot.time ? "default" : "outline"}
                           size="sm"
-                          onClick={() => setSelectedTime(time)}
+                          onClick={() => setSelectedTime(timeSlot.time)}
                           className="justify-center"
                         >
-                          {time}
+                          {timeSlot.time}
                         </Button>
                       ))}
                     </div>
@@ -373,14 +399,14 @@ export default function BookLesson() {
               {selectedDate && selectedTime && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Lesson Notes (Optional)</CardTitle>
+                    <CardTitle>Dars eslatmalari (Ixtiyoriy)</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <Label htmlFor="notes">What would you like to focus on in this lesson?</Label>
+                      <Label htmlFor="notes">Ushbu darsda nimaga e'tibor qaratmoqchisiz?</Label>
                       <Textarea
                         id="notes"
-                        placeholder="e.g., IELTS speaking practice, business presentation skills, grammar review..."
+                        placeholder="Masalan: IELTS speaking mashqi, business taqdimot ko'nikmalar, grammatika takrorlash..."
                         value={lessonNotes}
                         onChange={(e) => setLessonNotes(e.target.value)}
                         rows={3}
