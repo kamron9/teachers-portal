@@ -201,7 +201,7 @@ export default function TeacherDashboard() {
   const deliveryOptions = ['Online', 'Offline', 'Hybrid'];
   const iconOptions = [
     { value: 'book', label: '📚 Book', component: BookOpen },
-    { value: 'bar-chart', label: '📊 Chart', component: BarChart3 },
+    { value: 'bar-chart', label: '���� Chart', component: BarChart3 },
     { value: 'briefcase', label: '💼 Briefcase', component: null },
     { value: 'speech-bubble', label: '💬 Speech', component: MessageCircle }
   ];
@@ -805,7 +805,7 @@ export default function TeacherDashboard() {
                 </Button>
               )}
               <div className="text-xs text-gray-500 mt-3">
-                • Max file size: 50MB • Formats: MP4, MOV • Recommended: 2-3 minutes
+                • Max file size: 50MB • Formats: MP4, MOV ��� Recommended: 2-3 minutes
               </div>
             </div>
           </CardContent>
@@ -998,11 +998,16 @@ export default function TeacherDashboard() {
                         <div>
                           <label className="text-sm font-medium">Subject Name *</label>
                           <input
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ${
+                              !newSubject.name.trim() ? 'border-red-300 focus:border-red-500' : 'border-input'
+                            } bg-background`}
                             placeholder="e.g., General English"
                             value={newSubject.name}
                             onChange={(e) => setNewSubject(prev => ({ ...prev, name: e.target.value }))}
                           />
+                          {!newSubject.name.trim() && (
+                            <p className="text-xs text-red-500 mt-1">Subject name is required</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-sm font-medium">Level *</label>
@@ -1020,11 +1025,18 @@ export default function TeacherDashboard() {
                           <label className="text-sm font-medium">Price per hour (UZS) *</label>
                           <input
                             type="number"
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            min="1000"
+                            max="1000000"
+                            className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ${
+                              newSubject.price <= 0 ? 'border-red-300 focus:border-red-500' : 'border-input'
+                            } bg-background`}
                             placeholder="50000"
                             value={newSubject.price}
                             onChange={(e) => setNewSubject(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
                           />
+                          {newSubject.price <= 0 && (
+                            <p className="text-xs text-red-500 mt-1">Price must be greater than 0</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-sm font-medium">Delivery *</label>
