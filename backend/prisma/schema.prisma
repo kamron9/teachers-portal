@@ -1,0 +1,656 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SubjectLevel {
+  ALL_LEVELS
+  BEGINNER
+  ELEMENTARY
+  INTERMEDIATE
+  UPPER_INTERMEDIATE
+  ADVANCED
+  INTERMEDIATE_PLUS
+}
+
+enum DeliveryType {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
+enum SubjectIcon {
+  BOOK
+  BAR_CHART
+  BRIEFCASE
+  SPEECH_BUBBLE
+}
+
+enum OfferingStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum BookingType {
+  TRIAL
+  SINGLE
+  PACKAGE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentProvider {
+  CLICK
+  PAYME
+  UZUM_BANK
+  STRIPE
+}
+
+enum WalletEntryStatus {
+  PENDING
+  AVAILABLE
+  PAID
+}
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  PAID
+  FAILED
+  REJECTED
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum NotificationType {
+  BOOKING_CREATED
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  LESSON_REMINDER
+  PAYMENT_RECEIVED
+  PAYOUT_APPROVED
+  MESSAGE_RECEIVED
+  REVIEW_RECEIVED
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+}
+
+// Base User model
+model User {
+  id                String      @id @default(uuid())
+  email             String      @unique
+  phone             String?     @unique
+  emailVerified     Boolean     @default(false)
+  phoneVerified     Boolean     @default(false)
+  password          String
+  role              UserRole
+  status            UserStatus  @default(ACTIVE)
+  lastLoginAt       DateTime?
+  twoFactorEnabled  Boolean     @default(false)
+  emailConsent      Boolean     @default(true)
+  smsConsent        Boolean     @default(false)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  deletedAt         DateTime?
+  lastUpdatedBy     String?
+
+  // Relations
+  studentProfile    StudentProfile?
+  teacherProfile    TeacherProfile?
+  
+  // Activity tracking
+  sessions          UserSession[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id           String    @id @default(uuid())
+  userId       String
+  token        String    @unique
+  refreshToken String    @unique
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime  @default(now())
+  ipAddress    String?
+  userAgent    String?
+  isActive     Boolean   @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+model StudentProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  firstName         String
+  lastName          String
+  avatar            String?
+  timezone          String   @default("Asia/Tashkent")
+  preferredLanguages String[] @default(["uz"])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  bookings          Booking[]
+  packages          Package[]
+  reviews           Review[]
+  messageThreads    MessageThread[]
+  disputes          Dispute[]
+  paymentMethods    PaymentMethod[]
+
+  @@map("student_profiles")
+}
+
+model TeacherProfile {
+  id                    String             @id @default(uuid())
+  userId                String             @unique
+  firstName             String
+  lastName              String
+  avatar                String?
+  bioUz                 String?
+  bioRu                 String?
+  bioEn                 String?
+  videoIntroUrl         String?
+  experienceYears       Int                @default(0)
+  education             Json[]             @default([])
+  certificates          Json[]             @default([])
+  languagesTaught       String[]           @default([])
+  languagesSpoken       String[]           @default([])
+  verificationStatus    VerificationStatus @default(PENDING)
+  verificationReason    String?
+  verificationDocs      Json[]             @default([])
+  cancellationPolicy    String?
+  minNoticeHours        Int                @default(12)
+  maxAdvanceDays        Int                @default(30)
+  timezone              String             @default("Asia/Tashkent")
+  isActive              Boolean            @default(true)
+  rating                Float              @default(0)
+  totalReviews          Int                @default(0)
+  totalLessons          Int                @default(0)
+  totalEarnings         Int                @default(0) // UZS in kopeks
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  subjectOfferings      SubjectOffering[]
+  teacherChips          TeacherChips?
+  availabilityRules     AvailabilityRule[]
+  bookings              Booking[]
+  packages              Package[]
+  reviews               Review[]
+  messageThreads        MessageThread[]
+  walletEntries         WalletEntry[]
+  payouts               Payout[]
+  disputes              Dispute[]
+
+  @@map("teacher_profiles")
+}
+
+model SubjectOffering {
+  id            String          @id @default(uuid())
+  teacherId     String
+  subjectName   String
+  subjectNameUz String?
+  subjectNameRu String?
+  subjectNameEn String?
+  level         SubjectLevel
+  pricePerHour  Int             // UZS in kopeks
+  delivery      DeliveryType    @default(ONLINE)
+  icon          SubjectIcon     @default(BOOK)
+  status        OfferingStatus  @default(DRAFT)
+  orderIndex    Int             @default(0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  deletedAt     DateTime?
+
+  teacher  TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  // Relations
+  bookings Booking[]
+  packages Package[]
+
+  @@map("subject_offerings")
+}
+
+model TeacherChips {
+  id               String   @id @default(uuid())
+  teacherId        String   @unique
+  teachingLevels   String[] @default([])
+  examPreparation  String[] @default([])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  teacher TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@map("teacher_chips")
+}
+
+model AvailabilityRule {
+  id        String    @id @default(uuid())
+  teacherId String
+  type      String    // 'recurring' or 'one_off'
+  weekday   Int?      // 0-6 for recurring rules
+  date      DateTime? // specific date for one-off rules
+  startTime String    // HH:mm format
+  endTime   String    // HH:mm format
+  isOpen    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  teacher TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@map("availability_rules")
+}
+
+model Booking {
+  id               String        @id @default(uuid())
+  studentId        String
+  teacherId        String
+  subjectOfferingId String
+  packageId        String?
+  startAt          DateTime
+  endAt            DateTime
+  priceAtBooking   Int           // UZS in kopeks
+  type             BookingType
+  status           BookingStatus @default(PENDING)
+  studentTimezone  String        @default("Asia/Tashkent")
+  teacherTimezone  String        @default("Asia/Tashkent")
+  
+  // Cancellation info
+  cancelledAt      DateTime?
+  cancelledBy      String?       // userId
+  cancellationReason String?
+  
+  // Lesson tracking
+  actualStartAt    DateTime?
+  actualEndAt      DateTime?
+  studentAttended  Boolean?
+  teacherAttended  Boolean?
+  lessonNotes      String?
+  
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  // Relations
+  student          StudentProfile @relation(fields: [studentId], references: [id])
+  teacher          TeacherProfile @relation(fields: [teacherId], references: [id])
+  subjectOffering  SubjectOffering @relation(fields: [subjectOfferingId], references: [id])
+  package          Package? @relation(fields: [packageId], references: [id])
+  
+  payment          Payment?
+  reviews          Review[]
+  disputes         Dispute[]
+  messageThread    MessageThread?
+
+  @@map("bookings")
+}
+
+model Package {
+  id                String         @id @default(uuid())
+  studentId         String
+  teacherId         String
+  subjectOfferingId String
+  lessonsTotal      Int
+  lessonsRemaining  Int
+  priceTotal        Int            // UZS in kopeks
+  expiresAt         DateTime
+  status            BookingStatus  @default(PENDING)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  // Relations
+  student           StudentProfile @relation(fields: [studentId], references: [id])
+  teacher           TeacherProfile @relation(fields: [teacherId], references: [id])
+  subjectOffering   SubjectOffering @relation(fields: [subjectOfferingId], references: [id])
+  
+  bookings          Booking[]
+  payment           Payment?
+
+  @@map("packages")
+}
+
+model Payment {
+  id             String          @id @default(uuid())
+  bookingId      String?         @unique
+  packageId      String?         @unique
+  amount         Int             // UZS in kopeks
+  provider       PaymentProvider
+  providerRef    String?
+  status         PaymentStatus   @default(PENDING)
+  currency       String          @default("UZS")
+  capturedAt     DateTime?
+  refundedAt     DateTime?
+  refundAmount   Int?            // UZS in kopeks
+  failureReason  String?
+  metadata       Json?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  // Relations
+  booking        Booking? @relation(fields: [bookingId], references: [id])
+  package        Package? @relation(fields: [packageId], references: [id])
+
+  @@map("payments")
+}
+
+model WalletEntry {
+  id          String            @id @default(uuid())
+  teacherId   String
+  bookingId   String?
+  packageId   String?
+  amount      Int               // UZS in kopeks (net after commission)
+  commission  Int               // UZS in kopeks
+  status      WalletEntryStatus @default(PENDING)
+  availableAt DateTime?
+  description String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  teacher TeacherProfile @relation(fields: [teacherId], references: [id])
+
+  @@map("wallet_entries")
+}
+
+model PaymentMethod {
+  id        String @id @default(uuid())
+  studentId String
+  provider  PaymentProvider
+  token     String // Encrypted payment method token
+  last4     String?
+  expiryMonth Int?
+  expiryYear  Int?
+  isDefault   Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  student StudentProfile @relation(fields: [studentId], references: [id])
+
+  @@map("payment_methods")
+}
+
+model Payout {
+  id          String       @id @default(uuid())
+  teacherId   String
+  amount      Int          // UZS in kopeks
+  method      String       // 'bank_transfer', 'card', etc.
+  accountRef  String       // Bank account or card reference
+  status      PayoutStatus @default(PENDING)
+  approvedBy  String?      // Admin user ID
+  approvedAt  DateTime?
+  paidAt      DateTime?
+  failureReason String?
+  providerRef String?      // Payment provider transaction ID
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  teacher TeacherProfile @relation(fields: [teacherId], references: [id])
+
+  @@map("payouts")
+}
+
+model MessageThread {
+  id        String @id @default(uuid())
+  studentId String
+  teacherId String
+  bookingId String? @unique
+  isActive  Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  student  StudentProfile @relation(fields: [studentId], references: [id])
+  teacher  TeacherProfile @relation(fields: [teacherId], references: [id])
+  booking  Booking? @relation(fields: [bookingId], references: [id])
+  
+  messages Message[]
+
+  @@unique([studentId, teacherId])
+  @@map("message_threads")
+}
+
+model Message {
+  id         String        @id @default(uuid())
+  threadId   String
+  senderId   String        // User ID
+  content    String
+  attachments Json[]       @default([])
+  status     MessageStatus @default(SENT)
+  isReported Boolean       @default(false)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Review {
+  id          String       @id @default(uuid())
+  teacherId   String
+  studentId   String
+  bookingId   String
+  rating      Int          // 1-5
+  comment     String?
+  isAnonymous Boolean      @default(false)
+  status      ReviewStatus @default(PENDING)
+  moderationReason String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  teacher TeacherProfile @relation(fields: [teacherId], references: [id])
+  student StudentProfile @relation(fields: [studentId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@unique([studentId, bookingId])
+  @@map("reviews")
+}
+
+model Dispute {
+  id              String        @id @default(uuid())
+  bookingId       String
+  openedBy        String        // User ID (student or teacher)
+  studentId       String
+  teacherId       String
+  reason          String
+  evidence        Json[]        @default([])
+  status          DisputeStatus @default(OPEN)
+  resolutionNotes String?
+  resolvedBy      String?       // Admin user ID
+  resolvedAt      DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id])
+  student StudentProfile @relation(fields: [studentId], references: [id])
+  teacher TeacherProfile @relation(fields: [teacherId], references: [id])
+
+  @@map("disputes")
+}
+
+model Notification {
+  id        String             @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  content   String
+  data      Json?              // Additional notification data
+  channels  NotificationChannel[]
+  isRead    Boolean            @default(false)
+  readAt    DateTime?
+  sentAt    DateTime?
+  createdAt DateTime           @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id              String                @id @default(uuid())
+  userId          String                @unique
+  emailEnabled    Boolean               @default(true)
+  smsEnabled      Boolean               @default(false)
+  pushEnabled     Boolean               @default(true)
+  preferences     Json                  @default("{}")  // Per notification type preferences
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@map("notification_preferences")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  action      String   // CREATE, UPDATE, DELETE, etc.
+  resource    String   // table/model name
+  resourceId  String?  // ID of the affected resource
+  oldValues   Json?
+  newValues   Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
+
+model GlobalSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("global_settings")
+}
+
+// Feature flags for A/B testing and gradual rollouts
+model FeatureFlag {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  isEnabled   Boolean  @default(false)
+  percentage  Int      @default(0) // 0-100 for percentage rollout
+  conditions  Json?    // Additional conditions
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("feature_flags")
+}
+
+// Coupons and promotions
+model Coupon {
+  id              String    @id @default(uuid())
+  code            String    @unique
+  description     String?
+  discountType    String    // 'percentage' or 'fixed'
+  discountValue   Int       // Percentage (0-100) or fixed amount in kopeks
+  minAmount       Int?      // Minimum order amount in kopeks
+  maxDiscount     Int?      // Maximum discount amount in kopeks
+  usageLimit      Int?      // Total usage limit
+  usageCount      Int       @default(0)
+  userLimit       Int?      // Per-user usage limit
+  validFrom       DateTime
+  validUntil      DateTime
+  isActive        Boolean   @default(true)
+  applicableToUsers String[] @default([]) // User IDs or empty for all
+  applicableToSubjects String[] @default([]) // Subject names or empty for all
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("coupons")
+}
+
+// Referral system
+model Referral {
+  id              String    @id @default(uuid())
+  referrerId      String    // User who made the referral
+  refereeId       String?   // User who was referred (null if not signed up yet)
+  referralCode    String    @unique
+  email           String?   // Email of referred person
+  phone           String?   // Phone of referred person
+  bonusAmount     Int       @default(0) // Bonus amount in kopeks
+  isCompleted     Boolean   @default(false)
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("referrals")
+}
