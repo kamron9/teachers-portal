@@ -1,19 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { 
-  ArrowLeft, Share2, Heart, Star, Users, BookOpen, Globe, Clock, 
-  Calendar, Video, MessageCircle, CheckCircle, Play, Download,
-  Filter, ChevronDown, ChevronRight, MapPin, Award, GraduationCap,
-  Languages, TrendingUp, Badge as BadgeIcon, Camera, FileText
-} from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { Progress } from '../components/ui/progress';
-import { Separator } from '../components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  Share2,
+  Heart,
+  Star,
+  Users,
+  BookOpen,
+  Globe,
+  Clock,
+  Calendar,
+  Video,
+  MessageCircle,
+  CheckCircle,
+  Play,
+  Download,
+  Filter,
+  ChevronDown,
+  ChevronRight,
+  MapPin,
+  Award,
+  GraduationCap,
+  Languages,
+  TrendingUp,
+  Badge as BadgeIcon,
+  Camera,
+  FileText,
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { Progress } from "../components/ui/progress";
+import { Separator } from "../components/ui/separator";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 
 interface TeacherData {
   id: string;
@@ -31,11 +68,11 @@ interface TeacherData {
   totalLessons: number;
   studentsCount: number;
   experienceYears: number;
-  
+
   bio: string;
   teachingPhilosophy: string;
   whyITeach: string;
-  
+
   subjects: Array<{
     name: string;
     price: number;
@@ -43,30 +80,30 @@ interface TeacherData {
     format: string;
     icon: string;
   }>;
-  
+
   teachingLevels: string[];
   examPrep: string[];
-  
+
   education: Array<{
     degree: string;
     institution: string;
     year: string;
     verified: boolean;
   }>;
-  
+
   certifications: Array<{
     name: string;
     issuer: string;
     year: string;
     verified: boolean;
   }>;
-  
+
   schedule: {
     timezone: string;
     nextAvailable: string;
     recurringSlots: string[];
   };
-  
+
   reviews: Array<{
     id: string;
     studentName: string;
@@ -79,13 +116,13 @@ interface TeacherData {
     helpful: number;
     teacherResponse?: string;
   }>;
-  
+
   materials: {
     introVideo: string;
     sampleLessons: string[];
     resources: Array<{ name: string; type: string; url: string }>;
   };
-  
+
   pricing: {
     trialPrice: number;
     regularPrice: number;
@@ -105,7 +142,7 @@ const mockTeacher: TeacherData = {
   languages: [
     { language: "English", proficiency: "Native" },
     { language: "Uzbek", proficiency: "Native" },
-    { language: "Russian", proficiency: "Fluent" }
+    { language: "Russian", proficiency: "Fluent" },
   ],
   responseTime: "Usually responds in 2 hours",
   rating: 4.9,
@@ -113,106 +150,172 @@ const mockTeacher: TeacherData = {
   totalLessons: 1247,
   studentsCount: 156,
   experienceYears: 5,
-  
+
   bio: "Hello! I'm Aziza, a passionate English teacher with over 5 years of experience helping students achieve their language goals. I specialize in IELTS preparation, business English, and conversation practice. My interactive teaching style combines proven methodologies with modern technology to create engaging and effective lessons.",
-  
-  teachingPhilosophy: "I believe that language learning should be fun, practical, and tailored to each student's needs. My approach focuses on building confidence through real-world applications and interactive practice.",
-  
-  whyITeach: "Teaching allows me to share my passion for languages while helping students unlock new opportunities. There's nothing more rewarding than seeing a student achieve their language goals and gain confidence in communication.",
-  
+
+  teachingPhilosophy:
+    "I believe that language learning should be fun, practical, and tailored to each student's needs. My approach focuses on building confidence through real-world applications and interactive practice.",
+
+  whyITeach:
+    "Teaching allows me to share my passion for languages while helping students unlock new opportunities. There's nothing more rewarding than seeing a student achieve their language goals and gain confidence in communication.",
+
   subjects: [
-    { name: "General English", price: 50000, level: "All Levels", format: "Online", icon: "🇬🇧" },
-    { name: "IELTS Preparation", price: 65000, level: "Intermediate+", format: "Online", icon: "📊" },
-    { name: "Business English", price: 70000, level: "Intermediate+", format: "Online", icon: "💼" },
-    { name: "Conversation Practice", price: 40000, level: "All Levels", format: "Online", icon: "💬" }
+    {
+      name: "General English",
+      price: 50000,
+      level: "All Levels",
+      format: "Online",
+      icon: "🇬🇧",
+    },
+    {
+      name: "IELTS Preparation",
+      price: 65000,
+      level: "Intermediate+",
+      format: "Online",
+      icon: "📊",
+    },
+    {
+      name: "Business English",
+      price: 70000,
+      level: "Intermediate+",
+      format: "Online",
+      icon: "💼",
+    },
+    {
+      name: "Conversation Practice",
+      price: 40000,
+      level: "All Levels",
+      format: "Online",
+      icon: "💬",
+    },
   ],
-  
-  teachingLevels: ["Beginner", "Elementary", "Intermediate", "Upper-Intermediate", "Advanced"],
-  examPrep: ["IELTS", "TOEFL", "Cambridge English", "Business English Certificate"],
-  
+
+  teachingLevels: [
+    "Beginner",
+    "Elementary",
+    "Intermediate",
+    "Upper-Intermediate",
+    "Advanced",
+  ],
+  examPrep: [
+    "IELTS",
+    "TOEFL",
+    "Cambridge English",
+    "Business English Certificate",
+  ],
+
   education: [
     {
       degree: "Master's in English Literature",
       institution: "National University of Uzbekistan",
       year: "2018",
-      verified: true
+      verified: true,
     },
     {
       degree: "Bachelor's in English Language",
       institution: "Tashkent State University",
       year: "2016",
-      verified: true
-    }
+      verified: true,
+    },
   ],
-  
+
   certifications: [
-    { name: "TESOL Certificate", issuer: "British Council", year: "2019", verified: true },
-    { name: "IELTS Teacher Training", issuer: "IDP Education", year: "2020", verified: true },
-    { name: "Business English Certification", issuer: "Cambridge English", year: "2021", verified: false }
+    {
+      name: "TESOL Certificate",
+      issuer: "British Council",
+      year: "2019",
+      verified: true,
+    },
+    {
+      name: "IELTS Teacher Training",
+      issuer: "IDP Education",
+      year: "2020",
+      verified: true,
+    },
+    {
+      name: "Business English Certification",
+      issuer: "Cambridge English",
+      year: "2021",
+      verified: false,
+    },
   ],
-  
+
   schedule: {
     timezone: "Asia/Tashkent (UTC+5)",
     nextAvailable: "Today at 14:00",
-    recurringSlots: ["Mon 09:00-17:00", "Tue 09:00-17:00", "Wed 09:00-17:00", "Thu 09:00-17:00", "Fri 09:00-17:00"]
+    recurringSlots: [
+      "Mon 09:00-17:00",
+      "Tue 09:00-17:00",
+      "Wed 09:00-17:00",
+      "Thu 09:00-17:00",
+      "Fri 09:00-17:00",
+    ],
   },
-  
+
   reviews: [
     {
       id: "1",
       studentName: "John Smith",
       studentAvatar: "/placeholder.svg",
       rating: 5,
-      comment: "Aziza is an excellent teacher! Her IELTS preparation course helped me achieve band 7.5. She's patient, knowledgeable, and always prepared with engaging materials.",
+      comment:
+        "Aziza is an excellent teacher! Her IELTS preparation course helped me achieve band 7.5. She's patient, knowledgeable, and always prepared with engaging materials.",
       date: "2024-01-15",
       subject: "IELTS Preparation",
       lessonCount: 20,
       helpful: 12,
-      teacherResponse: "Thank you so much, John! I'm thrilled to hear about your success. Keep up the great work!"
+      teacherResponse:
+        "Thank you so much, John! I'm thrilled to hear about your success. Keep up the great work!",
     },
     {
       id: "2",
       studentName: "Maria Garcia",
       studentAvatar: "/placeholder.svg",
       rating: 5,
-      comment: "Amazing teacher for business English. Really helped me improve my presentation skills and confidence in meetings.",
+      comment:
+        "Amazing teacher for business English. Really helped me improve my presentation skills and confidence in meetings.",
       date: "2024-01-10",
       subject: "Business English",
       lessonCount: 15,
-      helpful: 8
+      helpful: 8,
     },
     {
       id: "3",
       studentName: "Ahmed Hassan",
       studentAvatar: "/placeholder.svg",
       rating: 4,
-      comment: "Good teacher, clear explanations. Sometimes the lessons feel a bit rushed but overall very helpful.",
+      comment:
+        "Good teacher, clear explanations. Sometimes the lessons feel a bit rushed but overall very helpful.",
       date: "2024-01-05",
       subject: "General English",
       lessonCount: 8,
-      helpful: 3
-    }
+      helpful: 3,
+    },
   ],
-  
+
   materials: {
     introVideo: "/sample-intro.mp4",
     sampleLessons: ["/sample-lesson-1.mp4", "/sample-lesson-2.mp4"],
     resources: [
       { name: "IELTS Writing Guide", type: "PDF", url: "/ielts-guide.pdf" },
-      { name: "Business English Vocabulary", type: "PDF", url: "/business-vocab.pdf" },
-      { name: "Grammar Reference", type: "PDF", url: "/grammar-ref.pdf" }
-    ]
+      {
+        name: "Business English Vocabulary",
+        type: "PDF",
+        url: "/business-vocab.pdf",
+      },
+      { name: "Grammar Reference", type: "PDF", url: "/grammar-ref.pdf" },
+    ],
   },
-  
+
   pricing: {
     trialPrice: 25000,
     regularPrice: 50000,
     packages: [
       { lessons: 5, price: 225000, discount: 10 },
       { lessons: 10, price: 425000, discount: 15 },
-      { lessons: 20, price: 800000, discount: 20 }
-    ]
-  }
+      { lessons: 20, price: 800000, discount: 20 },
+    ],
+  },
 };
 
 const TeacherDetails: React.FC = () => {
@@ -232,7 +335,7 @@ const TeacherDetails: React.FC = () => {
 
   const handleBookTrial = () => {
     if (!teacher) return;
-    
+
     const params = new URLSearchParams({
       tutorId: teacher.id,
       tutorName: teacher.name,
@@ -240,20 +343,24 @@ const TeacherDetails: React.FC = () => {
       tutorRating: teacher.rating.toString(),
       subject: selectedSubject,
       slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      slotEnd: new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString(),
+      slotEnd: new Date(
+        Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000,
+      ).toISOString(),
       price: teacher.pricing.trialPrice.toString(),
-      serviceFee: '0'
+      serviceFee: "0",
     });
-    
+
     navigate(`/booking?${params.toString()}`);
   };
 
   const handleBookRegular = () => {
     if (!teacher) return;
-    
-    const selectedSubjectData = teacher.subjects.find(s => s.name === selectedSubject);
+
+    const selectedSubjectData = teacher.subjects.find(
+      (s) => s.name === selectedSubject,
+    );
     const price = selectedSubjectData?.price || teacher.pricing.regularPrice;
-    
+
     const params = new URLSearchParams({
       tutorId: teacher.id,
       tutorName: teacher.name,
@@ -261,26 +368,31 @@ const TeacherDetails: React.FC = () => {
       tutorRating: teacher.rating.toString(),
       subject: selectedSubject,
       slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      slotEnd: new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString(),
+      slotEnd: new Date(
+        Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000,
+      ).toISOString(),
       price: price.toString(),
-      serviceFee: '5000'
+      serviceFee: "5000",
     });
-    
+
     navigate(`/booking?${params.toString()}`);
   };
 
-  const filteredReviews = teacher?.reviews.filter(review => {
-    if (reviewFilter === "all") return true;
-    return review.rating === parseInt(reviewFilter);
-  }) || [];
+  const filteredReviews =
+    teacher?.reviews.filter((review) => {
+      if (reviewFilter === "all") return true;
+      return review.rating === parseInt(reviewFilter);
+    }) || [];
 
-  const ratingDistribution = teacher ? [
-    { stars: 5, count: Math.floor(teacher.totalReviews * 0.8) },
-    { stars: 4, count: Math.floor(teacher.totalReviews * 0.15) },
-    { stars: 3, count: Math.floor(teacher.totalReviews * 0.03) },
-    { stars: 2, count: Math.floor(teacher.totalReviews * 0.01) },
-    { stars: 1, count: Math.floor(teacher.totalReviews * 0.01) }
-  ] : [];
+  const ratingDistribution = teacher
+    ? [
+        { stars: 5, count: Math.floor(teacher.totalReviews * 0.8) },
+        { stars: 4, count: Math.floor(teacher.totalReviews * 0.15) },
+        { stars: 3, count: Math.floor(teacher.totalReviews * 0.03) },
+        { stars: 2, count: Math.floor(teacher.totalReviews * 0.01) },
+        { stars: 1, count: Math.floor(teacher.totalReviews * 0.01) },
+      ]
+    : [];
 
   if (!teacher) {
     return (
@@ -297,14 +409,22 @@ const TeacherDetails: React.FC = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate('/teachers')}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/teachers")}
+              >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Teachers
               </Button>
               <div className="hidden md:flex items-center text-sm text-muted-foreground">
-                <Link to="/" className="hover:text-primary">Home</Link>
+                <Link to="/" className="hover:text-primary">
+                  Home
+                </Link>
                 <ChevronRight className="h-4 w-4 mx-2" />
-                <Link to="/teachers" className="hover:text-primary">Teachers</Link>
+                <Link to="/teachers" className="hover:text-primary">
+                  Teachers
+                </Link>
                 <ChevronRight className="h-4 w-4 mx-2" />
                 <span className="text-foreground">{teacher.name}</span>
               </div>
@@ -314,13 +434,15 @@ const TeacherDetails: React.FC = () => {
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 onClick={() => setIsSaved(!isSaved)}
                 className={isSaved ? "text-red-500" : ""}
               >
-                <Heart className={`h-4 w-4 mr-2 ${isSaved ? "fill-current" : ""}`} />
+                <Heart
+                  className={`h-4 w-4 mr-2 ${isSaved ? "fill-current" : ""}`}
+                />
                 {isSaved ? "Saved" : "Save"}
               </Button>
             </div>
@@ -333,7 +455,6 @@ const TeacherDetails: React.FC = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main Content - Left Column */}
             <div className="lg:col-span-2 space-y-8">
-              
               {/* Teacher Hero Section */}
               <Card>
                 <CardContent className="p-6">
@@ -341,14 +462,22 @@ const TeacherDetails: React.FC = () => {
                     <div className="flex-shrink-0">
                       <div className="relative">
                         <Avatar className="w-32 h-32">
-                          <AvatarImage src={teacher.profileImage} alt={teacher.name} />
+                          <AvatarImage
+                            src={teacher.profileImage}
+                            alt={teacher.name}
+                          />
                           <AvatarFallback className="text-2xl">
-                            {teacher.name.split(' ').map(n => n[0]).join('')}
+                            {teacher.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
                           </AvatarFallback>
                         </Avatar>
-                        <div className={`absolute -bottom-2 -right-2 w-6 h-6 rounded-full border-2 border-white ${
-                          teacher.isOnline ? 'bg-green-500' : 'bg-gray-400'
-                        }`} />
+                        <div
+                          className={`absolute -bottom-2 -right-2 w-6 h-6 rounded-full border-2 border-white ${
+                            teacher.isOnline ? "bg-green-500" : "bg-gray-400"
+                          }`}
+                        />
                         {teacher.isVerified && (
                           <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                             <CheckCircle className="h-4 w-4 text-white" />
@@ -356,19 +485,24 @@ const TeacherDetails: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="flex-1 space-y-4">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <h1 className="text-2xl font-bold">{teacher.name}</h1>
                           {teacher.isVerified && (
-                            <Badge variant="secondary" className="text-blue-600">
+                            <Badge
+                              variant="secondary"
+                              className="text-blue-600"
+                            >
                               <CheckCircle className="h-3 w-3 mr-1" />
                               Verified
                             </Badge>
                           )}
                         </div>
-                        <p className="text-lg text-muted-foreground mb-2">{teacher.title}</p>
+                        <p className="text-lg text-muted-foreground mb-2">
+                          {teacher.title}
+                        </p>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <MapPin className="h-4 w-4" />
@@ -401,30 +535,46 @@ const TeacherDetails: React.FC = () => {
                         <div className="text-center">
                           <div className="flex items-center justify-center gap-1 mb-1">
                             <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                            <span className="font-bold text-lg">{teacher.rating}</span>
+                            <span className="font-bold text-lg">
+                              {teacher.rating}
+                            </span>
                           </div>
-                          <p className="text-xs text-muted-foreground">{teacher.totalReviews} reviews</p>
+                          <p className="text-xs text-muted-foreground">
+                            {teacher.totalReviews} reviews
+                          </p>
                         </div>
                         <div className="text-center">
                           <div className="flex items-center justify-center gap-1 mb-1">
                             <BookOpen className="h-4 w-4 text-blue-500" />
-                            <span className="font-bold text-lg">{teacher.totalLessons.toLocaleString()}</span>
+                            <span className="font-bold text-lg">
+                              {teacher.totalLessons.toLocaleString()}
+                            </span>
                           </div>
-                          <p className="text-xs text-muted-foreground">lessons</p>
+                          <p className="text-xs text-muted-foreground">
+                            lessons
+                          </p>
                         </div>
                         <div className="text-center">
                           <div className="flex items-center justify-center gap-1 mb-1">
                             <Users className="h-4 w-4 text-green-500" />
-                            <span className="font-bold text-lg">{teacher.studentsCount}</span>
+                            <span className="font-bold text-lg">
+                              {teacher.studentsCount}
+                            </span>
                           </div>
-                          <p className="text-xs text-muted-foreground">students</p>
+                          <p className="text-xs text-muted-foreground">
+                            students
+                          </p>
                         </div>
                         <div className="text-center">
                           <div className="flex items-center justify-center gap-1 mb-1">
                             <TrendingUp className="h-4 w-4 text-purple-500" />
-                            <span className="font-bold text-lg">{teacher.experienceYears}+</span>
+                            <span className="font-bold text-lg">
+                              {teacher.experienceYears}+
+                            </span>
                           </div>
-                          <p className="text-xs text-muted-foreground">years exp.</p>
+                          <p className="text-xs text-muted-foreground">
+                            years exp.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -440,11 +590,15 @@ const TeacherDetails: React.FC = () => {
                 <CardContent className="space-y-4">
                   <div>
                     <p className="text-muted-foreground leading-relaxed">
-                      {isDescriptionExpanded ? teacher.bio : `${teacher.bio.substring(0, 200)}...`}
-                      <Button 
-                        variant="link" 
+                      {isDescriptionExpanded
+                        ? teacher.bio
+                        : `${teacher.bio.substring(0, 200)}...`}
+                      <Button
+                        variant="link"
                         className="p-0 h-auto text-primary"
-                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                        onClick={() =>
+                          setIsDescriptionExpanded(!isDescriptionExpanded)
+                        }
                       >
                         {isDescriptionExpanded ? "Read less" : "Read more"}
                       </Button>
@@ -455,12 +609,18 @@ const TeacherDetails: React.FC = () => {
                     <>
                       <Separator />
                       <div>
-                        <h4 className="font-semibold mb-2">Teaching Philosophy</h4>
-                        <p className="text-muted-foreground">{teacher.teachingPhilosophy}</p>
+                        <h4 className="font-semibold mb-2">
+                          Teaching Philosophy
+                        </h4>
+                        <p className="text-muted-foreground">
+                          {teacher.teachingPhilosophy}
+                        </p>
                       </div>
                       <div>
                         <h4 className="font-semibold mb-2">Why I Teach</h4>
-                        <p className="text-muted-foreground">{teacher.whyITeach}</p>
+                        <p className="text-muted-foreground">
+                          {teacher.whyITeach}
+                        </p>
                       </div>
                     </>
                   )}
@@ -481,13 +641,21 @@ const TeacherDetails: React.FC = () => {
                             <div className="flex items-center gap-2">
                               <span className="text-2xl">{subject.icon}</span>
                               <div>
-                                <h4 className="font-semibold">{subject.name}</h4>
-                                <p className="text-sm text-muted-foreground">{subject.level}</p>
+                                <h4 className="font-semibold">
+                                  {subject.name}
+                                </h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {subject.level}
+                                </p>
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="font-bold text-lg">{subject.price.toLocaleString()} UZS</p>
-                              <p className="text-xs text-muted-foreground">per hour</p>
+                              <p className="font-bold text-lg">
+                                {subject.price.toLocaleString()} UZS
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                per hour
+                              </p>
                             </div>
                           </div>
                           <Badge variant="outline" className="text-xs">
@@ -505,7 +673,9 @@ const TeacherDetails: React.FC = () => {
                       <h4 className="font-semibold mb-3">Teaching Levels</h4>
                       <div className="flex flex-wrap gap-2">
                         {teacher.teachingLevels.map((level, index) => (
-                          <Badge key={index} variant="secondary">{level}</Badge>
+                          <Badge key={index} variant="secondary">
+                            {level}
+                          </Badge>
                         ))}
                       </div>
                     </div>
@@ -513,7 +683,9 @@ const TeacherDetails: React.FC = () => {
                       <h4 className="font-semibold mb-3">Exam Preparation</h4>
                       <div className="flex flex-wrap gap-2">
                         {teacher.examPrep.map((exam, index) => (
-                          <Badge key={index} variant="secondary">{exam}</Badge>
+                          <Badge key={index} variant="secondary">
+                            {exam}
+                          </Badge>
                         ))}
                       </div>
                     </div>
@@ -534,14 +706,24 @@ const TeacherDetails: React.FC = () => {
                     </h4>
                     <div className="space-y-3">
                       {teacher.education.map((edu, index) => (
-                        <div key={index} className="flex items-start justify-between p-3 border rounded-lg">
+                        <div
+                          key={index}
+                          className="flex items-start justify-between p-3 border rounded-lg"
+                        >
                           <div>
                             <h5 className="font-medium">{edu.degree}</h5>
-                            <p className="text-sm text-muted-foreground">{edu.institution}</p>
-                            <p className="text-xs text-muted-foreground">{edu.year}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {edu.institution}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {edu.year}
+                            </p>
                           </div>
                           {edu.verified && (
-                            <Badge variant="secondary" className="text-green-600">
+                            <Badge
+                              variant="secondary"
+                              className="text-green-600"
+                            >
                               <CheckCircle className="h-3 w-3 mr-1" />
                               Verified
                             </Badge>
@@ -558,15 +740,26 @@ const TeacherDetails: React.FC = () => {
                     </h4>
                     <div className="space-y-3">
                       {teacher.certifications.map((cert, index) => (
-                        <div key={index} className="flex items-start justify-between p-3 border rounded-lg">
+                        <div
+                          key={index}
+                          className="flex items-start justify-between p-3 border rounded-lg"
+                        >
                           <div>
                             <h5 className="font-medium">{cert.name}</h5>
-                            <p className="text-sm text-muted-foreground">{cert.issuer}</p>
-                            <p className="text-xs text-muted-foreground">{cert.year}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {cert.issuer}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {cert.year}
+                            </p>
                           </div>
-                          <Badge 
+                          <Badge
                             variant={cert.verified ? "secondary" : "outline"}
-                            className={cert.verified ? "text-green-600" : "text-orange-600"}
+                            className={
+                              cert.verified
+                                ? "text-green-600"
+                                : "text-orange-600"
+                            }
                           >
                             {cert.verified ? (
                               <>
@@ -588,8 +781,13 @@ const TeacherDetails: React.FC = () => {
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>Student Reviews ({teacher.totalReviews})</CardTitle>
-                    <Select value={reviewFilter} onValueChange={setReviewFilter}>
+                    <CardTitle>
+                      Student Reviews ({teacher.totalReviews})
+                    </CardTitle>
+                    <Select
+                      value={reviewFilter}
+                      onValueChange={setReviewFilter}
+                    >
                       <SelectTrigger className="w-40">
                         <SelectValue />
                       </SelectTrigger>
@@ -608,25 +806,39 @@ const TeacherDetails: React.FC = () => {
                   {/* Rating Summary */}
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="text-center">
-                      <div className="text-4xl font-bold mb-1">{teacher.rating}</div>
+                      <div className="text-4xl font-bold mb-1">
+                        {teacher.rating}
+                      </div>
                       <div className="flex items-center justify-center gap-1 mb-2">
                         {[1, 2, 3, 4, 5].map((star) => (
-                          <Star 
-                            key={star} 
+                          <Star
+                            key={star}
                             className={`h-5 w-5 ${
-                              star <= teacher.rating ? 'text-yellow-500 fill-current' : 'text-gray-300'
-                            }`} 
+                              star <= teacher.rating
+                                ? "text-yellow-500 fill-current"
+                                : "text-gray-300"
+                            }`}
                           />
                         ))}
                       </div>
-                      <p className="text-sm text-muted-foreground">{teacher.totalReviews} reviews</p>
+                      <p className="text-sm text-muted-foreground">
+                        {teacher.totalReviews} reviews
+                      </p>
                     </div>
                     <div className="space-y-2">
                       {ratingDistribution.map((dist) => (
-                        <div key={dist.stars} className="flex items-center gap-2">
+                        <div
+                          key={dist.stars}
+                          className="flex items-center gap-2"
+                        >
                           <span className="text-sm w-6">{dist.stars}★</span>
-                          <Progress value={(dist.count / teacher.totalReviews) * 100} className="flex-1" />
-                          <span className="text-sm text-muted-foreground w-8">{dist.count}</span>
+                          <Progress
+                            value={(dist.count / teacher.totalReviews) * 100}
+                            className="flex-1"
+                          />
+                          <span className="text-sm text-muted-foreground w-8">
+                            {dist.count}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -641,21 +853,29 @@ const TeacherDetails: React.FC = () => {
                         <div className="flex items-start gap-3 mb-3">
                           <Avatar className="w-10 h-10">
                             <AvatarImage src={review.studentAvatar} />
-                            <AvatarFallback>{review.studentName[0]}</AvatarFallback>
+                            <AvatarFallback>
+                              {review.studentName[0]}
+                            </AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <h5 className="font-medium">{review.studentName}</h5>
-                              <Badge variant="outline" className="text-xs">{review.subject}</Badge>
+                              <h5 className="font-medium">
+                                {review.studentName}
+                              </h5>
+                              <Badge variant="outline" className="text-xs">
+                                {review.subject}
+                              </Badge>
                             </div>
                             <div className="flex items-center gap-2 mb-2">
                               <div className="flex items-center gap-1">
                                 {[1, 2, 3, 4, 5].map((star) => (
-                                  <Star 
-                                    key={star} 
+                                  <Star
+                                    key={star}
                                     className={`h-3 w-3 ${
-                                      star <= review.rating ? 'text-yellow-500 fill-current' : 'text-gray-300'
-                                    }`} 
+                                      star <= review.rating
+                                        ? "text-yellow-500 fill-current"
+                                        : "text-gray-300"
+                                    }`}
                                   />
                                 ))}
                               </div>
@@ -663,14 +883,24 @@ const TeacherDetails: React.FC = () => {
                                 {review.lessonCount} lessons • {review.date}
                               </span>
                             </div>
-                            <p className="text-sm text-muted-foreground mb-2">{review.comment}</p>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {review.comment}
+                            </p>
                             {review.teacherResponse && (
                               <div className="bg-muted p-3 rounded-lg mt-2">
-                                <p className="text-xs font-medium mb-1">Teacher's response:</p>
-                                <p className="text-xs text-muted-foreground">{review.teacherResponse}</p>
+                                <p className="text-xs font-medium mb-1">
+                                  Teacher's response:
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {review.teacherResponse}
+                                </p>
                               </div>
                             )}
-                            <Button variant="ghost" size="sm" className="mt-2 p-0 h-auto">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="mt-2 p-0 h-auto"
+                            >
                               👍 Helpful ({review.helpful})
                             </Button>
                           </div>
@@ -700,7 +930,10 @@ const TeacherDetails: React.FC = () => {
                       Introduction Video
                     </h4>
                     <div className="relative bg-muted rounded-lg h-48 flex items-center justify-center">
-                      <Button variant="outline" className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex items-center gap-2"
+                      >
                         <Play className="h-4 w-4" />
                         Watch Introduction (2:30)
                       </Button>
@@ -715,12 +948,19 @@ const TeacherDetails: React.FC = () => {
                     </h4>
                     <div className="grid md:grid-cols-2 gap-3">
                       {teacher.materials.resources.map((resource, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
                           <div className="flex items-center gap-2">
                             <FileText className="h-4 w-4 text-blue-500" />
                             <div>
-                              <p className="text-sm font-medium">{resource.name}</p>
-                              <p className="text-xs text-muted-foreground">{resource.type}</p>
+                              <p className="text-sm font-medium">
+                                {resource.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {resource.type}
+                              </p>
                             </div>
                           </div>
                           <Button size="sm" variant="ghost">
@@ -744,15 +984,21 @@ const TeacherDetails: React.FC = () => {
                   <CardContent className="space-y-4">
                     {/* Subject Selection */}
                     <div>
-                      <label className="text-sm font-medium mb-2 block">Choose Subject</label>
-                      <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                      <label className="text-sm font-medium mb-2 block">
+                        Choose Subject
+                      </label>
+                      <Select
+                        value={selectedSubject}
+                        onValueChange={setSelectedSubject}
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {teacher.subjects.map((subject) => (
                             <SelectItem key={subject.name} value={subject.name}>
-                              {subject.name} - {subject.price.toLocaleString()} UZS/hr
+                              {subject.name} - {subject.price.toLocaleString()}{" "}
+                              UZS/hr
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -763,20 +1009,34 @@ const TeacherDetails: React.FC = () => {
                     <div className="bg-muted p-3 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Calendar className="h-4 w-4" />
-                        <span className="text-sm font-medium">Next Available</span>
+                        <span className="text-sm font-medium">
+                          Next Available
+                        </span>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-1">{teacher.schedule.nextAvailable}</p>
-                      <p className="text-xs text-muted-foreground">{teacher.schedule.timezone}</p>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        {teacher.schedule.nextAvailable}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {teacher.schedule.timezone}
+                      </p>
                     </div>
 
                     {/* Trial Lesson */}
                     <div className="space-y-2">
-                      <Button onClick={handleBookTrial} className="w-full" size="lg">
+                      <Button
+                        onClick={handleBookTrial}
+                        className="w-full"
+                        size="lg"
+                      >
                         Book Trial Lesson
                       </Button>
                       <div className="text-center">
-                        <span className="text-lg font-bold">{teacher.pricing.trialPrice.toLocaleString()} UZS</span>
-                        <span className="text-sm text-muted-foreground ml-1">• 30 minutes</span>
+                        <span className="text-lg font-bold">
+                          {teacher.pricing.trialPrice.toLocaleString()} UZS
+                        </span>
+                        <span className="text-sm text-muted-foreground ml-1">
+                          • 30 minutes
+                        </span>
                       </div>
                     </div>
 
@@ -785,20 +1045,33 @@ const TeacherDetails: React.FC = () => {
                         <span className="w-full border-t" />
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">or</span>
+                        <span className="bg-background px-2 text-muted-foreground">
+                          or
+                        </span>
                       </div>
                     </div>
 
                     {/* Regular Lesson */}
                     <div className="space-y-2">
-                      <Button onClick={handleBookRegular} variant="outline" className="w-full" size="lg">
+                      <Button
+                        onClick={handleBookRegular}
+                        variant="outline"
+                        className="w-full"
+                        size="lg"
+                      >
                         Book Regular Lesson
                       </Button>
                       <div className="text-center">
                         <span className="text-lg font-bold">
-                          {teacher.subjects.find(s => s.name === selectedSubject)?.price.toLocaleString() || teacher.pricing.regularPrice.toLocaleString()} UZS
+                          {teacher.subjects
+                            .find((s) => s.name === selectedSubject)
+                            ?.price.toLocaleString() ||
+                            teacher.pricing.regularPrice.toLocaleString()}{" "}
+                          UZS
                         </span>
-                        <span className="text-sm text-muted-foreground ml-1">• 60 minutes</span>
+                        <span className="text-sm text-muted-foreground ml-1">
+                          • 60 minutes
+                        </span>
                       </div>
                     </div>
 
@@ -819,14 +1092,19 @@ const TeacherDetails: React.FC = () => {
                     {teacher.pricing.packages.map((pkg, index) => (
                       <div key={index} className="border rounded-lg p-3">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium">{pkg.lessons} Lessons</span>
+                          <span className="font-medium">
+                            {pkg.lessons} Lessons
+                          </span>
                           <Badge variant="secondary">{pkg.discount}% off</Badge>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-muted-foreground">
-                            {(pkg.price / pkg.lessons).toLocaleString()} UZS/lesson
+                            {(pkg.price / pkg.lessons).toLocaleString()}{" "}
+                            UZS/lesson
                           </span>
-                          <span className="font-bold">{pkg.price.toLocaleString()} UZS</span>
+                          <span className="font-bold">
+                            {pkg.price.toLocaleString()} UZS
+                          </span>
                         </div>
                       </div>
                     ))}

@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer';
-import { config } from '../config';
-import { logger } from '../utils/logger';
+import nodemailer from "nodemailer";
+import { config } from "../config";
+import { logger } from "../utils/logger";
 
 interface EmailOptions {
   to: string;
@@ -32,9 +32,9 @@ class EmailService {
   private async verifyConnection(): Promise<void> {
     try {
       await this.transporter.verify();
-      logger.info('Email service connected successfully');
+      logger.info("Email service connected successfully");
     } catch (error) {
-      logger.error('Email service connection failed:', error);
+      logger.error("Email service connection failed:", error);
     }
   }
 
@@ -49,15 +49,15 @@ class EmailService {
       };
 
       const result = await this.transporter.sendMail(mailOptions);
-      
-      logger.info('Email sent successfully', {
+
+      logger.info("Email sent successfully", {
         to: options.to,
         subject: options.subject,
         messageId: result.messageId,
         template: options.template,
       });
     } catch (error) {
-      logger.error('Failed to send email', {
+      logger.error("Failed to send email", {
         to: options.to,
         subject: options.subject,
         error: error.message,
@@ -66,9 +66,12 @@ class EmailService {
     }
   }
 
-  private getTemplate(templateName: string, data: Record<string, any> = {}): string {
+  private getTemplate(
+    templateName: string,
+    data: Record<string, any> = {},
+  ): string {
     const templates: Record<string, (data: Record<string, any>) => string> = {
-      'email-verification': (data) => `
+      "email-verification": (data) => `
         <!DOCTYPE html>
         <html>
         <head>
@@ -104,7 +107,7 @@ class EmailService {
         </html>
       `,
 
-      'password-reset': (data) => `
+      "password-reset": (data) => `
         <!DOCTYPE html>
         <html>
         <head>
@@ -140,7 +143,7 @@ class EmailService {
         </html>
       `,
 
-      'booking-confirmation': (data) => `
+      "booking-confirmation": (data) => `
         <!DOCTYPE html>
         <html>
         <head>
@@ -181,7 +184,7 @@ class EmailService {
         </html>
       `,
 
-      'lesson-reminder': (data) => `
+      "lesson-reminder": (data) => `
         <!DOCTYPE html>
         <html>
         <head>
@@ -219,7 +222,7 @@ class EmailService {
         </html>
       `,
 
-      'payment-confirmation': (data) => `
+      "payment-confirmation": (data) => `
         <!DOCTYPE html>
         <html>
         <head>

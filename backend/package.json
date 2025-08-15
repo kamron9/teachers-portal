@@ -17,7 +17,13 @@
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix"
   },
-  "keywords": ["tutoring", "marketplace", "uzbekistan", "education", "api"],
+  "keywords": [
+    "tutoring",
+    "marketplace",
+    "uzbekistan",
+    "education",
+    "api"
+  ],
   "author": "Tutoring Marketplace Team",
   "license": "MIT",
   "dependencies": {

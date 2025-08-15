@@ -1,79 +1,89 @@
-import express from 'express';
-import { prisma } from '../lib/prisma';
-import { requireRole, requireVerification } from '../middleware/auth';
-import { validateRequest, validateParams, validateQuery } from '../middleware/validation';
-import { AppError, PaymentError, NotFoundError } from '../utils/errors';
-import { logger } from '../utils/logger';
-import { 
-  createPaymentSchema, 
+import express from "express";
+import { prisma } from "../lib/prisma";
+import { requireRole, requireVerification } from "../middleware/auth";
+import {
+  validateRequest,
+  validateParams,
+  validateQuery,
+} from "../middleware/validation";
+import { AppError, PaymentError, NotFoundError } from "../utils/errors";
+import { logger } from "../utils/logger";
+import {
+  createPaymentSchema,
   paymentWebhookSchema,
   paymentQuerySchema,
   refundSchema,
-  payoutRequestSchema
-} from '../validators/paymentValidators';
-import { commonSchemas } from '../middleware/validation';
-import { PaymentService } from '../services/paymentService';
-import { config } from '../config';
-import { sendEmail } from '../services/emailService';
-import { sendSMS } from '../services/smsService';
-import Joi from 'joi';
+  payoutRequestSchema,
+} from "../validators/paymentValidators";
+import { commonSchemas } from "../middleware/validation";
+import { PaymentService } from "../services/paymentService";
+import { config } from "../config";
+import { sendEmail } from "../services/emailService";
+import { sendSMS } from "../services/smsService";
+import Joi from "joi";
 
 const router = express.Router();
 const paymentService = new PaymentService();
 
 // Create payment for booking (Student only)
 router.post(
-  '/',
-  requireRole('STUDENT'),
+  "/",
+  requireRole("STUDENT"),
   validateRequest(createPaymentSchema),
   async (req, res) => {
     const studentId = req.user!.id;
-    const { 
-      bookingId, 
-      packageId, 
-      provider, 
-      returnUrl, 
+    const {
+      bookingId,
+      packageId,
+      provider,
+      returnUrl,
       cancelUrl,
-      paymentMethodId 
+      paymentMethodId,
     } = req.body;
 
     // Validate that either bookingId or packageId is provided
     if (!bookingId && !packageId) {
-      throw new PaymentError('Either booking ID or package ID is required', 'MISSING_PAYMENT_TARGET');
+      throw new PaymentError(
+        "Either booking ID or package ID is required",
+        "MISSING_PAYMENT_TARGET",
+      );
     }
 
     let amount = 0;
-    let description = '';
+    let description = "";
     let targetEntity: any = null;
 
     // Get payment details based on target
     if (bookingId) {
       const booking = await prisma.booking.findUnique({
-        where: { 
+        where: {
           id: bookingId,
-          studentId 
+          studentId,
         },
         include: {
           teacher: {
             select: {
               firstName: true,
-              lastName: true
-            }
+              lastName: true,
+            },
           },
           subjectOffering: {
             select: {
-              subjectName: true
-            }
-          }
-        }
+              subjectName: true,
+            },
+          },
+        },
       });
 
       if (!booking) {
-        throw new NotFoundError('Booking not found');
+        throw new NotFoundError("Booking not found");
       }
 
-      if (booking.status !== 'PENDING') {
-        throw new PaymentError('Payment can only be made for pending bookings', 'INVALID_BOOKING_STATUS');
+      if (booking.status !== "PENDING") {
+        throw new PaymentError(
+          "Payment can only be made for pending bookings",
+          "INVALID_BOOKING_STATUS",
+        );
       }
 
       amount = booking.priceAtBooking;
@@ -81,31 +91,34 @@ router.post(
       targetEntity = booking;
     } else if (packageId) {
       const packageInfo = await prisma.package.findUnique({
-        where: { 
+        where: {
           id: packageId,
-          studentId 
+          studentId,
         },
         include: {
           teacher: {
             select: {
               firstName: true,
-              lastName: true
-            }
+              lastName: true,
+            },
           },
           subjectOffering: {
             select: {
-              subjectName: true
-            }
-          }
-        }
+              subjectName: true,
+            },
+          },
+        },
       });
 
       if (!packageInfo) {
-        throw new NotFoundError('Package not found');
+        throw new NotFoundError("Package not found");
       }
 
-      if (packageInfo.status !== 'PENDING') {
-        throw new PaymentError('Payment can only be made for pending packages', 'INVALID_PACKAGE_STATUS');
+      if (packageInfo.status !== "PENDING") {
+        throw new PaymentError(
+          "Payment can only be made for pending packages",
+          "INVALID_PACKAGE_STATUS",
+        );
       }
 
       amount = packageInfo.priceTotal;
@@ -120,15 +133,15 @@ router.post(
         packageId,
         amount,
         provider,
-        status: 'PENDING',
-        currency: 'UZS',
+        status: "PENDING",
+        currency: "UZS",
         metadata: {
           description,
           returnUrl,
           cancelUrl,
-          paymentMethodId
-        }
-      }
+          paymentMethodId,
+        },
+      },
     });
 
     try {
@@ -143,8 +156,8 @@ router.post(
         paymentMethodId,
         customerInfo: {
           id: studentId,
-          email: req.user!.email
-        }
+          email: req.user!.email,
+        },
       });
 
       // Update payment with provider reference
@@ -154,18 +167,18 @@ router.post(
           providerRef: paymentResult.providerRef,
           metadata: {
             ...payment.metadata,
-            ...paymentResult.metadata
-          }
-        }
+            ...paymentResult.metadata,
+          },
+        },
       });
 
-      logger.info('Payment created', {
+      logger.info("Payment created", {
         paymentId: payment.id,
         studentId,
         amount,
         provider,
         bookingId,
-        packageId
+        packageId,
       });
 
       res.status(201).json({
@@ -173,30 +186,32 @@ router.post(
           id: payment.id,
           amount,
           provider,
-          status: 'PENDING'
+          status: "PENDING",
         },
         paymentUrl: paymentResult.paymentUrl,
-        providerRef: paymentResult.providerRef
+        providerRef: paymentResult.providerRef,
       });
-
     } catch (error) {
       // Update payment status to failed
       await prisma.payment.update({
         where: { id: payment.id },
-        data: { 
-          status: 'FAILED',
-          failureReason: error.message 
-        }
+        data: {
+          status: "FAILED",
+          failureReason: error.message,
+        },
       });
 
-      throw new PaymentError(`Payment processing failed: ${error.message}`, 'PAYMENT_PROCESSING_FAILED');
+      throw new PaymentError(
+        `Payment processing failed: ${error.message}`,
+        "PAYMENT_PROCESSING_FAILED",
+      );
     }
-  }
+  },
 );
 
 // Get payment details
 router.get(
-  '/:paymentId',
+  "/:paymentId",
   validateParams(Joi.object({ paymentId: commonSchemas.id })),
   async (req, res) => {
     const { paymentId } = req.params;
@@ -212,17 +227,17 @@ router.get(
               select: {
                 id: true,
                 firstName: true,
-                lastName: true
-              }
+                lastName: true,
+              },
             },
             teacher: {
               select: {
                 id: true,
                 firstName: true,
-                lastName: true
-              }
-            }
-          }
+                lastName: true,
+              },
+            },
+          },
         },
         package: {
           include: {
@@ -230,188 +245,209 @@ router.get(
               select: {
                 id: true,
                 firstName: true,
-                lastName: true
-              }
+                lastName: true,
+              },
             },
             teacher: {
               select: {
                 id: true,
                 firstName: true,
-                lastName: true
-              }
-            }
-          }
-        }
-      }
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!payment) {
-      throw new NotFoundError('Payment not found');
+      throw new NotFoundError("Payment not found");
     }
 
     // Check access permissions
     const studentId = payment.booking?.studentId || payment.package?.studentId;
     const teacherId = payment.booking?.teacherId || payment.package?.teacherId;
 
-    if (userRole === 'STUDENT' && studentId !== userId) {
-      throw new AppError('Access denied', 403, 'INSUFFICIENT_PERMISSIONS');
+    if (userRole === "STUDENT" && studentId !== userId) {
+      throw new AppError("Access denied", 403, "INSUFFICIENT_PERMISSIONS");
     }
-    if (userRole === 'TEACHER' && teacherId !== userId) {
-      throw new AppError('Access denied', 403, 'INSUFFICIENT_PERMISSIONS');
+    if (userRole === "TEACHER" && teacherId !== userId) {
+      throw new AppError("Access denied", 403, "INSUFFICIENT_PERMISSIONS");
     }
 
     res.json(payment);
-  }
+  },
 );
 
 // Get payment history
-router.get(
-  '/',
-  validateQuery(paymentQuerySchema),
-  async (req, res) => {
-    const userId = req.user!.id;
-    const userRole = req.user!.role;
-    const { 
-      status, 
-      provider, 
-      startDate, 
-      endDate, 
-      page = 1, 
-      limit = 20,
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
-    } = req.query;
+router.get("/", validateQuery(paymentQuerySchema), async (req, res) => {
+  const userId = req.user!.id;
+  const userRole = req.user!.role;
+  const {
+    status,
+    provider,
+    startDate,
+    endDate,
+    page = 1,
+    limit = 20,
+    sortBy = "createdAt",
+    sortOrder = "desc",
+  } = req.query;
 
-    // Build where clause based on user role
-    let whereClause: any = {};
-    
-    if (userRole === 'STUDENT') {
-      whereClause = {
-        OR: [
-          { booking: { studentId: userId } },
-          { package: { studentId: userId } }
-        ]
-      };
-    } else if (userRole === 'TEACHER') {
-      whereClause = {
-        OR: [
-          { booking: { teacherId: userId } },
-          { package: { teacherId: userId } }
-        ]
-      };
-    } else if (userRole !== 'ADMIN') {
-      throw new AppError('Invalid user role for payment access', 403, 'INSUFFICIENT_PERMISSIONS');
-    }
+  // Build where clause based on user role
+  let whereClause: any = {};
 
-    // Add filters
-    if (status) {
-      whereClause.status = Array.isArray(status) ? { in: status } : status;
-    }
-    if (provider) {
-      whereClause.provider = Array.isArray(provider) ? { in: provider } : provider;
-    }
-    if (startDate || endDate) {
-      whereClause.createdAt = {};
-      if (startDate) whereClause.createdAt.gte = new Date(startDate as string);
-      if (endDate) whereClause.createdAt.lte = new Date(endDate as string);
-    }
-
-    // Calculate pagination
-    const skip = (page - 1) * limit;
-
-    const [payments, totalCount] = await Promise.all([
-      prisma.payment.findMany({
-        where: whereClause,
-        include: {
-          booking: {
-            include: {
-              subjectOffering: {
-                select: {
-                  subjectName: true
-                }
-              }
-            }
-          },
-          package: {
-            include: {
-              subjectOffering: {
-                select: {
-                  subjectName: true
-                }
-              }
-            }
-          }
-        },
-        orderBy: { [sortBy as string]: sortOrder },
-        skip,
-        take: limit
-      }),
-
-      prisma.payment.count({ where: whereClause })
-    ]);
-
-    res.json({
-      payments,
-      pagination: {
-        page,
-        limit,
-        total: totalCount,
-        pages: Math.ceil(totalCount / limit)
-      }
-    });
+  if (userRole === "STUDENT") {
+    whereClause = {
+      OR: [
+        { booking: { studentId: userId } },
+        { package: { studentId: userId } },
+      ],
+    };
+  } else if (userRole === "TEACHER") {
+    whereClause = {
+      OR: [
+        { booking: { teacherId: userId } },
+        { package: { teacherId: userId } },
+      ],
+    };
+  } else if (userRole !== "ADMIN") {
+    throw new AppError(
+      "Invalid user role for payment access",
+      403,
+      "INSUFFICIENT_PERMISSIONS",
+    );
   }
-);
+
+  // Add filters
+  if (status) {
+    whereClause.status = Array.isArray(status) ? { in: status } : status;
+  }
+  if (provider) {
+    whereClause.provider = Array.isArray(provider)
+      ? { in: provider }
+      : provider;
+  }
+  if (startDate || endDate) {
+    whereClause.createdAt = {};
+    if (startDate) whereClause.createdAt.gte = new Date(startDate as string);
+    if (endDate) whereClause.createdAt.lte = new Date(endDate as string);
+  }
+
+  // Calculate pagination
+  const skip = (page - 1) * limit;
+
+  const [payments, totalCount] = await Promise.all([
+    prisma.payment.findMany({
+      where: whereClause,
+      include: {
+        booking: {
+          include: {
+            subjectOffering: {
+              select: {
+                subjectName: true,
+              },
+            },
+          },
+        },
+        package: {
+          include: {
+            subjectOffering: {
+              select: {
+                subjectName: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { [sortBy as string]: sortOrder },
+      skip,
+      take: limit,
+    }),
+
+    prisma.payment.count({ where: whereClause }),
+  ]);
+
+  res.json({
+    payments,
+    pagination: {
+      page,
+      limit,
+      total: totalCount,
+      pages: Math.ceil(totalCount / limit),
+    },
+  });
+});
 
 // Webhook endpoint for payment providers
 router.post(
-  '/webhook/:provider',
-  validateParams(Joi.object({ provider: Joi.string().valid('CLICK', 'PAYME', 'UZUM_BANK', 'STRIPE').required() })),
+  "/webhook/:provider",
+  validateParams(
+    Joi.object({
+      provider: Joi.string()
+        .valid("CLICK", "PAYME", "UZUM_BANK", "STRIPE")
+        .required(),
+    }),
+  ),
   async (req, res) => {
     const { provider } = req.params;
     const webhookData = req.body;
 
     try {
       // Verify webhook signature
-      const isValid = await paymentService.verifyWebhook(provider as any, req.headers, webhookData);
-      
+      const isValid = await paymentService.verifyWebhook(
+        provider as any,
+        req.headers,
+        webhookData,
+      );
+
       if (!isValid) {
-        throw new PaymentError('Invalid webhook signature', 'INVALID_WEBHOOK_SIGNATURE');
+        throw new PaymentError(
+          "Invalid webhook signature",
+          "INVALID_WEBHOOK_SIGNATURE",
+        );
       }
 
       // Process webhook
-      const result = await paymentService.processWebhook(provider as any, webhookData);
+      const result = await paymentService.processWebhook(
+        provider as any,
+        webhookData,
+      );
 
       if (result.paymentId) {
-        await handlePaymentStatusUpdate(result.paymentId, result.status, result.metadata);
+        await handlePaymentStatusUpdate(
+          result.paymentId,
+          result.status,
+          result.metadata,
+        );
       }
 
-      logger.info('Payment webhook processed', {
+      logger.info("Payment webhook processed", {
         provider,
         paymentId: result.paymentId,
-        status: result.status
+        status: result.status,
       });
 
       res.json({ received: true });
-
     } catch (error) {
-      logger.error('Payment webhook processing failed', {
+      logger.error("Payment webhook processing failed", {
         provider,
         error: error.message,
-        webhookData
+        webhookData,
       });
 
-      res.status(400).json({ 
-        error: 'Webhook processing failed',
-        message: error.message 
+      res.status(400).json({
+        error: "Webhook processing failed",
+        message: error.message,
       });
     }
-  }
+  },
 );
 
 // Request refund (Student only)
 router.post(
-  '/:paymentId/refund',
-  requireRole('STUDENT'),
+  "/:paymentId/refund",
+  requireRole("STUDENT"),
   validateParams(Joi.object({ paymentId: commonSchemas.id })),
   validateRequest(refundSchema),
   async (req, res) => {
@@ -423,26 +459,32 @@ router.post(
       where: { id: paymentId },
       include: {
         booking: {
-          where: { studentId }
+          where: { studentId },
         },
         package: {
-          where: { studentId }
-        }
-      }
+          where: { studentId },
+        },
+      },
     });
 
     if (!payment) {
-      throw new NotFoundError('Payment not found');
+      throw new NotFoundError("Payment not found");
     }
 
-    if (payment.status !== 'COMPLETED') {
-      throw new PaymentError('Only completed payments can be refunded', 'PAYMENT_NOT_REFUNDABLE');
+    if (payment.status !== "COMPLETED") {
+      throw new PaymentError(
+        "Only completed payments can be refunded",
+        "PAYMENT_NOT_REFUNDABLE",
+      );
     }
 
     const refundAmount = amount || payment.amount;
-    
+
     if (refundAmount > payment.amount) {
-      throw new PaymentError('Refund amount cannot exceed payment amount', 'INVALID_REFUND_AMOUNT');
+      throw new PaymentError(
+        "Refund amount cannot exceed payment amount",
+        "INVALID_REFUND_AMOUNT",
+      );
     }
 
     try {
@@ -452,69 +494,74 @@ router.post(
         providerRef: payment.providerRef!,
         amount: refundAmount,
         reason,
-        provider: payment.provider
+        provider: payment.provider,
       });
 
       // Update payment record
       const updatedPayment = await prisma.payment.update({
         where: { id: paymentId },
         data: {
-          status: refundAmount === payment.amount ? 'REFUNDED' : 'PARTIALLY_REFUNDED',
+          status:
+            refundAmount === payment.amount ? "REFUNDED" : "PARTIALLY_REFUNDED",
           refundedAt: new Date(),
           refundAmount: (payment.refundAmount || 0) + refundAmount,
           metadata: {
             ...payment.metadata,
             refunds: [
-              ...(payment.metadata as any)?.refunds || [],
+              ...((payment.metadata as any)?.refunds || []),
               {
                 amount: refundAmount,
                 reason,
                 processedAt: new Date(),
-                refundRef: refundResult.refundRef
-              }
-            ]
-          }
-        }
+                refundRef: refundResult.refundRef,
+              },
+            ],
+          },
+        },
       });
 
-      logger.info('Payment refund processed', {
+      logger.info("Payment refund processed", {
         paymentId,
         studentId,
         refundAmount,
-        reason
+        reason,
       });
 
       res.json({
         refund: {
           amount: refundAmount,
           status: refundResult.status,
-          refundRef: refundResult.refundRef
+          refundRef: refundResult.refundRef,
         },
-        payment: updatedPayment
+        payment: updatedPayment,
       });
-
     } catch (error) {
-      throw new PaymentError(`Refund processing failed: ${error.message}`, 'REFUND_PROCESSING_FAILED');
+      throw new PaymentError(
+        `Refund processing failed: ${error.message}`,
+        "REFUND_PROCESSING_FAILED",
+      );
     }
-  }
+  },
 );
 
 // Get teacher earnings (Teacher only)
 router.get(
-  '/earnings/summary',
-  requireRole('TEACHER'),
-  requireVerification('teacher'),
-  validateQuery(Joi.object({
-    startDate: Joi.date().iso().optional(),
-    endDate: Joi.date().iso().min(Joi.ref('startDate')).optional(),
-    status: Joi.string().valid('PENDING', 'AVAILABLE', 'PAID').optional()
-  })),
+  "/earnings/summary",
+  requireRole("TEACHER"),
+  requireVerification("teacher"),
+  validateQuery(
+    Joi.object({
+      startDate: Joi.date().iso().optional(),
+      endDate: Joi.date().iso().min(Joi.ref("startDate")).optional(),
+      status: Joi.string().valid("PENDING", "AVAILABLE", "PAID").optional(),
+    }),
+  ),
   async (req, res) => {
     const teacherId = req.user!.id;
     const { startDate, endDate, status } = req.query;
 
     const whereClause: any = { teacherId };
-    
+
     if (status) {
       whereClause.status = status;
     }
@@ -535,41 +582,42 @@ router.get(
               student: {
                 select: {
                   firstName: true,
-                  lastName: true
-                }
+                  lastName: true,
+                },
               },
               subjectOffering: {
                 select: {
-                  subjectName: true
-                }
-              }
-            }
-          }
+                  subjectName: true,
+                },
+              },
+            },
+          },
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: "desc" },
       }),
 
       prisma.walletEntry.aggregate({
         where: { teacherId },
         _sum: {
           amount: true,
-          commission: true
+          commission: true,
         },
-        _count: true
-      })
+        _count: true,
+      }),
     ]);
 
     const summary = {
       totalEarnings: totalStats._sum.amount || 0,
       totalCommission: totalStats._sum.commission || 0,
-      netEarnings: (totalStats._sum.amount || 0) - (totalStats._sum.commission || 0),
+      netEarnings:
+        (totalStats._sum.amount || 0) - (totalStats._sum.commission || 0),
       totalTransactions: totalStats._count,
       availableBalance: earnings
-        .filter(e => e.status === 'AVAILABLE')
+        .filter((e) => e.status === "AVAILABLE")
         .reduce((sum, e) => sum + e.amount, 0),
       pendingBalance: earnings
-        .filter(e => e.status === 'PENDING')
-        .reduce((sum, e) => sum + e.amount, 0)
+        .filter((e) => e.status === "PENDING")
+        .reduce((sum, e) => sum + e.amount, 0),
     };
 
     res.json({
@@ -577,17 +625,17 @@ router.get(
       earnings: earnings.slice(0, 50), // Recent 50 entries
       pagination: {
         total: earnings.length,
-        hasMore: earnings.length > 50
-      }
+        hasMore: earnings.length > 50,
+      },
     });
-  }
+  },
 );
 
 // Request payout (Teacher only)
 router.post(
-  '/payout',
-  requireRole('TEACHER'),
-  requireVerification('teacher'),
+  "/payout",
+  requireRole("TEACHER"),
+  requireVerification("teacher"),
   validateRequest(payoutRequestSchema),
   async (req, res) => {
     const teacherId = req.user!.id;
@@ -597,27 +645,33 @@ router.post(
     const availableBalance = await prisma.walletEntry.aggregate({
       where: {
         teacherId,
-        status: 'AVAILABLE'
+        status: "AVAILABLE",
       },
-      _sum: { amount: true }
+      _sum: { amount: true },
     });
 
     const totalAvailable = availableBalance._sum.amount || 0;
 
     if (amount > totalAvailable) {
-      throw new PaymentError('Insufficient available balance', 'INSUFFICIENT_BALANCE');
+      throw new PaymentError(
+        "Insufficient available balance",
+        "INSUFFICIENT_BALANCE",
+      );
     }
 
     // Check for pending payouts
     const pendingPayout = await prisma.payout.findFirst({
       where: {
         teacherId,
-        status: { in: ['PENDING', 'APPROVED'] }
-      }
+        status: { in: ["PENDING", "APPROVED"] },
+      },
     });
 
     if (pendingPayout) {
-      throw new PaymentError('You have a pending payout request', 'PENDING_PAYOUT_EXISTS');
+      throw new PaymentError(
+        "You have a pending payout request",
+        "PENDING_PAYOUT_EXISTS",
+      );
     }
 
     // Create payout request
@@ -627,34 +681,38 @@ router.post(
         amount,
         method,
         accountRef,
-        status: 'PENDING'
-      }
+        status: "PENDING",
+      },
     });
 
-    logger.info('Payout request created', {
+    logger.info("Payout request created", {
       payoutId: payout.id,
       teacherId,
       amount,
-      method
+      method,
     });
 
     res.status(201).json({
       payout,
-      message: 'Payout request submitted successfully'
+      message: "Payout request submitted successfully",
     });
-  }
+  },
 );
 
 // Get payout history (Teacher only)
 router.get(
-  '/payouts',
-  requireRole('TEACHER'),
-  requireVerification('teacher'),
-  validateQuery(Joi.object({
-    status: Joi.string().valid('PENDING', 'APPROVED', 'PAID', 'FAILED', 'REJECTED').optional(),
-    page: Joi.number().integer().min(1).default(1),
-    limit: Joi.number().integer().min(1).max(50).default(20)
-  })),
+  "/payouts",
+  requireRole("TEACHER"),
+  requireVerification("teacher"),
+  validateQuery(
+    Joi.object({
+      status: Joi.string()
+        .valid("PENDING", "APPROVED", "PAID", "FAILED", "REJECTED")
+        .optional(),
+      page: Joi.number().integer().min(1).default(1),
+      limit: Joi.number().integer().min(1).max(50).default(20),
+    }),
+  ),
   async (req, res) => {
     const teacherId = req.user!.id;
     const { status, page = 1, limit = 20 } = req.query;
@@ -669,12 +727,12 @@ router.get(
     const [payouts, totalCount] = await Promise.all([
       prisma.payout.findMany({
         where: whereClause,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
-        take: limit
+        take: limit,
       }),
 
-      prisma.payout.count({ where: whereClause })
+      prisma.payout.count({ where: whereClause }),
     ]);
 
     res.json({
@@ -683,17 +741,17 @@ router.get(
         page,
         limit,
         total: totalCount,
-        pages: Math.ceil(totalCount / limit)
-      }
+        pages: Math.ceil(totalCount / limit),
+      },
     });
-  }
+  },
 );
 
 // Helper function to handle payment status updates
 async function handlePaymentStatusUpdate(
-  paymentId: string, 
-  status: string, 
-  metadata?: any
+  paymentId: string,
+  status: string,
+  metadata?: any,
 ): Promise<void> {
   const payment = await prisma.payment.findUnique({
     where: { id: paymentId },
@@ -705,22 +763,22 @@ async function handlePaymentStatusUpdate(
               user: {
                 select: {
                   email: true,
-                  phone: true
-                }
-              }
-            }
+                  phone: true,
+                },
+              },
+            },
           },
           teacher: {
             select: {
-              id: true
-            }
+              id: true,
+            },
           },
           subjectOffering: {
             select: {
-              subjectName: true
-            }
-          }
-        }
+              subjectName: true,
+            },
+          },
+        },
       },
       package: {
         include: {
@@ -729,23 +787,23 @@ async function handlePaymentStatusUpdate(
               user: {
                 select: {
                   email: true,
-                  phone: true
-                }
-              }
-            }
+                  phone: true,
+                },
+              },
+            },
           },
           teacher: {
             select: {
-              id: true
-            }
-          }
-        }
-      }
-    }
+              id: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!payment) {
-    logger.error('Payment not found for status update', { paymentId });
+    logger.error("Payment not found for status update", { paymentId });
     return;
   }
 
@@ -755,29 +813,32 @@ async function handlePaymentStatusUpdate(
       where: { id: paymentId },
       data: {
         status,
-        capturedAt: status === 'COMPLETED' ? new Date() : undefined,
-        metadata: { ...payment.metadata, ...metadata }
-      }
+        capturedAt: status === "COMPLETED" ? new Date() : undefined,
+        metadata: { ...payment.metadata, ...metadata },
+      },
     });
 
-    if (status === 'COMPLETED') {
+    if (status === "COMPLETED") {
       // Update booking/package status
       if (payment.bookingId) {
         await tx.booking.update({
           where: { id: payment.bookingId },
-          data: { status: 'CONFIRMED' }
+          data: { status: "CONFIRMED" },
         });
       } else if (payment.packageId) {
         await tx.package.update({
           where: { id: payment.packageId },
-          data: { status: 'CONFIRMED' }
+          data: { status: "CONFIRMED" },
         });
       }
 
       // Create wallet entry for teacher (after commission)
-      const teacherId = payment.booking?.teacherId || payment.package?.teacherId;
+      const teacherId =
+        payment.booking?.teacherId || payment.package?.teacherId;
       if (teacherId) {
-        const commission = Math.round(payment.amount * config.platform.commissionRate);
+        const commission = Math.round(
+          payment.amount * config.platform.commissionRate,
+        );
         const netAmount = payment.amount - commission;
 
         await tx.walletEntry.create({
@@ -787,9 +848,9 @@ async function handlePaymentStatusUpdate(
             packageId: payment.packageId,
             amount: netAmount,
             commission,
-            status: 'PENDING', // Will become available after lesson completion
-            description: `Payment for ${payment.booking ? 'lesson' : 'package'}`
-          }
+            status: "PENDING", // Will become available after lesson completion
+            description: `Payment for ${payment.booking ? "lesson" : "package"}`,
+          },
         });
       }
 
@@ -798,11 +859,11 @@ async function handlePaymentStatusUpdate(
     }
   });
 
-  logger.info('Payment status updated', {
+  logger.info("Payment status updated", {
     paymentId,
     status,
     bookingId: payment.bookingId,
-    packageId: payment.packageId
+    packageId: payment.packageId,
   });
 }
 
@@ -814,29 +875,28 @@ async function sendPaymentConfirmations(payment: any): Promise<void> {
     if (student?.user?.email) {
       await sendEmail({
         to: student.user.email,
-        subject: 'Payment Confirmation',
-        template: 'payment-confirmation',
+        subject: "Payment Confirmation",
+        template: "payment-confirmation",
         data: {
           amount: (payment.amount / 100).toLocaleString(),
           paymentMethod: payment.provider,
           transactionId: payment.providerRef,
           date: new Date().toLocaleDateString(),
-          type: payment.booking ? 'lesson' : 'package'
-        }
+          type: payment.booking ? "lesson" : "package",
+        },
       });
     }
 
     if (student?.user?.phone) {
       await sendSMS({
         to: student.user.phone,
-        message: `Payment of ${(payment.amount / 100).toLocaleString()} UZS has been processed successfully. Thank you!`
+        message: `Payment of ${(payment.amount / 100).toLocaleString()} UZS has been processed successfully. Thank you!`,
       });
     }
-
   } catch (error) {
-    logger.error('Failed to send payment confirmations', {
+    logger.error("Failed to send payment confirmations", {
       paymentId: payment.id,
-      error: error.message
+      error: error.message,
     });
   }
 }
