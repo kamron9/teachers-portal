@@ -598,7 +598,14 @@ export default function TeacherDashboard() {
                 <Button variant="outline" onClick={() => setIsEditing(false)}>
                   Cancel
                 </Button>
-                <Button onClick={() => { setIsEditing(false); setHasUnsavedChanges(false); }}>
+                <Button onClick={() => {
+                  setIsEditing(false);
+                  setHasUnsavedChanges(false);
+                  toast({
+                    title: "Profile Updated",
+                    description: "Subjects & pricing updated successfully."
+                  });
+                }}>
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Save Changes
                 </Button>
