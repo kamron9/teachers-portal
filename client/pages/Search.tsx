@@ -642,12 +642,12 @@ export default function Search() {
                 <p className="text-gray-600 mb-4">
                   Filtrlarni o'zgartiring yoki boshqa kalit so'zlar bilan qidiring.
                 </p>
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => {
                     setFilters({
-                      subject: '',
-                      language: '',
+                      subject: 'all',
+                      language: 'all',
                       priceFrom: 0,
                       priceTo: 100000,
                       rating: 0,
