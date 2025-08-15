@@ -88,15 +88,15 @@ const TeacherDetails: React.FC = () => {
 
     const params = new URLSearchParams({
       tutorId: teacher.id,
-      tutorName: teacher.name,
-      tutorAvatar: teacher.profileImage,
-      tutorRating: teacher.rating.toString(),
+      tutorName: `${teacher.firstName} ${teacher.lastName}`,
+      tutorAvatar: teacher.profileImage || '/placeholder.svg',
+      tutorRating: teacher.averageRating?.toString() || '0',
       subject: selectedSubject,
       slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       slotEnd: new Date(
         Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000,
       ).toISOString(),
-      price: teacher.pricing.trialPrice.toString(),
+      price: '2500000', // 25,000 UZS trial in kopeks
       serviceFee: "0",
     });
 
@@ -106,48 +106,67 @@ const TeacherDetails: React.FC = () => {
   const handleBookRegular = () => {
     if (!teacher) return;
 
-    const selectedSubjectData = teacher.subjects.find(
-      (s) => s.name === selectedSubject,
+    const selectedSubjectData = teacher.subjectOfferings?.find(
+      (s) => s.subjectName === selectedSubject,
     );
-    const price = selectedSubjectData?.price || teacher.pricing.regularPrice;
+    const price = selectedSubjectData?.pricePerHour || 5000000; // Default 50,000 UZS in kopeks
 
     const params = new URLSearchParams({
       tutorId: teacher.id,
-      tutorName: teacher.name,
-      tutorAvatar: teacher.profileImage,
-      tutorRating: teacher.rating.toString(),
+      tutorName: `${teacher.firstName} ${teacher.lastName}`,
+      tutorAvatar: teacher.profileImage || '/placeholder.svg',
+      tutorRating: teacher.averageRating?.toString() || '0',
       subject: selectedSubject,
       slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       slotEnd: new Date(
         Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000,
       ).toISOString(),
       price: price.toString(),
-      serviceFee: "5000",
+      serviceFee: "500000", // 5,000 UZS in kopeks
     });
 
     navigate(`/booking?${params.toString()}`);
   };
 
-  const filteredReviews =
-    teacher?.reviews.filter((review) => {
-      if (reviewFilter === "all") return true;
-      return review.rating === parseInt(reviewFilter);
-    }) || [];
+  const reviews = reviewsData?.reviews || [];
+  const filteredReviews = reviews.filter((review) => {
+    if (reviewFilter === "all") return true;
+    return review.rating === parseInt(reviewFilter);
+  });
 
+  const totalReviews = reviewsData?.totalCount || 0;
   const ratingDistribution = teacher
     ? [
-        { stars: 5, count: Math.floor(teacher.totalReviews * 0.8) },
-        { stars: 4, count: Math.floor(teacher.totalReviews * 0.15) },
-        { stars: 3, count: Math.floor(teacher.totalReviews * 0.03) },
-        { stars: 2, count: Math.floor(teacher.totalReviews * 0.01) },
-        { stars: 1, count: Math.floor(teacher.totalReviews * 0.01) },
+        { stars: 5, count: Math.floor(totalReviews * 0.8) },
+        { stars: 4, count: Math.floor(totalReviews * 0.15) },
+        { stars: 3, count: Math.floor(totalReviews * 0.03) },
+        { stars: 2, count: Math.floor(totalReviews * 0.01) },
+        { stars: 1, count: Math.floor(totalReviews * 0.01) },
       ]
     : [];
 
-  if (!teacher) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error || !teacher) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            O'qituvchi topilmadi
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Siz qidirayotgan o'qituvchi mavjud emas.
+          </p>
+          <Button onClick={() => navigate('/teachers')}>
+            O'qituvchilar ro'yxatiga qaytish
+          </Button>
+        </div>
       </div>
     );
   }
