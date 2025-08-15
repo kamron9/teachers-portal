@@ -132,7 +132,7 @@ export default function BookLesson() {
   const getAvailableSlots = () => {
     if (!selectedDate) return [];
     const dateStr = selectedDate.toISOString().split('T')[0];
-    return availableSlots[dateStr] || [];
+    return availableSlotsByDate[dateStr] || [];
   };
 
   const selectedPackageDetails = packages.find(p => p.id === selectedPackage);
