@@ -421,37 +421,37 @@ export default function BookLesson() {
             <div className="space-y-6">
               <Card className="sticky top-24">
                 <CardHeader>
-                  <CardTitle>Booking Summary</CardTitle>
+                  <CardTitle>Buyurtma xulosasi</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Package:</span>
+                      <span className="text-gray-600">Paket:</span>
                       <span className="font-medium">{selectedPackageDetails?.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Duration:</span>
-                      <span>{selectedPackageDetails?.duration} minutes</span>
+                      <span className="text-gray-600">Davomiyligi:</span>
+                      <span>{selectedPackageDetails?.duration} daqiqa</span>
                     </div>
                     {selectedDate && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Date:</span>
+                        <span className="text-gray-600">Sana:</span>
                         <span>{selectedDate.toLocaleDateString()}</span>
                       </div>
                     )}
                     {selectedTime && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Time:</span>
-                        <span>{selectedTime} ({teacher.timezone})</span>
+                        <span className="text-gray-600">Vaqt:</span>
+                        <span>{selectedTime} (Toshkent vaqti)</span>
                       </div>
                     )}
                   </div>
 
                   <div className="border-t pt-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold">Total:</span>
+                      <span className="text-lg font-semibold">Jami:</span>
                       <span className="text-2xl font-bold text-primary">
-                        {totalPrice.toLocaleString()} UZS
+                        {formatPrice(totalPrice)}
                       </span>
                     </div>
                     {selectedPackageDetails?.discount && (
@@ -462,37 +462,36 @@ export default function BookLesson() {
                   </div>
 
                   <div className="space-y-2">
-                    <Link to={`/payment?teacherId=${teacherId}&package=${selectedPackage}&date=${selectedDate?.toISOString()}&time=${selectedTime}`}>
-                      <Button 
-                        className="w-full" 
-                        size="lg"
-                        disabled={!selectedDate || !selectedTime}
-                      >
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        Proceed to Payment
-                      </Button>
-                    </Link>
+                    <Button
+                      className="w-full"
+                      size="lg"
+                      disabled={!selectedDate || !selectedTime || createBookingMutation.isPending}
+                      onClick={handleBookingSubmit}
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      {createBookingMutation.isPending ? 'Yuklanmoqda...' : 'To\'lovga o\'tish'}
+                    </Button>
                   </div>
 
                   {(!selectedDate || !selectedTime) && (
                     <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
                       <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                      <span>Please select both date and time to continue</span>
+                      <span>Davom etish uchun sana va vaqtni tanlang</span>
                     </div>
                   )}
 
                   <div className="text-xs text-gray-500 space-y-1">
                     <div className="flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
-                      <span>Free cancellation up to 24 hours before</span>
+                      <span>24 soat oldin bepul bekor qilish</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
-                      <span>Instant booking confirmation</span>
+                      <span>Zudlik bilan buyurtma tasdiqlash</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
-                      <span>Secure payment processing</span>
+                      <span>Xavfsiz to'lov jarayoni</span>
                     </div>
                   </div>
                 </CardContent>
