@@ -912,11 +912,12 @@ export default function TeacherDashboard() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => {
-                                  if (confirm('Remove this subject?')) {
+                                  if (confirm(`Remove "${subject.name}" from your offerings?`)) {
                                     deleteSubject(subject.id);
                                   }
                                 }}
                                 className="h-6 w-6 p-0 text-red-500 hover:text-red-600"
+                                title="Remove this subject"
                               >
                                 <X className="h-3 w-3" />
                               </Button>
