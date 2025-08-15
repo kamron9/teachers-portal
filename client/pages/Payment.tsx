@@ -14,9 +14,11 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Payment() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState("payme");
   const [isProcessing, setIsProcessing] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const createPaymentMutation = useCreatePayment();
   const [cardDetails, setCardDetails] = useState({
     number: "",
     expiry: "",
