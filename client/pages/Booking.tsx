@@ -129,35 +129,22 @@ const Booking: React.FC = () => {
 
     // Analytics: booking_confirm_attempt
     console.log('Analytics: booking_confirm_attempt', { tutorId: slotData.tutorId });
-    
-    setBookingState(prev => ({ ...prev, isLoading: true, error: null }));
-    
-    try {
-      const response = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          tutorId: slotData.tutorId,
-          slotStart: slotData.slotStart,
-          slotEnd: slotData.slotEnd
-        })
-      });
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Booking yaratishda xatolik');
-      }
+    setBookingState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      // Mock API call - simulating booking creation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Generate mock booking ID
+      const mockBookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
       setBookingState(prev => ({
         ...prev,
         isLoading: false,
-        bookingId: data.bookingId
+        bookingId: mockBookingId
       }));
-      
+
       setCurrentStep(3);
     } catch (error) {
       setBookingState(prev => ({
