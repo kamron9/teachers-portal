@@ -296,10 +296,10 @@ export default function Login() {
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Signing In...
+                      Kirilmoqda...
                     </>
                   ) : (
-                    'Sign In'
+                    'Kirish'
                   )}
                 </Button>
               </form>
