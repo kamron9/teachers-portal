@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTeacherSearch, useSubjects } from "@/hooks/useApi";
-import { formatPrice } from "@/lib/api";
+import { formatPrice, Subject } from "@/lib/api";
 
 // TutorCard component
 const TutorCard = ({ tutor }: { tutor: any }) => (
