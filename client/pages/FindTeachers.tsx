@@ -53,17 +53,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function FindTeachers() {
-  const { subject } = useParams<{ subject: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  // Get initial search parameters from URL
+  const initialSubject = searchParams.get('subject') || '';
+  const initialQuery = searchParams.get('query') || '';
+  const initialLanguage = searchParams.get('language') || '';
+  const initialPriceFrom = searchParams.get('priceFrom') || '';
+  const initialPriceTo = searchParams.get('priceTo') || '';
+
   // Filter and search state
-  const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState("all");
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [selectedSubject, setSelectedSubject] = useState(initialSubject);
+  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
+  const [priceRange, setPriceRange] = useState(() => {
+    if (initialPriceFrom && initialPriceTo) {
+      return `${initialPriceFrom}-${initialPriceTo}`;
+    }
+    return "all";
+  });
   const [experience, setExperience] = useState("all");
   const [rating, setRating] = useState("all");
   const [availability, setAvailability] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>("desc");
 
   // Subject information mapping
   const subjectInfo: Record<string, any> = {
