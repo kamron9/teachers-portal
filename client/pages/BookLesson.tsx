@@ -138,6 +138,32 @@ export default function BookLesson() {
   const selectedPackageDetails = packages.find(p => p.id === selectedPackage);
   const totalPrice = selectedPackageDetails?.price || 0;
 
+  // Handle booking submission
+  const handleBookingSubmit = async () => {
+    if (!selectedDate || !selectedTime || !teacher) return;
+
+    const selectedSlot = getAvailableSlots().find(s => s.time === selectedTime);
+    if (!selectedSlot) return;
+
+    try {
+      const bookingData = {
+        teacherId: teacher.id,
+        subjectOfferingId: teacher.subjectOfferings?.[0]?.id || '',
+        startAt: selectedSlot.slot.startAt,
+        endAt: selectedSlot.slot.endAt,
+        type: selectedPackage === 'trial' ? 'TRIAL' as const : 'SINGLE' as const,
+        studentTimezone: 'Asia/Tashkent'
+      };
+
+      await createBookingMutation.mutateAsync(bookingData);
+
+      // Navigate to payment or success page
+      navigate(`/payment?bookingId=${Date.now()}&amount=${totalPrice}`);
+    } catch (error) {
+      console.error('Booking failed:', error);
+    }
+  };
+
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
