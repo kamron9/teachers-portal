@@ -115,10 +115,17 @@ export default function Index() {
     navigate(`/search?subject=${categoryId}`);
   };
 
+  // Get popular categories from subjects data
+  const popularCategories = subjects.slice(0, 6).map(subject => ({
+    id: subject.id,
+    name: subject.name,
+    count: subject.teacherCount || 0
+  }));
+
   // CTA tutor click handler - TZ bo'yicha cta_tutor_clicked
   const handleTutorCTAClick = () => {
     // analytics.track('cta_tutor_clicked');
-    navigate('/auth/register?role=tutor');
+    navigate('/teacher-signup');
   };
 
   return (
@@ -147,12 +154,11 @@ export default function Index() {
                       <SelectValue placeholder="Fanni tanlang" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="english">Ingliz tili</SelectItem>
-                      <SelectItem value="math">Matematika</SelectItem>
-                      <SelectItem value="physics">Fizika</SelectItem>
-                      <SelectItem value="chemistry">Kimyo</SelectItem>
-                      <SelectItem value="programming">Dasturlash</SelectItem>
-                      <SelectItem value="ielts">IELTS</SelectItem>
+                      {subjects.map((subject) => (
+                        <SelectItem key={subject.id} value={subject.id}>
+                          {subject.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -209,22 +215,24 @@ export default function Index() {
             </Card>
 
             {/* Popular categories - TZ bo'yicha tez filter chiplar */}
-            <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {popularCategories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleCategoryClick(category.id)}
-                  className="rounded-full"
-                >
-                  {category.name}
-                  <Badge variant="secondary" className="ml-2 text-xs">
-                    {category.count}
-                  </Badge>
-                </Button>
-              ))}
-            </div>
+            {popularCategories.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-3 mb-12">
+                {popularCategories.map((category) => (
+                  <Button
+                    key={category.id}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCategoryClick(category.id)}
+                    className="rounded-full"
+                  >
+                    {category.name}
+                    <Badge variant="secondary" className="ml-2 text-xs">
+                      {category.count}
+                    </Badge>
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
