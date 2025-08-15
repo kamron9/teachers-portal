@@ -462,7 +462,7 @@ export default function Search() {
                           <SelectValue placeholder="Tilni tanlang" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Barcha tillar</SelectItem>
+                          <SelectItem value="all">Barcha tillar</SelectItem>
                           <SelectItem value="o'zbek">O'zbek</SelectItem>
                           <SelectItem value="rus">Rus</SelectItem>
                           <SelectItem value="ingliz">Ingliz</SelectItem>
