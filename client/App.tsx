@@ -26,6 +26,7 @@ import AdminUsers from "./pages/AdminUsers";
 import Login from "./pages/Login";
 import Subjects from "./pages/Subjects";
 import FindTeachers from "./pages/FindTeachers";
+import Search from "./pages/Search";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 
