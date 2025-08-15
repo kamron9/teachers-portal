@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  Link,
+  useSearchParams,
+} from "react-router-dom";
 import {
   Star,
   MapPin,
@@ -58,11 +63,11 @@ export default function FindTeachers() {
   const navigate = useNavigate();
 
   // Get initial search parameters from URL
-  const initialSubject = searchParams.get('subject') || '';
-  const initialQuery = searchParams.get('query') || '';
-  const initialLanguage = searchParams.get('language') || '';
-  const initialPriceFrom = searchParams.get('priceFrom') || '';
-  const initialPriceTo = searchParams.get('priceTo') || '';
+  const initialSubject = searchParams.get("subject") || "";
+  const initialQuery = searchParams.get("query") || "";
+  const initialLanguage = searchParams.get("language") || "";
+  const initialPriceFrom = searchParams.get("priceFrom") || "";
+  const initialPriceTo = searchParams.get("priceTo") || "";
 
   // Filter and search state
   const [searchQuery, setSearchQuery] = useState(initialQuery);
@@ -78,7 +83,7 @@ export default function FindTeachers() {
   const [rating, setRating] = useState("all");
   const [availability, setAvailability] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>("desc");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // Fetch subjects and teachers data
   const { data: subjectsData } = useSubjects();
@@ -89,8 +94,14 @@ export default function FindTeachers() {
     query: searchQuery || undefined,
     subjects: selectedSubject ? [selectedSubject] : undefined,
     languages: selectedLanguage ? [selectedLanguage] : undefined,
-    minPrice: priceRange !== "all" ? parseInt(priceRange.split("-")[0]) * 100 : undefined, // Convert UZS to kopeks
-    maxPrice: priceRange !== "all" ? parseInt(priceRange.split("-")[1]) * 100 : undefined, // Convert UZS to kopeks
+    minPrice:
+      priceRange !== "all"
+        ? parseInt(priceRange.split("-")[0]) * 100
+        : undefined, // Convert UZS to kopeks
+    maxPrice:
+      priceRange !== "all"
+        ? parseInt(priceRange.split("-")[1]) * 100
+        : undefined, // Convert UZS to kopeks
     minRating: rating !== "all" ? parseFloat(rating) : undefined,
     experienceLevel: experience !== "all" ? [`${experience}+`] : undefined,
     sortBy,
@@ -98,30 +109,43 @@ export default function FindTeachers() {
     limit: 50,
   };
 
-  const { data: teachersData, isLoading, error } = useTeacherSearch(searchApiParams);
+  const {
+    data: teachersData,
+    isLoading,
+    error,
+  } = useTeacherSearch(searchApiParams);
 
   const teachers = teachersData?.teachers || [];
-  const currentSubject = subjects.find(s => s.id === selectedSubject);
+  const currentSubject = subjects.find((s) => s.id === selectedSubject);
 
   // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
-    if (searchQuery) params.set('query', searchQuery);
-    if (selectedSubject) params.set('subject', selectedSubject);
-    if (selectedLanguage) params.set('language', selectedLanguage);
-    if (priceRange !== 'all') {
-      const [min, max] = priceRange.split('-');
-      params.set('priceFrom', min);
-      params.set('priceTo', max);
+    if (searchQuery) params.set("query", searchQuery);
+    if (selectedSubject) params.set("subject", selectedSubject);
+    if (selectedLanguage) params.set("language", selectedLanguage);
+    if (priceRange !== "all") {
+      const [min, max] = priceRange.split("-");
+      params.set("priceFrom", min);
+      params.set("priceTo", max);
     }
 
     const newSearch = params.toString();
     if (newSearch !== searchParams.toString()) {
       setSearchParams(params);
     }
-  }, [searchQuery, selectedSubject, selectedLanguage, priceRange, searchParams, setSearchParams]);
+  }, [
+    searchQuery,
+    selectedSubject,
+    selectedLanguage,
+    priceRange,
+    searchParams,
+    setSearchParams,
+  ]);
 
-  const pageTitle = currentSubject ? `${currentSubject.name} o'qituvchilari` : "O'qituvchilarni qidirish";
+  const pageTitle = currentSubject
+    ? `${currentSubject.name} o'qituvchilari`
+    : "O'qituvchilarni qidirish";
   const pageDescription = currentSubject
     ? `${currentSubject.name} fani bo'yicha malakali o'qituvchilar`
     : "Barcha fanlar bo'yicha malakali o'qituvchilarni toping";
@@ -154,11 +178,9 @@ export default function FindTeachers() {
 
           {/* Page Header */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="text-4xl">{currentSubject ? '📚' : '👨‍🏫'}</div>
+            <div className="text-4xl">{currentSubject ? "📚" : "👨‍🏫"}</div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {pageTitle}
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
               <p className="text-gray-600">{pageDescription}</p>
               <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                 <span>{teachers.length} o'qituvchi mavjud</span>
@@ -169,8 +191,10 @@ export default function FindTeachers() {
                       Boshlang'ich narx{" "}
                       {formatPrice(
                         Math.min(
-                          ...teachers.map((t) => t.subjectOfferings?.[0]?.pricePerHour || 0)
-                        )
+                          ...teachers.map(
+                            (t) => t.subjectOfferings?.[0]?.pricePerHour || 0,
+                          ),
+                        ),
                       )}
                       /soat
                     </span>
@@ -212,10 +236,11 @@ export default function FindTeachers() {
 
                 {/* Subject Filter */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Fan
-                  </label>
-                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                  <label className="text-sm font-medium mb-2 block">Fan</label>
+                  <Select
+                    value={selectedSubject}
+                    onValueChange={setSelectedSubject}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Fanni tanlang" />
                     </SelectTrigger>
@@ -232,10 +257,11 @@ export default function FindTeachers() {
 
                 {/* Language Filter */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Til
-                  </label>
-                  <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                  <label className="text-sm font-medium mb-2 block">Til</label>
+                  <Select
+                    value={selectedLanguage}
+                    onValueChange={setSelectedLanguage}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Tilni tanlang" />
                     </SelectTrigger>
@@ -266,7 +292,9 @@ export default function FindTeachers() {
                       <SelectItem value="60000-80000">
                         60,000 - 80,000
                       </SelectItem>
-                      <SelectItem value="80000-999999">80,000 dan yuqori</SelectItem>
+                      <SelectItem value="80000-999999">
+                        80,000 dan yuqori
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -1,12 +1,30 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Star, MapPin, Users, ArrowRight, BookOpen, Heart, MessageCircle, Calculator, Atom, Globe } from "lucide-react";
+import {
+  Search,
+  Star,
+  MapPin,
+  Users,
+  ArrowRight,
+  BookOpen,
+  Heart,
+  MessageCircle,
+  Calculator,
+  Atom,
+  Globe,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useTeacherSearch, useSubjects } from "@/hooks/useApi";
 import { formatPrice, Subject } from "@/lib/api";
 
@@ -17,9 +35,13 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
       <div className="flex items-start gap-4">
         <div className="relative">
           <Avatar className="w-16 h-16">
-            <AvatarImage src={tutor.profileImage || "/placeholder.svg"} alt={`${tutor.firstName} ${tutor.lastName}`} />
+            <AvatarImage
+              src={tutor.profileImage || "/placeholder.svg"}
+              alt={`${tutor.firstName} ${tutor.lastName}`}
+            />
             <AvatarFallback>
-              {tutor.firstName?.[0]}{tutor.lastName?.[0]}
+              {tutor.firstName?.[0]}
+              {tutor.lastName?.[0]}
             </AvatarFallback>
           </Avatar>
           {tutor.isVerified && (
@@ -28,20 +50,28 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
             </div>
           )}
         </div>
-        
+
         <div className="flex-1">
-          <h3 className="font-semibold text-lg text-gray-900">{tutor.firstName} {tutor.lastName}</h3>
-          <p className="text-primary font-medium">{tutor.subjectOfferings?.[0]?.subjectName || 'Fan belgilanmagan'}</p>
-          
+          <h3 className="font-semibold text-lg text-gray-900">
+            {tutor.firstName} {tutor.lastName}
+          </h3>
+          <p className="text-primary font-medium">
+            {tutor.subjectOfferings?.[0]?.subjectName || "Fan belgilanmagan"}
+          </p>
+
           <div className="flex items-center gap-2 mt-2">
             <div className="flex items-center gap-1">
               <Star className="h-4 w-4 text-yellow-500 fill-current" />
-              <span className="font-medium">{tutor.averageRating?.toFixed(1) || 'N/A'}</span>
+              <span className="font-medium">
+                {tutor.averageRating?.toFixed(1) || "N/A"}
+              </span>
             </div>
             <span className="text-gray-400">•</span>
-            <span className="text-sm text-gray-600">{tutor.totalStudents || 0} o'quvchi</span>
+            <span className="text-sm text-gray-600">
+              {tutor.totalStudents || 0} o'quvchi
+            </span>
           </div>
-          
+
           <div className="flex flex-wrap gap-1 mt-2">
             {tutor.languages?.slice(0, 2).map((lang: string, index: number) => (
               <Badge key={index} variant="secondary" className="text-xs">
@@ -53,7 +83,7 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
               </Badge>
             )}
           </div>
-          
+
           <div className="flex items-center justify-between mt-4">
             <div>
               <span className="text-xl font-bold text-gray-900">
@@ -62,9 +92,7 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
               <span className="text-gray-600 text-sm">/soat</span>
             </div>
             <Link to={`/tutor/${tutor.id}`}>
-              <Button size="sm">
-                Ko'rish
-              </Button>
+              <Button size="sm">Ko'rish</Button>
             </Link>
           </div>
         </div>
@@ -81,13 +109,17 @@ export default function Index() {
     subject: "",
     language: "",
     priceFrom: "",
-    priceTo: ""
+    priceTo: "",
   });
 
   // Fetch featured teachers - TZ bo'yicha GET /teachers?limit=6&sort=rating_desc
-  const { data: teachersData, isLoading, error } = useTeacherSearch(
-    { limit: 6, sortBy: 'rating', sortOrder: 'desc' },
-    { staleTime: 1000 * 60 * 5 } // 5 minutes
+  const {
+    data: teachersData,
+    isLoading,
+    error,
+  } = useTeacherSearch(
+    { limit: 6, sortBy: "rating", sortOrder: "desc" },
+    { staleTime: 1000 * 60 * 5 }, // 5 minutes
   );
 
   // Fetch subjects for search dropdown
@@ -99,14 +131,14 @@ export default function Index() {
   // Search handler - TZ bo'yicha /search?subject=&language=&priceFrom=&priceTo=
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (searchData.subject) params.set('subject', searchData.subject);
-    if (searchData.language) params.set('language', searchData.language);
-    if (searchData.priceFrom) params.set('priceFrom', searchData.priceFrom);
-    if (searchData.priceTo) params.set('priceTo', searchData.priceTo);
-    
+    if (searchData.subject) params.set("subject", searchData.subject);
+    if (searchData.language) params.set("language", searchData.language);
+    if (searchData.priceFrom) params.set("priceFrom", searchData.priceFrom);
+    if (searchData.priceTo) params.set("priceTo", searchData.priceTo);
+
     // Analytics - TZ bo'yicha search_from_home
     // analytics.track('search_from_home', searchData);
-    
+
     navigate(`/search?${params.toString()}`);
   };
 
@@ -116,16 +148,16 @@ export default function Index() {
   };
 
   // Get popular categories from subjects data
-  const popularCategories = subjects.slice(0, 6).map(subject => ({
+  const popularCategories = subjects.slice(0, 6).map((subject) => ({
     id: subject.id,
     name: subject.name,
-    count: subject.teacherCount || 0
+    count: subject.teacherCount || 0,
   }));
 
   // CTA tutor click handler - TZ bo'yicha cta_tutor_clicked
   const handleTutorCTAClick = () => {
     // analytics.track('cta_tutor_clicked');
-    navigate('/teacher-signup');
+    navigate("/teacher-signup");
   };
 
   return (
@@ -140,8 +172,8 @@ export default function Index() {
               <span className="text-primary block">o'rganing</span>
             </h1>
             <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-              Malakali o'qituvchilar bilan individual onlayn darslar. 
-              Istalgan fanni uydan turib o'rganing.
+              Malakali o'qituvchilar bilan individual onlayn darslar. Istalgan
+              fanni uydan turib o'rganing.
             </p>
 
             {/* SearchBar - TZ bo'yicha (Subject, Language, PriceFrom/To) */}
@@ -149,7 +181,12 @@ export default function Index() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Fan</label>
-                  <Select value={searchData.subject} onValueChange={(value) => setSearchData({...searchData, subject: value})}>
+                  <Select
+                    value={searchData.subject}
+                    onValueChange={(value) =>
+                      setSearchData({ ...searchData, subject: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Fanni tanlang" />
                     </SelectTrigger>
@@ -162,10 +199,15 @@ export default function Index() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-medium mb-2 block">Til</label>
-                  <Select value={searchData.language} onValueChange={(value) => setSearchData({...searchData, language: value})}>
+                  <Select
+                    value={searchData.language}
+                    onValueChange={(value) =>
+                      setSearchData({ ...searchData, language: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Tilni tanlang" />
                     </SelectTrigger>
@@ -176,10 +218,17 @@ export default function Index() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Narx (dan)</label>
-                  <Select value={searchData.priceFrom} onValueChange={(value) => setSearchData({...searchData, priceFrom: value})}>
+                  <label className="text-sm font-medium mb-2 block">
+                    Narx (dan)
+                  </label>
+                  <Select
+                    value={searchData.priceFrom}
+                    onValueChange={(value) =>
+                      setSearchData({ ...searchData, priceFrom: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="0 so'm" />
                     </SelectTrigger>
@@ -191,10 +240,17 @@ export default function Index() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Narx (gacha)</label>
-                  <Select value={searchData.priceTo} onValueChange={(value) => setSearchData({...searchData, priceTo: value})}>
+                  <label className="text-sm font-medium mb-2 block">
+                    Narx (gacha)
+                  </label>
+                  <Select
+                    value={searchData.priceTo}
+                    onValueChange={(value) =>
+                      setSearchData({ ...searchData, priceTo: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="100,000 so'm" />
                     </SelectTrigger>
@@ -207,7 +263,7 @@ export default function Index() {
                   </Select>
                 </div>
               </div>
-              
+
               <Button className="w-full mt-6" size="lg" onClick={handleSearch}>
                 <Search className="h-5 w-5 mr-2" />
                 O'qituvchi qidirish
@@ -322,11 +378,12 @@ export default function Index() {
               O'qituvchi bo'lib ishlashni xohlaysizmi?
             </h2>
             <p className="text-xl mb-8 opacity-90">
-              Minglab o'quvchilar sizni kutmoqda. Bilimingizni ulashing va daromad oling.
+              Minglab o'quvchilar sizni kutmoqda. Bilimingizni ulashing va
+              daromad oling.
             </p>
-            <Button 
-              size="lg" 
-              variant="secondary" 
+            <Button
+              size="lg"
+              variant="secondary"
               className="text-primary"
               onClick={handleTutorCTAClick}
             >
@@ -352,23 +409,39 @@ export default function Index() {
                 O'zbekistondagi eng yaxshi onlayn ta'lim platformasi
               </p>
             </div>
-            
+
             <div>
               <h3 className="font-semibold mb-4">Yordam</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to="/faq" className="hover:text-white">FAQ</Link></li>
-                <li><Link to="/support" className="hover:text-white">Qo'llab-quvvatlash</Link></li>
+                <li>
+                  <Link to="/faq" className="hover:text-white">
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/support" className="hover:text-white">
+                    Qo'llab-quvvatlash
+                  </Link>
+                </li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="font-semibold mb-4">Kompaniya</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to="/about" className="hover:text-white">Biz haqimizda</Link></li>
-                <li><Link to="/careers" className="hover:text-white">Karyera</Link></li>
+                <li>
+                  <Link to="/about" className="hover:text-white">
+                    Biz haqimizda
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/careers" className="hover:text-white">
+                    Karyera
+                  </Link>
+                </li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="font-semibold mb-4">Bog'lanish</h3>
               <ul className="space-y-2 text-gray-400">
@@ -377,7 +450,7 @@ export default function Index() {
               </ul>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
             <p>&copy; 2024 TutorUZ. Barcha huquqlar himoyalangan.</p>
           </div>

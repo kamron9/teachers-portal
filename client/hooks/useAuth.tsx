@@ -1,7 +1,13 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { apiClient, User } from '@/lib/api';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import { apiClient, User } from "@/lib/api";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
@@ -11,7 +17,7 @@ interface AuthContextType {
   register: (data: {
     email: string;
     password: string;
-    role: 'STUDENT' | 'TEACHER';
+    role: "STUDENT" | "TEACHER";
     firstName: string;
     lastName: string;
     phone?: string;
@@ -40,7 +46,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(currentUser);
       }
     } catch (error) {
-      console.error('Failed to fetch current user:', error);
+      console.error("Failed to fetch current user:", error);
       // Clear invalid tokens
       await apiClient.logout();
       setUser(null);
@@ -58,26 +64,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(true);
       const response = await apiClient.login(email, password);
       setUser(response.user);
-      
-      toast.success('Kirish muvaffaqiyatli');
-      
+
+      toast.success("Kirish muvaffaqiyatli");
+
       // Redirect based on role
       switch (response.user.role) {
-        case 'TEACHER':
-          navigate('/teacher-dashboard');
+        case "TEACHER":
+          navigate("/teacher-dashboard");
           break;
-        case 'STUDENT':
-          navigate('/student-dashboard');
+        case "STUDENT":
+          navigate("/student-dashboard");
           break;
-        case 'ADMIN':
-          navigate('/admin-dashboard');
+        case "ADMIN":
+          navigate("/admin-dashboard");
           break;
         default:
-          navigate('/');
+          navigate("/");
       }
     } catch (error: any) {
-      console.error('Login failed:', error);
-      toast.error(error.message || 'Kirish xatosi');
+      console.error("Login failed:", error);
+      toast.error(error.message || "Kirish xatosi");
       throw error;
     } finally {
       setIsLoading(false);
@@ -87,7 +93,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const register = async (data: {
     email: string;
     password: string;
-    role: 'STUDENT' | 'TEACHER';
+    role: "STUDENT" | "TEACHER";
     firstName: string;
     lastName: string;
     phone?: string;
@@ -96,23 +102,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(true);
       const response = await apiClient.register(data);
       setUser(response.user);
-      
-      toast.success('Ro\'yxatdan o\'tish muvaffaqiyatli');
-      
+
+      toast.success("Ro'yxatdan o'tish muvaffaqiyatli");
+
       // Redirect based on role
       switch (response.user.role) {
-        case 'TEACHER':
-          navigate('/teacher-dashboard');
+        case "TEACHER":
+          navigate("/teacher-dashboard");
           break;
-        case 'STUDENT':
-          navigate('/student-dashboard');
+        case "STUDENT":
+          navigate("/student-dashboard");
           break;
         default:
-          navigate('/');
+          navigate("/");
       }
     } catch (error: any) {
-      console.error('Registration failed:', error);
-      toast.error(error.message || 'Ro\'yxatdan o\'tish xatosi');
+      console.error("Registration failed:", error);
+      toast.error(error.message || "Ro'yxatdan o'tish xatosi");
       throw error;
     } finally {
       setIsLoading(false);
@@ -123,13 +129,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await apiClient.logout();
       setUser(null);
-      toast.success('Chiqish muvaffaqiyatli');
-      navigate('/');
+      toast.success("Chiqish muvaffaqiyatli");
+      navigate("/");
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
       // Force logout even if API call fails
       setUser(null);
-      navigate('/');
+      navigate("/");
     }
   };
 
@@ -147,17 +153,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     refetch,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
@@ -165,23 +167,23 @@ export function useAuth() {
 // Route protection HOCs
 interface ProtectedRouteProps {
   children: ReactNode;
-  roles?: ('STUDENT' | 'TEACHER' | 'ADMIN')[];
+  roles?: ("STUDENT" | "TEACHER" | "ADMIN")[];
   requireVerification?: boolean;
   fallback?: ReactNode;
 }
 
-export function ProtectedRoute({ 
-  children, 
-  roles, 
+export function ProtectedRoute({
+  children,
+  roles,
   requireVerification = false,
-  fallback 
+  fallback,
 }: ProtectedRouteProps) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate('/login');
+      navigate("/login");
     }
   }, [isLoading, isAuthenticated, navigate]);
 
@@ -204,15 +206,19 @@ export function ProtectedRoute({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Kirish taqiqlangan</h1>
-          <p className="text-gray-600">Sizda ushbu sahifaga kirish huquqi yo'q</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Kirish taqiqlangan
+          </h1>
+          <p className="text-gray-600">
+            Sizda ushbu sahifaga kirish huquqi yo'q
+          </p>
         </div>
       </div>
     );
   }
 
   // Check verification requirement for teachers
-  if (requireVerification && user.role === 'TEACHER') {
+  if (requireVerification && user.role === "TEACHER") {
     // This would need to be expanded to check teacher verification status
     // For now, we'll allow access
   }
@@ -223,11 +229,11 @@ export function ProtectedRoute({
 // Hook for role-based UI
 export function useRole() {
   const { user } = useAuth();
-  
+
   return {
-    isStudent: user?.role === 'STUDENT',
-    isTeacher: user?.role === 'TEACHER',
-    isAdmin: user?.role === 'ADMIN',
+    isStudent: user?.role === "STUDENT",
+    isTeacher: user?.role === "TEACHER",
+    isAdmin: user?.role === "ADMIN",
     role: user?.role,
   };
 }
@@ -235,12 +241,12 @@ export function useRole() {
 // Hook for verification status
 export function useVerification() {
   const { user } = useAuth();
-  
+
   // This would need to be expanded based on actual verification fields
   // For now, assume all users are verified
   return {
     isVerified: true,
-    verificationStatus: 'APPROVED' as const,
+    verificationStatus: "APPROVED" as const,
     canReceiveBookings: true,
   };
 }

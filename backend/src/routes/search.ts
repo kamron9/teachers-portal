@@ -22,11 +22,11 @@ router.get(
   async (req, res) => {
     const {
       query,
-      type = 'all',
+      type = "all",
       page = 1,
       limit = 20,
-      sortBy = 'relevance',
-      sortOrder = 'desc',
+      sortBy = "relevance",
+      sortOrder = "desc",
     } = req.query;
 
     const skip = (page - 1) * limit;
@@ -39,13 +39,13 @@ router.get(
 
     try {
       // Search teachers
-      if (type === 'all' || type === 'teachers') {
+      if (type === "all" || type === "teachers") {
         const teacherWhere = {
           AND: [
             {
               user: {
                 isActive: true,
-                role: 'TEACHER',
+                role: "TEACHER",
               },
             },
             {
@@ -53,19 +53,19 @@ router.get(
                 {
                   firstName: {
                     contains: query as string,
-                    mode: 'insensitive' as const,
+                    mode: "insensitive" as const,
                   },
                 },
                 {
                   lastName: {
                     contains: query as string,
-                    mode: 'insensitive' as const,
+                    mode: "insensitive" as const,
                   },
                 },
                 {
                   bio: {
                     contains: query as string,
-                    mode: 'insensitive' as const,
+                    mode: "insensitive" as const,
                   },
                 },
                 {
@@ -78,7 +78,7 @@ router.get(
                     some: {
                       subjectName: {
                         contains: query as string,
-                        mode: 'insensitive' as const,
+                        mode: "insensitive" as const,
                       },
                     },
                   },
@@ -88,12 +88,12 @@ router.get(
           ],
         };
 
-        let teacherOrderBy: any = { createdAt: 'desc' };
-        if (sortBy === 'rating') {
+        let teacherOrderBy: any = { createdAt: "desc" };
+        if (sortBy === "rating") {
           teacherOrderBy = { rating: sortOrder };
-        } else if (sortBy === 'experience') {
+        } else if (sortBy === "experience") {
           teacherOrderBy = { experienceYears: sortOrder };
-        } else if (sortBy === 'price') {
+        } else if (sortBy === "price") {
           teacherOrderBy = { hourlyRate: sortOrder };
         }
 
@@ -120,32 +120,35 @@ router.get(
               _count: {
                 select: {
                   reviews: {
-                    where: { status: 'APPROVED' },
+                    where: { status: "APPROVED" },
                   },
                 },
               },
             },
             orderBy: teacherOrderBy,
-            skip: type === 'teachers' ? skip : 0,
-            take: type === 'teachers' ? limit : 10,
+            skip: type === "teachers" ? skip : 0,
+            take: type === "teachers" ? limit : 10,
           }),
           prisma.teacherProfile.count({ where: teacherWhere }),
         ]);
 
         results.teachers = teachers;
-        if (type === 'teachers') {
+        if (type === "teachers") {
           results.totalResults = teacherCount;
         }
       }
 
       // Search students (admin only)
-      if ((type === 'all' || type === 'students') && req.user!.role === 'ADMIN') {
+      if (
+        (type === "all" || type === "students") &&
+        req.user!.role === "ADMIN"
+      ) {
         const studentWhere = {
           AND: [
             {
               user: {
                 isActive: true,
-                role: 'STUDENT',
+                role: "STUDENT",
               },
             },
             {
@@ -153,13 +156,13 @@ router.get(
                 {
                   firstName: {
                     contains: query as string,
-                    mode: 'insensitive' as const,
+                    mode: "insensitive" as const,
                   },
                 },
                 {
                   lastName: {
                     contains: query as string,
-                    mode: 'insensitive' as const,
+                    mode: "insensitive" as const,
                   },
                 },
                 {
@@ -190,39 +193,39 @@ router.get(
                 },
               },
             },
-            orderBy: { createdAt: 'desc' },
-            skip: type === 'students' ? skip : 0,
-            take: type === 'students' ? limit : 10,
+            orderBy: { createdAt: "desc" },
+            skip: type === "students" ? skip : 0,
+            take: type === "students" ? limit : 10,
           }),
           prisma.studentProfile.count({ where: studentWhere }),
         ]);
 
         results.students = students;
-        if (type === 'students') {
+        if (type === "students") {
           results.totalResults = studentCount;
         }
       }
 
       // Search subjects
-      if (type === 'all' || type === 'subjects') {
+      if (type === "all" || type === "subjects") {
         const subjectWhere = {
           OR: [
             {
               name: {
                 contains: query as string,
-                mode: 'insensitive' as const,
+                mode: "insensitive" as const,
               },
             },
             {
               description: {
                 contains: query as string,
-                mode: 'insensitive' as const,
+                mode: "insensitive" as const,
               },
             },
             {
               category: {
                 contains: query as string,
-                mode: 'insensitive' as const,
+                mode: "insensitive" as const,
               },
             },
           ],
@@ -238,24 +241,24 @@ router.get(
                 },
               },
             },
-            orderBy: { name: 'asc' },
-            skip: type === 'subjects' ? skip : 0,
-            take: type === 'subjects' ? limit : 10,
+            orderBy: { name: "asc" },
+            skip: type === "subjects" ? skip : 0,
+            take: type === "subjects" ? limit : 10,
           }),
           prisma.subject.count({ where: subjectWhere }),
         ]);
 
         results.subjects = subjects;
-        if (type === 'subjects') {
+        if (type === "subjects") {
           results.totalResults = subjectCount;
         }
       }
 
       // Calculate total for 'all' type
-      if (type === 'all') {
-        results.totalResults = 
-          results.teachers.length + 
-          results.students.length + 
+      if (type === "all") {
+        results.totalResults =
+          results.teachers.length +
+          results.students.length +
           results.subjects.length;
       }
 
@@ -301,8 +304,8 @@ router.get(
       availability,
       location,
       languages,
-      sortBy = 'rating',
-      sortOrder = 'desc',
+      sortBy = "rating",
+      sortOrder = "desc",
       page = 1,
       limit = 20,
     } = req.query;
@@ -311,7 +314,7 @@ router.get(
     let whereClause: any = {
       user: {
         isActive: true,
-        role: 'TEACHER',
+        role: "TEACHER",
       },
     };
 
@@ -321,19 +324,19 @@ router.get(
         {
           firstName: {
             contains: query as string,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         {
           lastName: {
             contains: query as string,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         {
           bio: {
             contains: query as string,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         {
@@ -371,28 +374,32 @@ router.get(
 
     // Experience level filter
     if (experienceLevel) {
-      const expLevels = Array.isArray(experienceLevel) ? experienceLevel : [experienceLevel];
+      const expLevels = Array.isArray(experienceLevel)
+        ? experienceLevel
+        : [experienceLevel];
       const expRanges: any = [];
-      
+
       expLevels.forEach((level: string) => {
         switch (level) {
-          case 'beginner':
+          case "beginner":
             expRanges.push({ experienceYears: { gte: 0, lt: 2 } });
             break;
-          case 'intermediate':
+          case "intermediate":
             expRanges.push({ experienceYears: { gte: 2, lt: 5 } });
             break;
-          case 'advanced':
+          case "advanced":
             expRanges.push({ experienceYears: { gte: 5, lt: 10 } });
             break;
-          case 'expert':
+          case "expert":
             expRanges.push({ experienceYears: { gte: 10 } });
             break;
         }
       });
 
       if (expRanges.length > 0) {
-        whereClause.OR = whereClause.OR ? [...whereClause.OR, ...expRanges] : expRanges;
+        whereClause.OR = whereClause.OR
+          ? [...whereClause.OR, ...expRanges]
+          : expRanges;
       }
     }
 
@@ -400,7 +407,7 @@ router.get(
     if (location) {
       whereClause.city = {
         contains: location as string,
-        mode: 'insensitive',
+        mode: "insensitive",
       };
     }
 
@@ -412,7 +419,7 @@ router.get(
     }
 
     // Availability filter (simplified - checks if teacher has any future availability)
-    if (availability === 'available') {
+    if (availability === "available") {
       whereClause.availabilitySlots = {
         some: {
           startTime: {
@@ -425,16 +432,16 @@ router.get(
 
     let orderBy: any;
     switch (sortBy) {
-      case 'rating':
+      case "rating":
         orderBy = { rating: sortOrder };
         break;
-      case 'price':
+      case "price":
         orderBy = { hourlyRate: sortOrder };
         break;
-      case 'experience':
+      case "experience":
         orderBy = { experienceYears: sortOrder };
         break;
-      case 'reviews':
+      case "reviews":
         orderBy = { totalReviews: sortOrder };
         break;
       default:
@@ -477,10 +484,10 @@ router.get(
           _count: {
             select: {
               reviews: {
-                where: { status: 'APPROVED' },
+                where: { status: "APPROVED" },
               },
               bookings: {
-                where: { status: 'COMPLETED' },
+                where: { status: "COMPLETED" },
               },
             },
           },
@@ -535,8 +542,8 @@ router.get(
       registrationDate,
       isActive,
       hasBookings,
-      sortBy = 'createdAt',
-      sortOrder = 'desc',
+      sortBy = "createdAt",
+      sortOrder = "desc",
       page = 1,
       limit = 20,
     } = req.query;
@@ -544,7 +551,7 @@ router.get(
     const skip = (page - 1) * limit;
     let whereClause: any = {
       user: {
-        role: 'STUDENT',
+        role: "STUDENT",
       },
     };
 
@@ -554,20 +561,20 @@ router.get(
         {
           firstName: {
             contains: query as string,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         {
           lastName: {
             contains: query as string,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         {
           user: {
             email: {
               contains: query as string,
-              mode: 'insensitive',
+              mode: "insensitive",
             },
           },
         },
@@ -576,7 +583,7 @@ router.get(
 
     // Active status filter
     if (isActive !== undefined) {
-      whereClause.user.isActive = isActive === 'true';
+      whereClause.user.isActive = isActive === "true";
     }
 
     // Preferred subjects filter
@@ -591,7 +598,7 @@ router.get(
       const date = new Date(registrationDate as string);
       const nextDay = new Date(date);
       nextDay.setDate(date.getDate() + 1);
-      
+
       whereClause.user.createdAt = {
         gte: date,
         lt: nextDay,
@@ -599,11 +606,11 @@ router.get(
     }
 
     // Has bookings filter
-    if (hasBookings === 'true') {
+    if (hasBookings === "true") {
       whereClause.bookings = {
         some: {},
       };
-    } else if (hasBookings === 'false') {
+    } else if (hasBookings === "false") {
       whereClause.bookings = {
         none: {},
       };
@@ -611,13 +618,13 @@ router.get(
 
     let orderBy: any;
     switch (sortBy) {
-      case 'name':
+      case "name":
         orderBy = { firstName: sortOrder };
         break;
-      case 'email':
+      case "email":
         orderBy = { user: { email: sortOrder } };
         break;
-      case 'registrationDate':
+      case "registrationDate":
         orderBy = { user: { createdAt: sortOrder } };
         break;
       default:
@@ -687,8 +694,8 @@ router.get(
       query,
       category,
       hasTeachers,
-      sortBy = 'name',
-      sortOrder = 'asc',
+      sortBy = "name",
+      sortOrder = "asc",
       page = 1,
       limit = 50,
     } = req.query;
@@ -702,19 +709,19 @@ router.get(
         {
           name: {
             contains: query as string,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         {
           description: {
             contains: query as string,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         {
           category: {
             contains: query as string,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
       ];
@@ -726,11 +733,11 @@ router.get(
     }
 
     // Has teachers filter
-    if (hasTeachers === 'true') {
+    if (hasTeachers === "true") {
       whereClause.subjectOfferings = {
         some: {},
       };
-    } else if (hasTeachers === 'false') {
+    } else if (hasTeachers === "false") {
       whereClause.subjectOfferings = {
         none: {},
       };
@@ -738,10 +745,10 @@ router.get(
 
     let orderBy: any;
     switch (sortBy) {
-      case 'popularity':
+      case "popularity":
         orderBy = { subjectOfferings: { _count: sortOrder } };
         break;
-      case 'category':
+      case "category":
         orderBy = { category: sortOrder };
         break;
       default:
@@ -774,7 +781,7 @@ router.get(
             take: 3,
             orderBy: {
               teacher: {
-                rating: 'desc',
+                rating: "desc",
               },
             },
           },
@@ -784,15 +791,15 @@ router.get(
         take: limit,
       }),
       prisma.subject.count({ where: whereClause }),
-      
+
       // Get all categories for filtering
       prisma.subject.findMany({
         select: {
           category: true,
         },
-        distinct: ['category'],
+        distinct: ["category"],
         orderBy: {
-          category: 'asc',
+          category: "asc",
         },
       }),
     ]);
@@ -806,7 +813,7 @@ router.get(
 
     res.json({
       subjects,
-      categories: categories.map(c => c.category),
+      categories: categories.map((c) => c.category),
       pagination: {
         page,
         limit,
@@ -836,8 +843,8 @@ router.post(
       availabilityFilters,
       priceFilters,
       ratingFilters,
-      sortBy = 'relevance',
-      sortOrder = 'desc',
+      sortBy = "relevance",
+      sortOrder = "desc",
       page = 1,
       limit = 20,
     } = req.body;
@@ -849,7 +856,7 @@ router.post(
       let whereClause: any = {
         user: {
           isActive: true,
-          role: 'TEACHER',
+          role: "TEACHER",
         },
       };
 
@@ -859,19 +866,19 @@ router.post(
           {
             firstName: {
               contains: textQuery,
-              mode: 'insensitive',
+              mode: "insensitive",
             },
           },
           {
             lastName: {
               contains: textQuery,
-              mode: 'insensitive',
+              mode: "insensitive",
             },
           },
           {
             bio: {
               contains: textQuery,
-              mode: 'insensitive',
+              mode: "insensitive",
             },
           },
           {
@@ -884,7 +891,7 @@ router.post(
               some: {
                 subjectName: {
                   contains: textQuery,
-                  mode: 'insensitive',
+                  mode: "insensitive",
                 },
               },
             },
@@ -900,7 +907,7 @@ router.post(
         if (teacherFilters.education) {
           whereClause.education = {
             contains: teacherFilters.education,
-            mode: 'insensitive',
+            mode: "insensitive",
           };
         }
         if (teacherFilters.languages && teacherFilters.languages.length > 0) {
@@ -911,17 +918,22 @@ router.post(
       }
 
       // Apply subject filters
-      if (subjectFilters && subjectFilters.subjects && subjectFilters.subjects.length > 0) {
+      if (
+        subjectFilters &&
+        subjectFilters.subjects &&
+        subjectFilters.subjects.length > 0
+      ) {
         whereClause.subjectOfferings = {
           some: {
             subjectName: {
               in: subjectFilters.subjects,
             },
-            ...(subjectFilters.levels && subjectFilters.levels.length > 0 && {
-              level: {
-                in: subjectFilters.levels,
-              },
-            }),
+            ...(subjectFilters.levels &&
+              subjectFilters.levels.length > 0 && {
+                level: {
+                  in: subjectFilters.levels,
+                },
+              }),
           },
         };
       }
@@ -931,7 +943,7 @@ router.post(
         if (locationFilters.city) {
           whereClause.city = {
             contains: locationFilters.city,
-            mode: 'insensitive',
+            mode: "insensitive",
           };
         }
         if (locationFilters.region) {
@@ -985,16 +997,16 @@ router.post(
       // Determine sorting
       let orderBy: any;
       switch (sortBy) {
-        case 'rating':
+        case "rating":
           orderBy = { rating: sortOrder };
           break;
-        case 'price':
+        case "price":
           orderBy = { hourlyRate: sortOrder };
           break;
-        case 'experience':
+        case "experience":
           orderBy = { experienceYears: sortOrder };
           break;
-        case 'reviews':
+        case "reviews":
           orderBy = { totalReviews: sortOrder };
           break;
         default:
@@ -1036,10 +1048,10 @@ router.post(
             _count: {
               select: {
                 reviews: {
-                  where: { status: 'APPROVED' },
+                  where: { status: "APPROVED" },
                 },
                 bookings: {
-                  where: { status: 'COMPLETED' },
+                  where: { status: "COMPLETED" },
                 },
               },
             },
@@ -1084,14 +1096,18 @@ router.post(
       });
     } catch (error) {
       logger.error("Advanced search error", { error });
-      throw new AppError("Advanced search failed", 500, "ADVANCED_SEARCH_ERROR");
+      throw new AppError(
+        "Advanced search failed",
+        500,
+        "ADVANCED_SEARCH_ERROR",
+      );
     }
   },
 );
 
 // Get search suggestions/autocomplete
 router.get("/suggestions", requireAuth, async (req, res) => {
-  const { query, type = 'all' } = req.query;
+  const { query, type = "all" } = req.query;
 
   if (!query || (query as string).length < 2) {
     return res.json({ suggestions: [] });
@@ -1105,20 +1121,20 @@ router.get("/suggestions", requireAuth, async (req, res) => {
 
   try {
     // Teacher name suggestions
-    if (type === 'all' || type === 'teachers') {
+    if (type === "all" || type === "teachers") {
       const teachers = await prisma.teacherProfile.findMany({
         where: {
           OR: [
             {
               firstName: {
                 startsWith: query as string,
-                mode: 'insensitive',
+                mode: "insensitive",
               },
             },
             {
               lastName: {
                 startsWith: query as string,
-                mode: 'insensitive',
+                mode: "insensitive",
               },
             },
           ],
@@ -1135,21 +1151,21 @@ router.get("/suggestions", requireAuth, async (req, res) => {
         take: 5,
       });
 
-      suggestions.teachers = teachers.map(t => ({
+      suggestions.teachers = teachers.map((t) => ({
         id: t.id,
         text: `${t.firstName} ${t.lastName}`,
-        type: 'teacher',
+        type: "teacher",
         avatar: t.avatar,
       }));
     }
 
     // Subject suggestions
-    if (type === 'all' || type === 'subjects') {
+    if (type === "all" || type === "subjects") {
       const subjects = await prisma.subject.findMany({
         where: {
           name: {
             startsWith: query as string,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         select: {
@@ -1160,34 +1176,34 @@ router.get("/suggestions", requireAuth, async (req, res) => {
         take: 5,
       });
 
-      suggestions.subjects = subjects.map(s => ({
+      suggestions.subjects = subjects.map((s) => ({
         id: s.id,
         text: s.name,
-        type: 'subject',
+        type: "subject",
         category: s.category,
       }));
     }
 
     // Location suggestions
-    if (type === 'all' || type === 'locations') {
+    if (type === "all" || type === "locations") {
       const locations = await prisma.teacherProfile.findMany({
         where: {
           city: {
             startsWith: query as string,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         select: {
           city: true,
           region: true,
         },
-        distinct: ['city'],
+        distinct: ["city"],
         take: 5,
       });
 
-      suggestions.locations = locations.map(l => ({
+      suggestions.locations = locations.map((l) => ({
         text: l.city,
-        type: 'location',
+        type: "location",
         region: l.region,
       }));
     }

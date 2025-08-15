@@ -65,16 +65,16 @@ const TeacherDetails: React.FC = () => {
   const [isSaved, setIsSaved] = useState(false);
 
   // Fetch teacher data
-  const { data: teacher, isLoading, error } = useTeacherById(id || '', !!id);
+  const { data: teacher, isLoading, error } = useTeacherById(id || "", !!id);
 
   // Fetch teacher reviews
   const { data: reviewsData } = useTeacherReviews(
-    id || '',
+    id || "",
     {
       rating: reviewFilter !== "all" ? [parseInt(reviewFilter)] : undefined,
-      limit: 20
+      limit: 20,
     },
-    { enabled: !!id }
+    { enabled: !!id },
   );
 
   useEffect(() => {
@@ -89,14 +89,14 @@ const TeacherDetails: React.FC = () => {
     const params = new URLSearchParams({
       tutorId: teacher.id,
       tutorName: `${teacher.firstName} ${teacher.lastName}`,
-      tutorAvatar: teacher.profileImage || '/placeholder.svg',
-      tutorRating: teacher.averageRating?.toString() || '0',
+      tutorAvatar: teacher.profileImage || "/placeholder.svg",
+      tutorRating: teacher.averageRating?.toString() || "0",
       subject: selectedSubject,
       slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       slotEnd: new Date(
         Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000,
       ).toISOString(),
-      price: '2500000', // 25,000 UZS trial in kopeks
+      price: "2500000", // 25,000 UZS trial in kopeks
       serviceFee: "0",
     });
 
@@ -114,8 +114,8 @@ const TeacherDetails: React.FC = () => {
     const params = new URLSearchParams({
       tutorId: teacher.id,
       tutorName: `${teacher.firstName} ${teacher.lastName}`,
-      tutorAvatar: teacher.profileImage || '/placeholder.svg',
-      tutorRating: teacher.averageRating?.toString() || '0',
+      tutorAvatar: teacher.profileImage || "/placeholder.svg",
+      tutorRating: teacher.averageRating?.toString() || "0",
       subject: selectedSubject,
       slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       slotEnd: new Date(
@@ -163,7 +163,7 @@ const TeacherDetails: React.FC = () => {
           <p className="text-gray-600 mb-6">
             Siz qidirayotgan o'qituvchi mavjud emas.
           </p>
-          <Button onClick={() => navigate('/teachers')}>
+          <Button onClick={() => navigate("/teachers")}>
             O'qituvchilar ro'yxatiga qaytish
           </Button>
         </div>
@@ -195,7 +195,9 @@ const TeacherDetails: React.FC = () => {
                   Teachers
                 </Link>
                 <ChevronRight className="h-4 w-4 mx-2" />
-                <span className="text-foreground">{teacher.firstName} {teacher.lastName}</span>
+                <span className="text-foreground">
+                  {teacher.firstName} {teacher.lastName}
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-2">

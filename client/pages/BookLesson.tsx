@@ -1,15 +1,35 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useTeacherById, useAvailableSlots, useCreateBooking } from "@/hooks/useApi";
+import {
+  useTeacherById,
+  useAvailableSlots,
+  useCreateBooking,
+} from "@/hooks/useApi";
 import { formatPrice } from "@/lib/api";
-import { ArrowLeft, Calendar, Clock, Video, CreditCard, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  Video,
+  CreditCard,
+  CheckCircle,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function BookLesson() {
   const { teacherId } = useParams();
@@ -21,21 +41,33 @@ export default function BookLesson() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   // Fetch teacher data
-  const { data: teacher, isLoading: teacherLoading, error: teacherError } = useTeacherById(teacherId || '', !!teacherId);
+  const {
+    data: teacher,
+    isLoading: teacherLoading,
+    error: teacherError,
+  } = useTeacherById(teacherId || "", !!teacherId);
 
   // Get available slots for selected date range
-  const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-  const endDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+  const startDate = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth(),
+    1,
+  );
+  const endDate = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth() + 1,
+    0,
+  );
 
   const { data: slotsData } = useAvailableSlots(
-    teacherId || '',
+    teacherId || "",
     {
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
-      timezone: 'Asia/Tashkent',
-      duration: 60
+      startDate: startDate.toISOString().split("T")[0],
+      endDate: endDate.toISOString().split("T")[0],
+      timezone: "Asia/Tashkent",
+      duration: 60,
     },
-    !!teacherId && !!selectedDate
+    !!teacherId && !!selectedDate,
   );
 
   // Booking mutation
@@ -49,28 +81,28 @@ export default function BookLesson() {
       name: "Sinov darsi",
       price: Math.round(basePrice * 0.5), // 50% off for trial
       duration: 30,
-      discount: "50% chegirma"
+      discount: "50% chegirma",
     },
     {
       id: "single",
       name: "Yakka dars",
       price: basePrice,
-      duration: 60
+      duration: 60,
     },
     {
       id: "package5",
       name: "5 darslik paket",
       price: Math.round(basePrice * 5 * 0.9), // 10% off
       duration: 60,
-      savings: "10% tejash"
+      savings: "10% tejash",
     },
     {
       id: "package10",
       name: "10 darslik paket",
       price: Math.round(basePrice * 10 * 0.85), // 15% off
       duration: 60,
-      savings: "15% tejash"
-    }
+      savings: "15% tejash",
+    },
   ];
 
   // Generate calendar days
@@ -81,36 +113,37 @@ export default function BookLesson() {
     const lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
-    
+
     const days = [];
     const currentDate = new Date(startDate);
-    
+
     for (let i = 0; i < 42; i++) {
       days.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
     }
-    
+
     return days;
   };
 
   // Process available slots from API
-  const availableSlotsByDate = slotsData?.slots?.reduce((acc: any, slot: any) => {
-    const date = new Date(slot.startAt).toISOString().split('T')[0];
-    const time = new Date(slot.startAt).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
+  const availableSlotsByDate =
+    slotsData?.slots?.reduce((acc: any, slot: any) => {
+      const date = new Date(slot.startAt).toISOString().split("T")[0];
+      const time = new Date(slot.startAt).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
 
-    if (!acc[date]) {
-      acc[date] = [];
-    }
-    acc[date].push({ time, slot });
-    return acc;
-  }, {}) || {};
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push({ time, slot });
+      return acc;
+    }, {}) || {};
 
   const isDateAvailable = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = date.toISOString().split("T")[0];
     return availableSlotsByDate[dateStr]?.length > 0;
   };
 
@@ -131,28 +164,33 @@ export default function BookLesson() {
 
   const getAvailableSlots = () => {
     if (!selectedDate) return [];
-    const dateStr = selectedDate.toISOString().split('T')[0];
+    const dateStr = selectedDate.toISOString().split("T")[0];
     return availableSlotsByDate[dateStr] || [];
   };
 
-  const selectedPackageDetails = packages.find(p => p.id === selectedPackage);
+  const selectedPackageDetails = packages.find((p) => p.id === selectedPackage);
   const totalPrice = selectedPackageDetails?.price || 0;
 
   // Handle booking submission
   const handleBookingSubmit = async () => {
     if (!selectedDate || !selectedTime || !teacher) return;
 
-    const selectedSlot = getAvailableSlots().find(s => s.time === selectedTime);
+    const selectedSlot = getAvailableSlots().find(
+      (s) => s.time === selectedTime,
+    );
     if (!selectedSlot) return;
 
     try {
       const bookingData = {
         teacherId: teacher.id,
-        subjectOfferingId: teacher.subjectOfferings?.[0]?.id || '',
+        subjectOfferingId: teacher.subjectOfferings?.[0]?.id || "",
         startAt: selectedSlot.slot.startAt,
         endAt: selectedSlot.slot.endAt,
-        type: selectedPackage === 'trial' ? 'TRIAL' as const : 'SINGLE' as const,
-        studentTimezone: 'Asia/Tashkent'
+        type:
+          selectedPackage === "trial"
+            ? ("TRIAL" as const)
+            : ("SINGLE" as const),
+        studentTimezone: "Asia/Tashkent",
       };
 
       await createBookingMutation.mutateAsync(bookingData);
@@ -160,13 +198,23 @@ export default function BookLesson() {
       // Navigate to payment or success page
       navigate(`/payment?bookingId=${Date.now()}&amount=${totalPrice}`);
     } catch (error) {
-      console.error('Booking failed:', error);
+      console.error("Booking failed:", error);
     }
   };
 
   const monthNames = [
-    "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
-    "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
+    "Yanvar",
+    "Fevral",
+    "Mart",
+    "Aprel",
+    "May",
+    "Iyun",
+    "Iyul",
+    "Avgust",
+    "Sentabr",
+    "Oktabr",
+    "Noyabr",
+    "Dekabr",
   ];
 
   const dayNames = ["Yak", "Dush", "Sesh", "Chor", "Pay", "Jum", "Shan"];
@@ -189,7 +237,7 @@ export default function BookLesson() {
           <p className="text-gray-600 mb-6">
             Siz qidirayotgan o'qituvchi mavjud emas.
           </p>
-          <Button onClick={() => navigate('/teachers')}>
+          <Button onClick={() => navigate("/teachers")}>
             O'qituvchilar ro'yxatiga qaytish
           </Button>
         </div>
@@ -203,12 +251,19 @@ export default function BookLesson() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
-            <Link to={`/teacher/${teacherId}`} className="text-primary hover:text-primary/80">
+            <Link
+              to={`/teacher/${teacherId}`}
+              className="text-primary hover:text-primary/80"
+            >
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dars buyurtma qilish</h1>
-              <p className="text-gray-600">{teacher.firstName} {teacher.lastName} bilan dars rejalashtiring</p>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Dars buyurtma qilish
+              </h1>
+              <p className="text-gray-600">
+                {teacher.firstName} {teacher.lastName} bilan dars rejalashtiring
+              </p>
             </div>
           </div>
 
@@ -220,20 +275,36 @@ export default function BookLesson() {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
                     <Avatar className="w-16 h-16">
-                      <AvatarImage src={teacher.profileImage || '/placeholder.svg'} alt={`${teacher.firstName} ${teacher.lastName}`} />
+                      <AvatarImage
+                        src={teacher.profileImage || "/placeholder.svg"}
+                        alt={`${teacher.firstName} ${teacher.lastName}`}
+                      />
                       <AvatarFallback>
-                        {teacher.firstName?.[0]}{teacher.lastName?.[0]}
+                        {teacher.firstName?.[0]}
+                        {teacher.lastName?.[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h2 className="text-xl font-semibold text-gray-900">{teacher.firstName} {teacher.lastName}</h2>
-                      <p className="text-gray-600">{teacher.subjectOfferings?.[0]?.subjectName || 'O\'qituvchi'} mutaxassisi</p>
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        {teacher.firstName} {teacher.lastName}
+                      </h2>
+                      <p className="text-gray-600">
+                        {teacher.subjectOfferings?.[0]?.subjectName ||
+                          "O'qituvchi"}{" "}
+                        mutaxassisi
+                      </p>
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {teacher.subjectOfferings?.slice(0, 3).map((offering, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {offering.subjectName}
-                          </Badge>
-                        ))}
+                        {teacher.subjectOfferings
+                          ?.slice(0, 3)
+                          .map((offering, index) => (
+                            <Badge
+                              key={index}
+                              variant="secondary"
+                              className="text-xs"
+                            >
+                              {offering.subjectName}
+                            </Badge>
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -254,23 +325,33 @@ export default function BookLesson() {
                       key={pkg.id}
                       className={`p-4 border rounded-lg cursor-pointer transition-colors ${
                         selectedPackage === pkg.id
-                          ? 'border-primary bg-primary/5'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? "border-primary bg-primary/5"
+                          : "border-gray-200 hover:border-gray-300"
                       }`}
                       onClick={() => setSelectedPackage(pkg.id)}
                     >
                       <div className="flex justify-between items-center">
                         <div>
-                          <div className="font-medium text-gray-900">{pkg.name}</div>
-                          <div className="text-sm text-gray-600">{pkg.duration} minutes</div>
+                          <div className="font-medium text-gray-900">
+                            {pkg.name}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {pkg.duration} minutes
+                          </div>
                           {pkg.savings && (
-                            <div className="text-sm text-green-600 font-medium">{pkg.savings}</div>
+                            <div className="text-sm text-green-600 font-medium">
+                              {pkg.savings}
+                            </div>
                           )}
                         </div>
                         <div className="text-right">
-                          <div className="font-bold text-lg">{formatPrice(pkg.price)}</div>
+                          <div className="font-bold text-lg">
+                            {formatPrice(pkg.price)}
+                          </div>
                           {pkg.discount && (
-                            <div className="text-sm text-green-600">{pkg.discount}</div>
+                            <div className="text-sm text-green-600">
+                              {pkg.discount}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -293,17 +374,32 @@ export default function BookLesson() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
+                      onClick={() =>
+                        setCurrentMonth(
+                          new Date(
+                            currentMonth.getFullYear(),
+                            currentMonth.getMonth() - 1,
+                          ),
+                        )
+                      }
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <h3 className="text-lg font-semibold">
-                      {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                      {monthNames[currentMonth.getMonth()]}{" "}
+                      {currentMonth.getFullYear()}
                     </h3>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
+                      onClick={() =>
+                        setCurrentMonth(
+                          new Date(
+                            currentMonth.getFullYear(),
+                            currentMonth.getMonth() + 1,
+                          ),
+                        )
+                      }
                     >
                       <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -312,7 +408,10 @@ export default function BookLesson() {
                   {/* Day Names */}
                   <div className="grid grid-cols-7 gap-1 mb-2">
                     {dayNames.map((day) => (
-                      <div key={day} className="text-center text-sm font-medium text-gray-600 py-2">
+                      <div
+                        key={day}
+                        className="text-center text-sm font-medium text-gray-600 py-2"
+                      >
                         {day}
                       </div>
                     ))}
@@ -333,16 +432,21 @@ export default function BookLesson() {
                           disabled={!isAvailable || !isCurrentMonth || isPast}
                           className={`
                             aspect-square p-2 text-sm rounded-lg transition-colors
-                            ${!isCurrentMonth ? 'text-gray-300' : ''}
-                            ${isPast ? 'text-gray-300 cursor-not-allowed' : ''}
-                            ${isAvailable && isCurrentMonth && !isPast
-                              ? 'hover:bg-primary/10 cursor-pointer'
-                              : 'cursor-not-allowed'
+                            ${!isCurrentMonth ? "text-gray-300" : ""}
+                            ${isPast ? "text-gray-300 cursor-not-allowed" : ""}
+                            ${
+                              isAvailable && isCurrentMonth && !isPast
+                                ? "hover:bg-primary/10 cursor-pointer"
+                                : "cursor-not-allowed"
                             }
-                            ${isSelected ? 'bg-primary text-white' : ''}
-                            ${isAvailable && isCurrentMonth && !isPast && !isSelected
-                              ? 'bg-green-50 text-green-700 font-medium'
-                              : ''
+                            ${isSelected ? "bg-primary text-white" : ""}
+                            ${
+                              isAvailable &&
+                              isCurrentMonth &&
+                              !isPast &&
+                              !isSelected
+                                ? "bg-green-50 text-green-700 font-medium"
+                                : ""
                             }
                           `}
                         >
@@ -376,13 +480,18 @@ export default function BookLesson() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-sm text-gray-600 mb-4">
-                      {selectedDate.toLocaleDateString()} kuni mavjud vaqtlar (Toshkent vaqti)
+                      {selectedDate.toLocaleDateString()} kuni mavjud vaqtlar
+                      (Toshkent vaqti)
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       {getAvailableSlots().map((timeSlot) => (
                         <Button
                           key={timeSlot.time}
-                          variant={selectedTime === timeSlot.time ? "default" : "outline"}
+                          variant={
+                            selectedTime === timeSlot.time
+                              ? "default"
+                              : "outline"
+                          }
                           size="sm"
                           onClick={() => setSelectedTime(timeSlot.time)}
                           className="justify-center"
@@ -403,7 +512,9 @@ export default function BookLesson() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <Label htmlFor="notes">Ushbu darsda nimaga e'tibor qaratmoqchisiz?</Label>
+                      <Label htmlFor="notes">
+                        Ushbu darsda nimaga e'tibor qaratmoqchisiz?
+                      </Label>
                       <Textarea
                         id="notes"
                         placeholder="Masalan: IELTS speaking mashqi, business taqdimot ko'nikmalar, grammatika takrorlash..."
@@ -427,7 +538,9 @@ export default function BookLesson() {
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Paket:</span>
-                      <span className="font-medium">{selectedPackageDetails?.name}</span>
+                      <span className="font-medium">
+                        {selectedPackageDetails?.name}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Davomiyligi:</span>
@@ -465,11 +578,17 @@ export default function BookLesson() {
                     <Button
                       className="w-full"
                       size="lg"
-                      disabled={!selectedDate || !selectedTime || createBookingMutation.isPending}
+                      disabled={
+                        !selectedDate ||
+                        !selectedTime ||
+                        createBookingMutation.isPending
+                      }
                       onClick={handleBookingSubmit}
                     >
                       <CreditCard className="h-4 w-4 mr-2" />
-                      {createBookingMutation.isPending ? 'Yuklanmoqda...' : 'To\'lovga o\'tish'}
+                      {createBookingMutation.isPending
+                        ? "Yuklanmoqda..."
+                        : "To'lovga o'tish"}
                     </Button>
                   </div>
 

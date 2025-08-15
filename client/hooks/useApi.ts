@@ -1,69 +1,75 @@
-import { useQuery, useMutation, useQueryClient, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
-import { 
-  apiClient, 
-  TeacherProfile, 
-  StudentProfile, 
-  SubjectOffering, 
-  AvailabilityRule, 
-  AvailabilitySlot, 
-  Booking, 
-  Payment, 
-  Review, 
-  MessageThread, 
-  Message, 
-  Notification, 
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseQueryOptions,
+  UseMutationOptions,
+} from "@tanstack/react-query";
+import {
+  apiClient,
+  TeacherProfile,
+  StudentProfile,
+  SubjectOffering,
+  AvailabilityRule,
+  AvailabilitySlot,
+  Booking,
+  Payment,
+  Review,
+  MessageThread,
+  Message,
+  Notification,
   PaginatedResponse,
-  ApiError 
-} from '@/lib/api';
-import { toast } from 'sonner';
+  ApiError,
+} from "@/lib/api";
+import { toast } from "sonner";
 
 // Query Keys
 export const queryKeys = {
   // Auth
-  currentUser: ['auth', 'currentUser'] as const,
-  
+  currentUser: ["auth", "currentUser"] as const,
+
   // Teachers
-  teacherProfile: ['teacher', 'profile'] as const,
-  teacherById: (id: string) => ['teacher', 'byId', id] as const,
-  teacherSearch: (params: any) => ['teacher', 'search', params] as const,
-  
+  teacherProfile: ["teacher", "profile"] as const,
+  teacherById: (id: string) => ["teacher", "byId", id] as const,
+  teacherSearch: (params: any) => ["teacher", "search", params] as const,
+
   // Students
-  studentProfile: ['student', 'profile'] as const,
-  
+  studentProfile: ["student", "profile"] as const,
+
   // Subjects
-  subjects: (params?: any) => ['subjects', params] as const,
+  subjects: (params?: any) => ["subjects", params] as const,
 
   // Subject Offerings
-  subjectOfferings: ['subjectOfferings'] as const,
-  
+  subjectOfferings: ["subjectOfferings"] as const,
+
   // Availability
-  availability: (teacherId: string, startDate?: string, endDate?: string) => 
-    ['availability', teacherId, startDate, endDate] as const,
-  availableSlots: (teacherId: string, params: any) => 
-    ['availability', 'slots', teacherId, params] as const,
-    
+  availability: (teacherId: string, startDate?: string, endDate?: string) =>
+    ["availability", teacherId, startDate, endDate] as const,
+  availableSlots: (teacherId: string, params: any) =>
+    ["availability", "slots", teacherId, params] as const,
+
   // Bookings
-  bookings: (params?: any) => ['bookings', params] as const,
-  booking: (id: string) => ['booking', id] as const,
-  
+  bookings: (params?: any) => ["bookings", params] as const,
+  booking: (id: string) => ["booking", id] as const,
+
   // Payments
-  payments: (params?: any) => ['payments', params] as const,
-  payment: (id: string) => ['payment', id] as const,
-  
+  payments: (params?: any) => ["payments", params] as const,
+  payment: (id: string) => ["payment", id] as const,
+
   // Reviews
-  teacherReviews: (teacherId: string, params?: any) => 
-    ['reviews', 'teacher', teacherId, params] as const,
-    
+  teacherReviews: (teacherId: string, params?: any) =>
+    ["reviews", "teacher", teacherId, params] as const,
+
   // Messages
-  messageThreads: (params?: any) => ['messages', 'threads', params] as const,
-  messageThread: (threadId: string, params?: any) => 
-    ['messages', 'thread', threadId, params] as const,
-    
+  messageThreads: (params?: any) => ["messages", "threads", params] as const,
+  messageThread: (threadId: string, params?: any) =>
+    ["messages", "thread", threadId, params] as const,
+
   // Notifications
-  notifications: (params?: any) => ['notifications', params] as const,
-  
+  notifications: (params?: any) => ["notifications", params] as const,
+
   // Search
-  universalSearch: (params: any) => ['search', 'universal', params] as const,
+  universalSearch: (params: any) => ["search", "universal", params] as const,
 } as const;
 
 // Teacher Profile Hooks
@@ -86,16 +92,17 @@ export function useTeacherById(id: string, enabled = true) {
 
 export function useUpdateTeacherProfile() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (data: Partial<TeacherProfile>) => apiClient.updateTeacherProfile(data),
+    mutationFn: (data: Partial<TeacherProfile>) =>
+      apiClient.updateTeacherProfile(data),
     onSuccess: (data) => {
       queryClient.setQueryData(queryKeys.teacherProfile, data);
-      queryClient.invalidateQueries({ queryKey: ['teacher'] });
-      toast.success('Profil muvaffaqiyatli yangilandi');
+      queryClient.invalidateQueries({ queryKey: ["teacher"] });
+      toast.success("Profil muvaffaqiyatli yangilandi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Profil yangilanmadi');
+      toast.error(error.message || "Profil yangilanmadi");
     },
   });
 }
@@ -111,36 +118,40 @@ export function useStudentProfile() {
 
 export function useUpdateStudentProfile() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (data: Partial<StudentProfile>) => apiClient.updateStudentProfile(data),
+    mutationFn: (data: Partial<StudentProfile>) =>
+      apiClient.updateStudentProfile(data),
     onSuccess: (data) => {
       queryClient.setQueryData(queryKeys.studentProfile, data);
-      toast.success('Profil muvaffaqiyatli yangilandi');
+      toast.success("Profil muvaffaqiyatli yangilandi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Profil yangilanmadi');
+      toast.error(error.message || "Profil yangilanmadi");
     },
   });
 }
 
 // Teacher Search Hook
-export function useTeacherSearch(params: {
-  query?: string;
-  subjects?: string[];
-  minRating?: number;
-  maxRating?: number;
-  minPrice?: number;
-  maxPrice?: number;
-  experienceLevel?: string[];
-  availability?: string;
-  location?: string;
-  languages?: string[];
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}, options?: Partial<UseQueryOptions>) {
+export function useTeacherSearch(
+  params: {
+    query?: string;
+    subjects?: string[];
+    minRating?: number;
+    maxRating?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    experienceLevel?: string[];
+    availability?: string;
+    location?: string;
+    languages?: string[];
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  },
+  options?: Partial<UseQueryOptions>,
+) {
   return useQuery({
     queryKey: queryKeys.teacherSearch(params),
     queryFn: async () => {
@@ -148,117 +159,117 @@ export function useTeacherSearch(params: {
       return {
         teachers: [
           {
-            id: '1',
-            firstName: 'Aziza',
-            lastName: 'Karimova',
-            profileImage: '/placeholder.svg',
+            id: "1",
+            firstName: "Aziza",
+            lastName: "Karimova",
+            profileImage: "/placeholder.svg",
             averageRating: 4.9,
             totalStudents: 127,
             isVerified: true,
-            languages: ['O\'zbek', 'Ingliz', 'Rus'],
+            languages: ["O'zbek", "Ingliz", "Rus"],
             subjectOfferings: [
               {
-                id: '1',
-                subjectName: 'Ingliz tili',
+                id: "1",
+                subjectName: "Ingliz tili",
                 pricePerHour: 5000000, // 50,000 UZS in kopeks
-                level: 'INTERMEDIATE' as const,
-              }
-            ]
+                level: "INTERMEDIATE" as const,
+              },
+            ],
           },
           {
-            id: '2',
-            firstName: 'Bobur',
-            lastName: 'Umarov',
-            profileImage: '/placeholder.svg',
+            id: "2",
+            firstName: "Bobur",
+            lastName: "Umarov",
+            profileImage: "/placeholder.svg",
             averageRating: 4.8,
             totalStudents: 98,
             isVerified: true,
-            languages: ['O\'zbek', 'Rus'],
+            languages: ["O'zbek", "Rus"],
             subjectOfferings: [
               {
-                id: '2',
-                subjectName: 'Matematika',
+                id: "2",
+                subjectName: "Matematika",
                 pricePerHour: 4500000, // 45,000 UZS in kopeks
-                level: 'ADVANCED' as const,
-              }
-            ]
+                level: "ADVANCED" as const,
+              },
+            ],
           },
           {
-            id: '3',
-            firstName: 'Sarah',
-            lastName: 'Johnson',
-            profileImage: '/placeholder.svg',
+            id: "3",
+            firstName: "Sarah",
+            lastName: "Johnson",
+            profileImage: "/placeholder.svg",
             averageRating: 5.0,
             totalStudents: 84,
             isVerified: true,
-            languages: ['Ingliz'],
+            languages: ["Ingliz"],
             subjectOfferings: [
               {
-                id: '3',
-                subjectName: 'IELTS',
+                id: "3",
+                subjectName: "IELTS",
                 pricePerHour: 6500000, // 65,000 UZS in kopeks
-                level: 'ADVANCED' as const,
-              }
-            ]
+                level: "ADVANCED" as const,
+              },
+            ],
           },
           {
-            id: '4',
-            firstName: 'Malika',
-            lastName: 'Tosheva',
-            profileImage: '/placeholder.svg',
+            id: "4",
+            firstName: "Malika",
+            lastName: "Tosheva",
+            profileImage: "/placeholder.svg",
             averageRating: 4.7,
             totalStudents: 156,
             isVerified: true,
-            languages: ['O\'zbek', 'Rus', 'Ingliz'],
+            languages: ["O'zbek", "Rus", "Ingliz"],
             subjectOfferings: [
               {
-                id: '4',
-                subjectName: 'Fizika',
+                id: "4",
+                subjectName: "Fizika",
                 pricePerHour: 4000000, // 40,000 UZS in kopeks
-                level: 'INTERMEDIATE' as const,
-              }
-            ]
+                level: "INTERMEDIATE" as const,
+              },
+            ],
           },
           {
-            id: '5',
-            firstName: 'John',
-            lastName: 'Smith',
-            profileImage: '/placeholder.svg',
+            id: "5",
+            firstName: "John",
+            lastName: "Smith",
+            profileImage: "/placeholder.svg",
             averageRating: 4.9,
             totalStudents: 203,
             isVerified: true,
-            languages: ['Ingliz', 'Rus'],
+            languages: ["Ingliz", "Rus"],
             subjectOfferings: [
               {
-                id: '5',
-                subjectName: 'Dasturlash',
+                id: "5",
+                subjectName: "Dasturlash",
                 pricePerHour: 7500000, // 75,000 UZS in kopeks
-                level: 'ADVANCED' as const,
-              }
-            ]
+                level: "ADVANCED" as const,
+              },
+            ],
           },
           {
-            id: '6',
-            firstName: 'Dildora',
-            lastName: 'Abdullayeva',
-            profileImage: '/placeholder.svg',
+            id: "6",
+            firstName: "Dildora",
+            lastName: "Abdullayeva",
+            profileImage: "/placeholder.svg",
             averageRating: 4.8,
             totalStudents: 89,
             isVerified: true,
-            languages: ['O\'zbek', 'Rus'],
+            languages: ["O'zbek", "Rus"],
             subjectOfferings: [
               {
-                id: '6',
-                subjectName: 'Kimyo',
+                id: "6",
+                subjectName: "Kimyo",
                 pricePerHour: 3500000, // 35,000 UZS in kopeks
-                level: 'INTERMEDIATE' as const,
-              }
-            ]
-          }
+                level: "INTERMEDIATE" as const,
+              },
+            ],
+          },
         ],
         totalCount: 6,
         page: 1,
-        totalPages: 1
+        totalPages: 1,
       };
     },
     staleTime: 1000 * 60 * 2, // 2 minutes
@@ -267,33 +278,78 @@ export function useTeacherSearch(params: {
 }
 
 // Subjects Hooks
-export function useSubjects(params?: {
-  query?: string;
-  category?: string;
-  isActive?: boolean;
-  includeTeacherCount?: boolean;
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}, options?: Partial<UseQueryOptions>) {
+export function useSubjects(
+  params?: {
+    query?: string;
+    category?: string;
+    isActive?: boolean;
+    includeTeacherCount?: boolean;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  },
+  options?: Partial<UseQueryOptions>,
+) {
   return useQuery({
     queryKey: queryKeys.subjects(params),
     queryFn: async () => {
       // Fallback mock data for development
       return {
         subjects: [
-          { id: '1', name: 'Ingliz tili', teacherCount: 45, isActive: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-          { id: '2', name: 'Matematika', teacherCount: 32, isActive: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-          { id: '3', name: 'Fizika', teacherCount: 28, isActive: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-          { id: '4', name: 'Kimyo', teacherCount: 21, isActive: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-          { id: '5', name: 'Dasturlash', teacherCount: 18, isActive: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-          { id: '6', name: 'IELTS', teacherCount: 15, isActive: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+          {
+            id: "1",
+            name: "Ingliz tili",
+            teacherCount: 45,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: "2",
+            name: "Matematika",
+            teacherCount: 32,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: "3",
+            name: "Fizika",
+            teacherCount: 28,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: "4",
+            name: "Kimyo",
+            teacherCount: 21,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: "5",
+            name: "Dasturlash",
+            teacherCount: 18,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: "6",
+            name: "IELTS",
+            teacherCount: 15,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
         ],
-        categories: ['Tillar', 'Aniq fanlar', 'Texnologiya'],
+        categories: ["Tillar", "Aniq fanlar", "Texnologiya"],
         totalCount: 6,
         page: 1,
-        totalPages: 1
+        totalPages: 1,
       };
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -312,73 +368,86 @@ export function useSubjectOfferings() {
 
 export function useCreateSubjectOffering() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (data: Omit<SubjectOffering, 'id' | 'teacherId' | 'createdAt' | 'updatedAt'>) => 
-      apiClient.createSubjectOffering(data),
+    mutationFn: (
+      data: Omit<
+        SubjectOffering,
+        "id" | "teacherId" | "createdAt" | "updatedAt"
+      >,
+    ) => apiClient.createSubjectOffering(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.subjectOfferings });
-      queryClient.invalidateQueries({ queryKey: ['teacher'] });
-      toast.success('Yangi fan qo\'shildi');
+      queryClient.invalidateQueries({ queryKey: ["teacher"] });
+      toast.success("Yangi fan qo'shildi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Fan qo\'shilmadi');
+      toast.error(error.message || "Fan qo'shilmadi");
     },
   });
 }
 
 export function useUpdateSubjectOffering() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<SubjectOffering> }) => 
-      apiClient.updateSubjectOffering(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<SubjectOffering>;
+    }) => apiClient.updateSubjectOffering(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.subjectOfferings });
-      queryClient.invalidateQueries({ queryKey: ['teacher'] });
-      toast.success('Fan ma\'lumotlari yangilandi');
+      queryClient.invalidateQueries({ queryKey: ["teacher"] });
+      toast.success("Fan ma'lumotlari yangilandi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Fan yangilanmadi');
+      toast.error(error.message || "Fan yangilanmadi");
     },
   });
 }
 
 export function useDeleteSubjectOffering() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (id: string) => apiClient.deleteSubjectOffering(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.subjectOfferings });
-      queryClient.invalidateQueries({ queryKey: ['teacher'] });
-      toast.success('Fan o\'chirildi');
+      queryClient.invalidateQueries({ queryKey: ["teacher"] });
+      toast.success("Fan o'chirildi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Fan o\'chirilmadi');
+      toast.error(error.message || "Fan o'chirilmadi");
     },
   });
 }
 
 export function useReorderSubjectOfferings() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (offerings: { id: string; orderIndex: number }[]) => 
+    mutationFn: (offerings: { id: string; orderIndex: number }[]) =>
       apiClient.reorderSubjectOfferings(offerings),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.subjectOfferings });
-      queryClient.invalidateQueries({ queryKey: ['teacher'] });
-      toast.success('Fanlar tartibi o\'zgartirildi');
+      queryClient.invalidateQueries({ queryKey: ["teacher"] });
+      toast.success("Fanlar tartibi o'zgartirildi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Tartib o\'zgartirilmadi');
+      toast.error(error.message || "Tartib o'zgartirilmadi");
     },
   });
 }
 
 // Availability Hooks
-export function useAvailability(teacherId: string, startDate?: string, endDate?: string) {
+export function useAvailability(
+  teacherId: string,
+  startDate?: string,
+  endDate?: string,
+) {
   return useQuery({
     queryKey: queryKeys.availability(teacherId, startDate, endDate),
     queryFn: () => apiClient.getAvailability(teacherId, startDate, endDate),
@@ -387,13 +456,17 @@ export function useAvailability(teacherId: string, startDate?: string, endDate?:
   });
 }
 
-export function useAvailableSlots(teacherId: string, params: {
-  startDate: string;
-  endDate: string;
-  timezone?: string;
-  duration?: number;
-  subjectOfferingId?: string;
-}, enabled = true) {
+export function useAvailableSlots(
+  teacherId: string,
+  params: {
+    startDate: string;
+    endDate: string;
+    timezone?: string;
+    duration?: number;
+    subjectOfferingId?: string;
+  },
+  enabled = true,
+) {
   return useQuery({
     queryKey: queryKeys.availableSlots(teacherId, params),
     queryFn: () => apiClient.getAvailableSlots(teacherId, params),
@@ -404,46 +477,52 @@ export function useAvailableSlots(teacherId: string, params: {
 
 export function useCreateAvailabilityRule() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (rule: Omit<AvailabilityRule, 'id'>) => apiClient.createAvailabilityRule(rule),
+    mutationFn: (rule: Omit<AvailabilityRule, "id">) =>
+      apiClient.createAvailabilityRule(rule),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['availability'] });
-      toast.success('Vaqt jadvali qo\'shildi');
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Vaqt jadvali qo'shildi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Vaqt jadvali qo\'shilmadi');
+      toast.error(error.message || "Vaqt jadvali qo'shilmadi");
     },
   });
 }
 
 export function useUpdateAvailabilityRule() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<AvailabilityRule> }) => 
-      apiClient.updateAvailabilityRule(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<AvailabilityRule>;
+    }) => apiClient.updateAvailabilityRule(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['availability'] });
-      toast.success('Vaqt jadvali yangilandi');
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Vaqt jadvali yangilandi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Vaqt jadvali yangilanmadi');
+      toast.error(error.message || "Vaqt jadvali yangilanmadi");
     },
   });
 }
 
 export function useDeleteAvailabilityRule() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (id: string) => apiClient.deleteAvailabilityRule(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['availability'] });
-      toast.success('Vaqt jadvali o\'chirildi');
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Vaqt jadvali o'chirildi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Vaqt jadvali o\'chirilmadi');
+      toast.error(error.message || "Vaqt jadvali o'chirilmadi");
     },
   });
 }
@@ -457,7 +536,7 @@ export function useBookings(params?: {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }) {
   return useQuery({
     queryKey: queryKeys.bookings(params),
@@ -477,79 +556,91 @@ export function useBooking(id: string, enabled = true) {
 
 export function useCreateBooking() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (data: {
       teacherId: string;
       subjectOfferingId: string;
       startAt: string;
       endAt: string;
-      type?: 'TRIAL' | 'SINGLE' | 'PACKAGE';
+      type?: "TRIAL" | "SINGLE" | "PACKAGE";
       studentTimezone?: string;
       packageId?: string;
     }) => apiClient.createBooking(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
-      queryClient.invalidateQueries({ queryKey: ['availability'] });
-      toast.success('Dars band qilindi');
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Dars band qilindi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Dars band qilinmadi');
+      toast.error(error.message || "Dars band qilinmadi");
     },
   });
 }
 
 export function useUpdateBookingStatus() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, status, reason }: { id: string; status: 'CONFIRMED' | 'CANCELLED'; reason?: string }) => 
-      apiClient.updateBookingStatus(id, status, reason),
+    mutationFn: ({
+      id,
+      status,
+      reason,
+    }: {
+      id: string;
+      status: "CONFIRMED" | "CANCELLED";
+      reason?: string;
+    }) => apiClient.updateBookingStatus(id, status, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
-      queryClient.invalidateQueries({ queryKey: ['availability'] });
-      toast.success('Dars holati yangilandi');
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Dars holati yangilandi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Dars holati yangilanmadi');
+      toast.error(error.message || "Dars holati yangilanmadi");
     },
   });
 }
 
 export function useRescheduleBooking() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, newStartAt, newEndAt, reason }: { 
-      id: string; 
-      newStartAt: string; 
-      newEndAt: string; 
-      reason?: string 
+    mutationFn: ({
+      id,
+      newStartAt,
+      newEndAt,
+      reason,
+    }: {
+      id: string;
+      newStartAt: string;
+      newEndAt: string;
+      reason?: string;
     }) => apiClient.rescheduleBooking(id, newStartAt, newEndAt, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
-      queryClient.invalidateQueries({ queryKey: ['availability'] });
-      toast.success('Dars vaqti o\'zgartirildi');
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Dars vaqti o'zgartirildi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Dars vaqti o\'zgartirilmadi');
+      toast.error(error.message || "Dars vaqti o'zgartirilmadi");
     },
   });
 }
 
 export function useCancelBooking() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, reason }: { id: string; reason: string }) => 
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       apiClient.cancelBooking(id, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
-      queryClient.invalidateQueries({ queryKey: ['availability'] });
-      toast.success('Dars bekor qilindi');
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Dars bekor qilindi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Dars bekor qilinmadi');
+      toast.error(error.message || "Dars bekor qilinmadi");
     },
   });
 }
@@ -563,7 +654,7 @@ export function usePayments(params?: {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }) {
   return useQuery({
     queryKey: queryKeys.payments(params),
@@ -574,7 +665,7 @@ export function usePayments(params?: {
 
 export function useCreatePayment() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (data: {
       bookingId?: string;
@@ -585,26 +676,29 @@ export function useCreatePayment() {
       paymentMethodId?: string;
     }) => apiClient.createPayment(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] });
-      toast.success('To\'lov yaratildi');
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      toast.success("To'lov yaratildi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'To\'lov yaratilmadi');
+      toast.error(error.message || "To'lov yaratilmadi");
     },
   });
 }
 
 // Review Hooks
-export function useTeacherReviews(teacherId: string, params?: {
-  rating?: number[];
-  subject?: string;
-  status?: string;
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-  includeAnonymous?: boolean;
-}) {
+export function useTeacherReviews(
+  teacherId: string,
+  params?: {
+    rating?: number[];
+    subject?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    includeAnonymous?: boolean;
+  },
+) {
   return useQuery({
     queryKey: queryKeys.teacherReviews(teacherId, params),
     queryFn: () => apiClient.getTeacherReviews(teacherId, params),
@@ -615,7 +709,7 @@ export function useTeacherReviews(teacherId: string, params?: {
 
 export function useCreateReview() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (data: {
       teacherId: string;
@@ -625,12 +719,12 @@ export function useCreateReview() {
       isAnonymous?: boolean;
     }) => apiClient.createReview(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['teacher'] });
-      toast.success('Sharh qo\'shildi');
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher"] });
+      toast.success("Sharh qo'shildi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Sharh qo\'shilmadi');
+      toast.error(error.message || "Sharh qo'shilmadi");
     },
   });
 }
@@ -649,12 +743,16 @@ export function useMessageThreads(params?: {
   });
 }
 
-export function useMessageThread(threadId: string, params?: {
-  page?: number;
-  limit?: number;
-  before?: string;
-  after?: string;
-}, enabled = true) {
+export function useMessageThread(
+  threadId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    before?: string;
+    after?: string;
+  },
+  enabled = true,
+) {
   return useQuery({
     queryKey: queryKeys.messageThread(threadId, params),
     queryFn: () => apiClient.getMessageThread(threadId, params),
@@ -665,7 +763,7 @@ export function useMessageThread(threadId: string, params?: {
 
 export function useCreateMessageThread() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (data: {
       studentId: string;
@@ -674,46 +772,53 @@ export function useCreateMessageThread() {
       initialMessage?: string;
     }) => apiClient.createMessageThread(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
-      toast.success('Suhbat boshlandi');
+      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      toast.success("Suhbat boshlandi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Suhbat boshlanmadi');
+      toast.error(error.message || "Suhbat boshlanmadi");
     },
   });
 }
 
 export function useSendMessage() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ threadId, content, attachments = [] }: { 
-      threadId: string; 
-      content: string; 
-      attachments?: any[] 
+    mutationFn: ({
+      threadId,
+      content,
+      attachments = [],
+    }: {
+      threadId: string;
+      content: string;
+      attachments?: any[];
     }) => apiClient.sendMessage(threadId, content, attachments),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.messageThread(variables.threadId) 
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.messageThread(variables.threadId),
       });
-      queryClient.invalidateQueries({ queryKey: ['messages', 'threads'] });
+      queryClient.invalidateQueries({ queryKey: ["messages", "threads"] });
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Xabar yuborilmadi');
+      toast.error(error.message || "Xabar yuborilmadi");
     },
   });
 }
 
 // Notification Hooks
-export function useNotifications(params?: {
-  type?: string;
-  isRead?: boolean;
-  priority?: string;
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}, options?: Partial<UseQueryOptions>) {
+export function useNotifications(
+  params?: {
+    type?: string;
+    isRead?: boolean;
+    priority?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  },
+  options?: Partial<UseQueryOptions>,
+) {
   return useQuery({
     queryKey: queryKeys.notifications(params),
     queryFn: async () => {
@@ -723,7 +828,7 @@ export function useNotifications(params?: {
         unreadCount: 0,
         totalCount: 0,
         page: 1,
-        totalPages: 1
+        totalPages: 1,
       };
     },
     staleTime: 1000 * 30, // 30 seconds
@@ -733,42 +838,45 @@ export function useNotifications(params?: {
 
 export function useMarkNotificationAsRead() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (id: string) => apiClient.markNotificationAsRead(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Bildirishnoma belgilanmadi');
+      toast.error(error.message || "Bildirishnoma belgilanmadi");
     },
   });
 }
 
 export function useMarkAllNotificationsAsRead() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: () => apiClient.markAllNotificationsAsRead(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Barcha bildirishnomalar o\'qilgan deb belgilandi');
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      toast.success("Barcha bildirishnomalar o'qilgan deb belgilandi");
     },
     onError: (error: ApiError) => {
-      toast.error(error.message || 'Bildirishnomalar belgilanmadi');
+      toast.error(error.message || "Bildirishnomalar belgilanmadi");
     },
   });
 }
 
 // Universal Search Hook
-export function useUniversalSearch(params: {
-  query: string;
-  type?: 'all' | 'teachers' | 'students' | 'subjects';
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}, enabled = true) {
+export function useUniversalSearch(
+  params: {
+    query: string;
+    type?: "all" | "teachers" | "students" | "subjects";
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  },
+  enabled = true,
+) {
   return useQuery({
     queryKey: queryKeys.universalSearch(params),
     queryFn: () => apiClient.universalSearch(params),
@@ -780,24 +888,24 @@ export function useUniversalSearch(params: {
 // Optimistic update utilities
 export function useOptimisticUpdate() {
   const queryClient = useQueryClient();
-  
+
   return {
     updateSubjectOffering: (id: string, updates: Partial<SubjectOffering>) => {
       queryClient.setQueryData(
         queryKeys.subjectOfferings,
         (old: SubjectOffering[] | undefined) => {
           if (!old) return old;
-          return old.map(offering => 
-            offering.id === id ? { ...offering, ...updates } : offering
+          return old.map((offering) =>
+            offering.id === id ? { ...offering, ...updates } : offering,
           );
-        }
+        },
       );
     },
-    
+
     reorderSubjectOfferings: (newOrder: SubjectOffering[]) => {
       queryClient.setQueryData(queryKeys.subjectOfferings, newOrder);
     },
-    
+
     rollback: (queryKey: any) => {
       queryClient.invalidateQueries({ queryKey });
     },

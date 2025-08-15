@@ -1,7 +1,11 @@
 import express from "express";
 import { prisma } from "../lib/prisma";
 import { requireAuth, requireRole } from "../middleware/auth";
-import { validateRequest, validateQuery, validateParams } from "../middleware/validation";
+import {
+  validateRequest,
+  validateQuery,
+  validateParams,
+} from "../middleware/validation";
 import { AppError, NotFoundError } from "../utils/errors";
 import { logger } from "../utils/logger";
 import { sendEmail } from "../services/emailService";
@@ -111,7 +115,7 @@ router.get(
         priority,
       },
     });
-  }
+  },
 );
 
 // Mark notification as read
@@ -158,7 +162,7 @@ router.patch(
       notification: updatedNotification,
       message: "Notification marked as read",
     });
-  }
+  },
 );
 
 // Mark all notifications as read
@@ -219,7 +223,7 @@ router.delete(
     res.json({
       message: "Notification deleted successfully",
     });
-  }
+  },
 );
 
 // Create notification (Admin/System use)
@@ -313,14 +317,14 @@ router.post(
                 userName: user.teacherProfile
                   ? `${user.teacherProfile.firstName} ${user.teacherProfile.lastName}`
                   : user.studentProfile
-                  ? `${user.studentProfile.firstName} ${user.studentProfile.lastName}`
-                  : user.email,
+                    ? `${user.studentProfile.firstName} ${user.studentProfile.lastName}`
+                    : user.email,
                 title,
                 message,
                 actionUrl,
                 type,
               },
-            })
+            }),
           );
         }
       }
@@ -329,7 +333,7 @@ router.post(
       if (channels.includes("SMS")) {
         const phoneNumber =
           user.teacherProfile?.phoneNumber || user.studentProfile?.phoneNumber;
-        
+
         if (phoneNumber) {
           const userPrefs = user.notificationPreferences as any;
           const smsEnabled = userPrefs?.sms?.[type] !== false;
@@ -339,7 +343,7 @@ router.post(
               sendSMS({
                 to: phoneNumber,
                 message: `${title}: ${message}`,
-              })
+              }),
             );
           }
         }
@@ -366,7 +370,7 @@ router.post(
       recipients: users.length,
       channels,
     });
-  }
+  },
 );
 
 // Bulk create notifications
@@ -461,8 +465,8 @@ router.post(
                   userName: user.teacherProfile
                     ? `${user.teacherProfile.firstName} ${user.teacherProfile.lastName}`
                     : user.studentProfile
-                    ? `${user.studentProfile.firstName} ${user.studentProfile.lastName}`
-                    : user.email,
+                      ? `${user.studentProfile.firstName} ${user.studentProfile.lastName}`
+                      : user.email,
                   title,
                   message,
                   actionUrl,
@@ -475,8 +479,9 @@ router.post(
           // SMS
           if (channels.includes("SMS")) {
             const phoneNumber =
-              user.teacherProfile?.phoneNumber || user.studentProfile?.phoneNumber;
-            
+              user.teacherProfile?.phoneNumber ||
+              user.studentProfile?.phoneNumber;
+
             if (phoneNumber) {
               const smsEnabled = userPrefs?.sms?.[type] !== false;
               if (smsEnabled) {
@@ -493,7 +498,10 @@ router.post(
           userId: notificationData.userId,
           error: error.message,
         });
-        logger.error("Error creating bulk notification", { error, notificationData });
+        logger.error("Error creating bulk notification", {
+          error,
+          notificationData,
+        });
       }
     }
 
@@ -510,7 +518,7 @@ router.post(
       errors: errors.length,
       errorDetails: errors,
     });
-  }
+  },
 );
 
 // Get notification preferences
@@ -606,7 +614,7 @@ router.patch(
       preferences: updatedUser.notificationPreferences,
       message: "Notification preferences updated successfully",
     });
-  }
+  },
 );
 
 // Get notification statistics (Admin only)
@@ -617,7 +625,7 @@ router.get(
     Joi.object({
       period: Joi.string().valid("day", "week", "month").default("week"),
       type: Joi.string().optional(),
-    })
+    }),
   ),
   async (req, res) => {
     const { period = "week", type } = req.query;
@@ -689,9 +697,10 @@ router.get(
       }),
     ]);
 
-    const readPercentage = totalNotifications > 0 
-      ? ((readRate._count.isRead || 0) / totalNotifications) * 100 
-      : 0;
+    const readPercentage =
+      totalNotifications > 0
+        ? ((readRate._count.isRead || 0) / totalNotifications) * 100
+        : 0;
 
     res.json({
       period,
@@ -709,7 +718,7 @@ router.get(
         byPriority: notificationsByPriority,
       },
     });
-  }
+  },
 );
 
 // Send test notification (Admin only)
@@ -719,8 +728,10 @@ router.post(
   validateRequest(
     Joi.object({
       userId: commonSchemas.id.required(),
-      channels: Joi.array().items(Joi.string().valid("IN_APP", "EMAIL", "SMS")).default(["IN_APP"]),
-    })
+      channels: Joi.array()
+        .items(Joi.string().valid("IN_APP", "EMAIL", "SMS"))
+        .default(["IN_APP"]),
+    }),
   ),
   async (req, res) => {
     const { userId, channels } = req.body;
@@ -755,8 +766,8 @@ router.post(
     const userName = user.teacherProfile
       ? `${user.teacherProfile.firstName} ${user.teacherProfile.lastName}`
       : user.studentProfile
-      ? `${user.studentProfile.firstName} ${user.studentProfile.lastName}`
-      : user.email;
+        ? `${user.studentProfile.firstName} ${user.studentProfile.lastName}`
+        : user.email;
 
     const testResults = {
       inApp: false,
@@ -807,12 +818,13 @@ router.post(
     if (channels.includes("SMS")) {
       const phoneNumber =
         user.teacherProfile?.phoneNumber || user.studentProfile?.phoneNumber;
-      
+
       if (phoneNumber) {
         try {
           await sendSMS({
             to: phoneNumber,
-            message: "Test Notification: This is a test message from the tutoring platform.",
+            message:
+              "Test Notification: This is a test message from the tutoring platform.",
           });
           testResults.sms = true;
         } catch (error) {
@@ -833,7 +845,7 @@ router.post(
       results: testResults,
       userName,
     });
-  }
+  },
 );
 
 export default router;

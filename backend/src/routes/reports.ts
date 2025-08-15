@@ -156,7 +156,8 @@ router.get(
 
       // Process revenue by subject
       const subjectRevenue = revenueBySubject.reduce((acc: any, payment) => {
-        const subject = payment.booking?.subjectOffering?.subjectName || "Unknown";
+        const subject =
+          payment.booking?.subjectOffering?.subjectName || "Unknown";
         if (!acc[subject]) {
           acc[subject] = { revenue: 0, count: 0 };
         }
@@ -166,10 +167,13 @@ router.get(
       }, {});
 
       // Group revenue by time period
-      const groupedRevenue = groupRevenueByPeriod(revenueByPeriod, groupBy as string);
+      const groupedRevenue = groupRevenueByPeriod(
+        revenueByPeriod,
+        groupBy as string,
+      );
 
       // Get teacher details for top earners
-      const teacherIds = topEarningTeachers.map(t => t.teacherId);
+      const teacherIds = topEarningTeachers.map((t) => t.teacherId);
       const teacherDetails = await prisma.teacherProfile.findMany({
         where: { id: { in: teacherIds } },
         select: {
@@ -180,8 +184,8 @@ router.get(
         },
       });
 
-      const topEarnersWithDetails = topEarningTeachers.map(earnings => {
-        const teacher = teacherDetails.find(t => t.id === earnings.teacherId);
+      const topEarnersWithDetails = topEarningTeachers.map((earnings) => {
+        const teacher = teacherDetails.find((t) => t.id === earnings.teacherId);
         return {
           ...earnings,
           teacher,
@@ -194,9 +198,11 @@ router.get(
         overview: {
           totalRevenue: totalRevenue._sum.amount || 0,
           totalTransactions: totalRevenue._count || 0,
-          totalRefunds: includeRefunds ? (totalRefunds._sum.amount || 0) : 0,
-          refundCount: includeRefunds ? (totalRefunds._count || 0) : 0,
-          netRevenue: (totalRevenue._sum.amount || 0) - (includeRefunds ? (totalRefunds._sum.amount || 0) : 0),
+          totalRefunds: includeRefunds ? totalRefunds._sum.amount || 0 : 0,
+          refundCount: includeRefunds ? totalRefunds._count || 0 : 0,
+          netRevenue:
+            (totalRevenue._sum.amount || 0) -
+            (includeRefunds ? totalRefunds._sum.amount || 0 : 0),
           platformFees: platformFees._sum.platformFee || 0,
           teacherEarnings: teacherEarnings._sum.teacherAmount || 0,
         },
@@ -205,11 +211,13 @@ router.get(
           groupBy,
         },
         breakdown: {
-          bySubject: Object.entries(subjectRevenue).map(([subject, data]: [string, any]) => ({
-            subject,
-            revenue: data.revenue,
-            transactions: data.count,
-          })),
+          bySubject: Object.entries(subjectRevenue).map(
+            ([subject, data]: [string, any]) => ({
+              subject,
+              revenue: data.revenue,
+              transactions: data.count,
+            }),
+          ),
           byPaymentMethod: paymentMethods,
           topEarningTeachers: topEarnersWithDetails,
         },
@@ -224,9 +232,13 @@ router.get(
       res.json(report);
     } catch (error) {
       logger.error("Error generating revenue report", { error });
-      throw new AppError("Failed to generate revenue report", 500, "REPORT_GENERATION_ERROR");
+      throw new AppError(
+        "Failed to generate revenue report",
+        500,
+        "REPORT_GENERATION_ERROR",
+      );
     }
-  }
+  },
 );
 
 // User analytics and growth reports
@@ -366,34 +378,52 @@ router.get(
       ]);
 
       // Process data
-      const groupedRegistrations = groupDataByPeriod(userRegistrations, groupBy as string, "createdAt");
-      const groupedLogins = groupDataByPeriod(loginActivity, groupBy as string, "lastLoginAt");
+      const groupedRegistrations = groupDataByPeriod(
+        userRegistrations,
+        groupBy as string,
+        "createdAt",
+      );
+      const groupedLogins = groupDataByPeriod(
+        loginActivity,
+        groupBy as string,
+        "lastLoginAt",
+      );
 
       // Combine regional data
       const [teacherRegions, studentRegions] = usersByRegion;
-      const combinedRegions = [...teacherRegions, ...studentRegions].reduce((acc: any, region) => {
-        const regionName = region.region || "Unknown";
-        if (!acc[regionName]) {
-          acc[regionName] = 0;
-        }
-        acc[regionName] += region._count.id;
-        return acc;
-      }, {});
+      const combinedRegions = [...teacherRegions, ...studentRegions].reduce(
+        (acc: any, region) => {
+          const regionName = region.region || "Unknown";
+          if (!acc[regionName]) {
+            acc[regionName] = 0;
+          }
+          acc[regionName] += region._count.id;
+          return acc;
+        },
+        {},
+      );
 
       const [bookingsByUser, reviewsByUser] = userEngagement;
-      const avgBookingsPerUser = bookingsByUser.length > 0 
-        ? bookingsByUser.reduce((sum, b) => sum + b._count.id, 0) / bookingsByUser.length 
-        : 0;
-      const avgReviewsPerUser = reviewsByUser.length > 0 
-        ? reviewsByUser.reduce((sum, r) => sum + r._count.id, 0) / reviewsByUser.length 
-        : 0;
+      const avgBookingsPerUser =
+        bookingsByUser.length > 0
+          ? bookingsByUser.reduce((sum, b) => sum + b._count.id, 0) /
+            bookingsByUser.length
+          : 0;
+      const avgReviewsPerUser =
+        reviewsByUser.length > 0
+          ? reviewsByUser.reduce((sum, r) => sum + r._count.id, 0) /
+            reviewsByUser.length
+          : 0;
 
       const report = {
         period: { start: startDate, end: endDate },
         overview: {
           totalRegistrations: userRegistrations.length,
           activeUsers,
-          retentionRate: userRegistrations.length > 0 ? (userRetention / userRegistrations.length) * 100 : 0,
+          retentionRate:
+            userRegistrations.length > 0
+              ? (userRetention / userRegistrations.length) * 100
+              : 0,
           avgBookingsPerUser: parseFloat(avgBookingsPerUser.toFixed(2)),
           avgReviewsPerUser: parseFloat(avgReviewsPerUser.toFixed(2)),
         },
@@ -420,9 +450,13 @@ router.get(
       res.json(report);
     } catch (error) {
       logger.error("Error generating user analytics report", { error });
-      throw new AppError("Failed to generate user analytics report", 500, "REPORT_GENERATION_ERROR");
+      throw new AppError(
+        "Failed to generate user analytics report",
+        500,
+        "REPORT_GENERATION_ERROR",
+      );
     }
-  }
+  },
 );
 
 // Teacher performance reports
@@ -502,13 +536,22 @@ router.get(
 
       // Process teacher performance data
       const performanceData = teachers
-        .map(teacher => {
-          const completedBookings = teacher.bookings.filter(b => b.status === "COMPLETED");
-          const cancelledBookings = teacher.bookings.filter(b => b.status === "CANCELLED");
-          const totalEarnings = teacher.payments.reduce((sum, p) => sum + p.teacherAmount, 0);
-          const avgRating = teacher.reviews.length > 0 
-            ? teacher.reviews.reduce((sum, r) => sum + r.rating, 0) / teacher.reviews.length 
-            : 0;
+        .map((teacher) => {
+          const completedBookings = teacher.bookings.filter(
+            (b) => b.status === "COMPLETED",
+          );
+          const cancelledBookings = teacher.bookings.filter(
+            (b) => b.status === "CANCELLED",
+          );
+          const totalEarnings = teacher.payments.reduce(
+            (sum, p) => sum + p.teacherAmount,
+            0,
+          );
+          const avgRating =
+            teacher.reviews.length > 0
+              ? teacher.reviews.reduce((sum, r) => sum + r.rating, 0) /
+                teacher.reviews.length
+              : 0;
 
           return {
             id: teacher.id,
@@ -517,14 +560,15 @@ router.get(
             isVerified: teacher.isVerified,
             joinDate: teacher.user.createdAt,
             lastActive: teacher.user.lastLoginAt,
-            subjects: teacher.subjectOfferings.map(s => s.subjectName),
+            subjects: teacher.subjectOfferings.map((s) => s.subjectName),
             metrics: {
               totalBookings: teacher.bookings.length,
               completedBookings: completedBookings.length,
               cancelledBookings: cancelledBookings.length,
-              completionRate: teacher.bookings.length > 0 
-                ? (completedBookings.length / teacher.bookings.length) * 100 
-                : 0,
+              completionRate:
+                teacher.bookings.length > 0
+                  ? (completedBookings.length / teacher.bookings.length) * 100
+                  : 0,
               totalEarnings,
               avgRating: parseFloat(avgRating.toFixed(2)),
               totalReviews: teacher.reviews.length,
@@ -532,7 +576,7 @@ router.get(
             },
           };
         })
-        .filter(teacher => teacher.metrics.totalBookings >= minBookings);
+        .filter((teacher) => teacher.metrics.totalBookings >= minBookings);
 
       // Sort teachers
       performanceData.sort((a, b) => {
@@ -551,13 +595,22 @@ router.get(
 
       // Calculate aggregates
       const totalTeachers = performanceData.length;
-      const avgCompletionRate = totalTeachers > 0 
-        ? performanceData.reduce((sum, t) => sum + t.metrics.completionRate, 0) / totalTeachers 
-        : 0;
-      const avgRating = totalTeachers > 0 
-        ? performanceData.reduce((sum, t) => sum + t.metrics.avgRating, 0) / totalTeachers 
-        : 0;
-      const totalEarnings = performanceData.reduce((sum, t) => sum + t.metrics.totalEarnings, 0);
+      const avgCompletionRate =
+        totalTeachers > 0
+          ? performanceData.reduce(
+              (sum, t) => sum + t.metrics.completionRate,
+              0,
+            ) / totalTeachers
+          : 0;
+      const avgRating =
+        totalTeachers > 0
+          ? performanceData.reduce((sum, t) => sum + t.metrics.avgRating, 0) /
+            totalTeachers
+          : 0;
+      const totalEarnings = performanceData.reduce(
+        (sum, t) => sum + t.metrics.totalEarnings,
+        0,
+      );
 
       const report = {
         period: { start: startDate, end: endDate },
@@ -584,9 +637,13 @@ router.get(
       res.json(report);
     } catch (error) {
       logger.error("Error generating teacher performance report", { error });
-      throw new AppError("Failed to generate teacher performance report", 500, "REPORT_GENERATION_ERROR");
+      throw new AppError(
+        "Failed to generate teacher performance report",
+        500,
+        "REPORT_GENERATION_ERROR",
+      );
     }
-  }
+  },
 );
 
 // Booking analytics
@@ -687,7 +744,11 @@ router.get(
       ]);
 
       // Process data
-      const groupedBookings = groupDataByPeriod(bookings, groupBy as string, "createdAt");
+      const groupedBookings = groupDataByPeriod(
+        bookings,
+        groupBy as string,
+        "createdAt",
+      );
 
       const subjectBookings = bookingsBySubject.reduce((acc: any, booking) => {
         const subject = booking.subjectOffering?.subjectName || "Unknown";
@@ -712,12 +773,18 @@ router.get(
         overview: {
           totalBookings: bookings.length,
           avgBookingValue: avgBookingValue._avg.totalAmount || 0,
-          completionRate: bookings.length > 0 
-            ? (bookings.filter(b => b.status === "COMPLETED").length / bookings.length) * 100 
-            : 0,
-          cancellationRate: bookings.length > 0 
-            ? (bookings.filter(b => b.status === "CANCELLED").length / bookings.length) * 100 
-            : 0,
+          completionRate:
+            bookings.length > 0
+              ? (bookings.filter((b) => b.status === "COMPLETED").length /
+                  bookings.length) *
+                100
+              : 0,
+          cancellationRate:
+            bookings.length > 0
+              ? (bookings.filter((b) => b.status === "CANCELLED").length /
+                  bookings.length) *
+                100
+              : 0,
         },
         trends: {
           bookingsByPeriod: groupedBookings,
@@ -725,15 +792,19 @@ router.get(
         },
         breakdown: {
           byStatus: bookingsByStatus,
-          bySubject: Object.entries(subjectBookings).map(([subject, data]: [string, any]) => ({
-            subject,
-            count: data.count,
-            revenue: data.revenue,
-          })),
+          bySubject: Object.entries(subjectBookings).map(
+            ([subject, data]: [string, any]) => ({
+              subject,
+              count: data.count,
+              revenue: data.revenue,
+            }),
+          ),
           peakHours: Object.entries(hourCounts)
             .map(([hour, count]) => ({ hour: parseInt(hour), count }))
             .sort((a, b) => b.count - a.count),
-          cancellationReasons: cancellationReasons.filter(r => r.cancellationReason),
+          cancellationReasons: cancellationReasons.filter(
+            (r) => r.cancellationReason,
+          ),
         },
         filters: {
           includeStatus,
@@ -750,9 +821,13 @@ router.get(
       res.json(report);
     } catch (error) {
       logger.error("Error generating booking analytics report", { error });
-      throw new AppError("Failed to generate booking analytics report", 500, "REPORT_GENERATION_ERROR");
+      throw new AppError(
+        "Failed to generate booking analytics report",
+        500,
+        "REPORT_GENERATION_ERROR",
+      );
     }
-  }
+  },
 );
 
 // Platform metrics dashboard
@@ -862,38 +937,18 @@ router.get(
         ]),
       ]);
 
-      const [
-        totalUsers,
-        totalTeachers,
-        totalStudents,
-        newUsers,
-        activeUsers,
-      ] = userMetrics;
+      const [totalUsers, totalTeachers, totalStudents, newUsers, activeUsers] =
+        userMetrics;
 
-      const [
-        totalBookings,
-        completedBookings,
-        cancelledBookings,
-        newBookings,
-      ] = bookingMetrics;
+      const [totalBookings, completedBookings, cancelledBookings, newBookings] =
+        bookingMetrics;
 
-      const [
-        totalRevenue,
-        periodRevenue,
-        totalFees,
-      ] = revenueMetrics;
+      const [totalRevenue, periodRevenue, totalFees] = revenueMetrics;
 
-      const [
-        approvedReviews,
-        pendingReviews,
-        totalSubjects,
-        verifiedTeachers,
-      ] = contentMetrics;
+      const [approvedReviews, pendingReviews, totalSubjects, verifiedTeachers] =
+        contentMetrics;
 
-      const [
-        auditLogs,
-        notifications,
-      ] = systemMetrics;
+      const [auditLogs, notifications] = systemMetrics;
 
       const metrics = {
         period: period as string,
@@ -904,35 +959,39 @@ router.get(
           students: totalStudents,
           newInPeriod: newUsers,
           activeInPeriod: activeUsers,
-          growthRate: totalUsers > newUsers 
-            ? ((newUsers / (totalUsers - newUsers)) * 100).toFixed(2) 
-            : "0",
+          growthRate:
+            totalUsers > newUsers
+              ? ((newUsers / (totalUsers - newUsers)) * 100).toFixed(2)
+              : "0",
         },
         bookings: {
           total: totalBookings,
           completed: completedBookings,
           cancelled: cancelledBookings,
           newInPeriod: newBookings,
-          completionRate: totalBookings > 0 
-            ? ((completedBookings / totalBookings) * 100).toFixed(2) 
-            : "0",
+          completionRate:
+            totalBookings > 0
+              ? ((completedBookings / totalBookings) * 100).toFixed(2)
+              : "0",
         },
         revenue: {
           total: totalRevenue._sum.amount || 0,
           periodRevenue: periodRevenue._sum.amount || 0,
           platformFees: totalFees._sum.platformFee || 0,
-          avgPerBooking: completedBookings > 0 
-            ? ((totalRevenue._sum.amount || 0) / completedBookings).toFixed(2) 
-            : "0",
+          avgPerBooking:
+            completedBookings > 0
+              ? ((totalRevenue._sum.amount || 0) / completedBookings).toFixed(2)
+              : "0",
         },
         content: {
           approvedReviews,
           pendingReviews,
           totalSubjects,
           verifiedTeachers,
-          verificationRate: totalTeachers > 0 
-            ? ((verifiedTeachers / totalTeachers) * 100).toFixed(2) 
-            : "0",
+          verificationRate:
+            totalTeachers > 0
+              ? ((verifiedTeachers / totalTeachers) * 100).toFixed(2)
+              : "0",
         },
         system: {
           auditLogsInPeriod: auditLogs,
@@ -952,9 +1011,13 @@ router.get(
       res.json(metrics);
     } catch (error) {
       logger.error("Error generating platform metrics", { error });
-      throw new AppError("Failed to generate platform metrics", 500, "METRICS_GENERATION_ERROR");
+      throw new AppError(
+        "Failed to generate platform metrics",
+        500,
+        "METRICS_GENERATION_ERROR",
+      );
     }
-  }
+  },
 );
 
 // Custom report builder
@@ -982,16 +1045,44 @@ router.post(
       // Build base query based on data source
       switch (dataSource) {
         case "users":
-          result = await buildUserReport(metrics, filters, groupBy, startDate, endDate, limit);
+          result = await buildUserReport(
+            metrics,
+            filters,
+            groupBy,
+            startDate,
+            endDate,
+            limit,
+          );
           break;
         case "bookings":
-          result = await buildBookingReport(metrics, filters, groupBy, startDate, endDate, limit);
+          result = await buildBookingReport(
+            metrics,
+            filters,
+            groupBy,
+            startDate,
+            endDate,
+            limit,
+          );
           break;
         case "payments":
-          result = await buildPaymentReport(metrics, filters, groupBy, startDate, endDate, limit);
+          result = await buildPaymentReport(
+            metrics,
+            filters,
+            groupBy,
+            startDate,
+            endDate,
+            limit,
+          );
           break;
         case "reviews":
-          result = await buildReviewReport(metrics, filters, groupBy, startDate, endDate, limit);
+          result = await buildReviewReport(
+            metrics,
+            filters,
+            groupBy,
+            startDate,
+            endDate,
+            limit,
+          );
           break;
         default:
           throw new AppError("Invalid data source", 400, "INVALID_DATA_SOURCE");
@@ -1038,20 +1129,24 @@ router.post(
       });
     } catch (error) {
       logger.error("Error generating custom report", { error, reportName });
-      throw new AppError("Failed to generate custom report", 500, "CUSTOM_REPORT_ERROR");
+      throw new AppError(
+        "Failed to generate custom report",
+        500,
+        "CUSTOM_REPORT_ERROR",
+      );
     }
-  }
+  },
 );
 
 // Helper functions
 function groupRevenueByPeriod(payments: any[], groupBy: string) {
   // Implementation for grouping revenue data by time period
   const grouped: any = {};
-  
-  payments.forEach(payment => {
+
+  payments.forEach((payment) => {
     let key: string;
     const date = new Date(payment.createdAt);
-    
+
     switch (groupBy) {
       case "hour":
         key = date.toISOString().substring(0, 13);
@@ -1069,7 +1164,7 @@ function groupRevenueByPeriod(payments: any[], groupBy: string) {
       default:
         key = date.toISOString().substring(0, 10);
     }
-    
+
     if (!grouped[key]) {
       grouped[key] = {
         period: key,
@@ -1079,24 +1174,24 @@ function groupRevenueByPeriod(payments: any[], groupBy: string) {
         count: 0,
       };
     }
-    
+
     grouped[key].revenue += payment.amount;
     grouped[key].platformFees += payment.platformFee || 0;
     grouped[key].teacherAmount += payment.teacherAmount || 0;
     grouped[key].count += 1;
   });
-  
+
   return Object.values(grouped);
 }
 
 function groupDataByPeriod(data: any[], groupBy: string, dateField: string) {
   // Generic function for grouping data by time period
   const grouped: any = {};
-  
-  data.forEach(item => {
+
+  data.forEach((item) => {
     let key: string;
     const date = new Date(item[dateField]);
-    
+
     switch (groupBy) {
       case "hour":
         key = date.toISOString().substring(0, 13);
@@ -1114,7 +1209,7 @@ function groupDataByPeriod(data: any[], groupBy: string, dateField: string) {
       default:
         key = date.toISOString().substring(0, 10);
     }
-    
+
     if (!grouped[key]) {
       grouped[key] = {
         period: key,
@@ -1122,11 +1217,11 @@ function groupDataByPeriod(data: any[], groupBy: string, dateField: string) {
         data: [],
       };
     }
-    
+
     grouped[key].count += 1;
     grouped[key].data.push(item);
   });
-  
+
   return Object.values(grouped);
 }
 
@@ -1137,18 +1232,25 @@ function getWeekNumber(date: Date): number {
 }
 
 // Custom report builders
-async function buildUserReport(metrics: string[], filters: any, groupBy: string, startDate: string, endDate: string, limit: number) {
+async function buildUserReport(
+  metrics: string[],
+  filters: any,
+  groupBy: string,
+  startDate: string,
+  endDate: string,
+  limit: number,
+) {
   // Implementation for custom user reports
   const start = new Date(startDate);
   const end = new Date(endDate);
-  
+
   let whereClause: any = {
     createdAt: { gte: start, lte: end },
   };
-  
+
   if (filters.role) whereClause.role = filters.role;
   if (filters.isActive !== undefined) whereClause.isActive = filters.isActive;
-  
+
   const users = await prisma.user.findMany({
     where: whereClause,
     include: {
@@ -1163,7 +1265,7 @@ async function buildUserReport(metrics: string[], filters: any, groupBy: string,
     },
     take: limit,
   });
-  
+
   return {
     data: users,
     summary: {
@@ -1173,18 +1275,25 @@ async function buildUserReport(metrics: string[], filters: any, groupBy: string,
   };
 }
 
-async function buildBookingReport(metrics: string[], filters: any, groupBy: string, startDate: string, endDate: string, limit: number) {
+async function buildBookingReport(
+  metrics: string[],
+  filters: any,
+  groupBy: string,
+  startDate: string,
+  endDate: string,
+  limit: number,
+) {
   // Implementation for custom booking reports
   const start = new Date(startDate);
   const end = new Date(endDate);
-  
+
   let whereClause: any = {
     createdAt: { gte: start, lte: end },
   };
-  
+
   if (filters.status) whereClause.status = filters.status;
   if (filters.teacherId) whereClause.teacherId = filters.teacherId;
-  
+
   const bookings = await prisma.booking.findMany({
     where: whereClause,
     include: {
@@ -1194,7 +1303,7 @@ async function buildBookingReport(metrics: string[], filters: any, groupBy: stri
     },
     take: limit,
   });
-  
+
   return {
     data: bookings,
     summary: {
@@ -1204,18 +1313,25 @@ async function buildBookingReport(metrics: string[], filters: any, groupBy: stri
   };
 }
 
-async function buildPaymentReport(metrics: string[], filters: any, groupBy: string, startDate: string, endDate: string, limit: number) {
+async function buildPaymentReport(
+  metrics: string[],
+  filters: any,
+  groupBy: string,
+  startDate: string,
+  endDate: string,
+  limit: number,
+) {
   // Implementation for custom payment reports
   const start = new Date(startDate);
   const end = new Date(endDate);
-  
+
   let whereClause: any = {
     createdAt: { gte: start, lte: end },
   };
-  
+
   if (filters.status) whereClause.status = filters.status;
   if (filters.paymentMethod) whereClause.paymentMethod = filters.paymentMethod;
-  
+
   const payments = await prisma.payment.findMany({
     where: whereClause,
     include: {
@@ -1228,7 +1344,7 @@ async function buildPaymentReport(metrics: string[], filters: any, groupBy: stri
     },
     take: limit,
   });
-  
+
   return {
     data: payments,
     summary: {
@@ -1238,18 +1354,25 @@ async function buildPaymentReport(metrics: string[], filters: any, groupBy: stri
   };
 }
 
-async function buildReviewReport(metrics: string[], filters: any, groupBy: string, startDate: string, endDate: string, limit: number) {
+async function buildReviewReport(
+  metrics: string[],
+  filters: any,
+  groupBy: string,
+  startDate: string,
+  endDate: string,
+  limit: number,
+) {
   // Implementation for custom review reports
   const start = new Date(startDate);
   const end = new Date(endDate);
-  
+
   let whereClause: any = {
     createdAt: { gte: start, lte: end },
   };
-  
+
   if (filters.status) whereClause.status = filters.status;
   if (filters.rating) whereClause.rating = filters.rating;
-  
+
   const reviews = await prisma.review.findMany({
     where: whereClause,
     include: {
@@ -1259,7 +1382,7 @@ async function buildReviewReport(metrics: string[], filters: any, groupBy: strin
     },
     take: limit,
   });
-  
+
   return {
     data: reviews,
     summary: {
@@ -1271,67 +1394,72 @@ async function buildReviewReport(metrics: string[], filters: any, groupBy: strin
 
 function calculateUserMetrics(users: any[], metrics: string[]) {
   const result: any = {};
-  
+
   if (metrics.includes("count")) {
     result.count = users.length;
   }
-  
+
   if (metrics.includes("activeRate")) {
-    result.activeRate = users.length > 0 
-      ? (users.filter(u => u.isActive).length / users.length) * 100 
-      : 0;
+    result.activeRate =
+      users.length > 0
+        ? (users.filter((u) => u.isActive).length / users.length) * 100
+        : 0;
   }
-  
+
   return result;
 }
 
 function calculateBookingMetrics(bookings: any[], metrics: string[]) {
   const result: any = {};
-  
+
   if (metrics.includes("count")) {
     result.count = bookings.length;
   }
-  
+
   if (metrics.includes("completionRate")) {
-    const completed = bookings.filter(b => b.status === "COMPLETED").length;
-    result.completionRate = bookings.length > 0 ? (completed / bookings.length) * 100 : 0;
+    const completed = bookings.filter((b) => b.status === "COMPLETED").length;
+    result.completionRate =
+      bookings.length > 0 ? (completed / bookings.length) * 100 : 0;
   }
-  
+
   if (metrics.includes("avgValue")) {
-    const totalValue = bookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+    const totalValue = bookings.reduce(
+      (sum, b) => sum + (b.totalAmount || 0),
+      0,
+    );
     result.avgValue = bookings.length > 0 ? totalValue / bookings.length : 0;
   }
-  
+
   return result;
 }
 
 function calculatePaymentMetrics(payments: any[], metrics: string[]) {
   const result: any = {};
-  
+
   if (metrics.includes("totalAmount")) {
     result.totalAmount = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
   }
-  
+
   if (metrics.includes("avgAmount")) {
     const total = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
     result.avgAmount = payments.length > 0 ? total / payments.length : 0;
   }
-  
+
   return result;
 }
 
 function calculateReviewMetrics(reviews: any[], metrics: string[]) {
   const result: any = {};
-  
+
   if (metrics.includes("avgRating")) {
     const totalRating = reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
     result.avgRating = reviews.length > 0 ? totalRating / reviews.length : 0;
   }
-  
+
   if (metrics.includes("count")) {
     result.count = reviews.length;
   }
-  
+
   return result;
 }
 

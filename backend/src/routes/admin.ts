@@ -1,7 +1,11 @@
 import express from "express";
 import { prisma } from "../lib/prisma";
 import { requireRole } from "../middleware/auth";
-import { validateRequest, validateQuery, validateParams } from "../middleware/validation";
+import {
+  validateRequest,
+  validateQuery,
+  validateParams,
+} from "../middleware/validation";
 import { AppError, NotFoundError } from "../utils/errors";
 import { logger } from "../utils/logger";
 import {
@@ -40,32 +44,32 @@ router.get("/dashboard", requireRole("ADMIN"), async (req, res) => {
     prisma.teacherProfile.count(),
     prisma.studentProfile.count(),
     prisma.booking.count(),
-    
+
     // Total revenue
     prisma.payment.aggregate({
       where: { status: "COMPLETED" },
       _sum: { amount: true },
     }),
-    
+
     // New users this month
     prisma.user.count({
       where: {
         createdAt: { gte: thirtyDaysAgo },
       },
     }),
-    
+
     // New bookings this week
     prisma.booking.count({
       where: {
         createdAt: { gte: sevenDaysAgo },
       },
     }),
-    
+
     // Pending reviews for moderation
     prisma.review.count({
       where: { status: "PENDING" },
     }),
-    
+
     // Active teachers (had activity in last 30 days)
     prisma.teacherProfile.count({
       where: {
@@ -74,7 +78,7 @@ router.get("/dashboard", requireRole("ADMIN"), async (req, res) => {
         },
       },
     }),
-    
+
     // System health indicators
     Promise.all([
       prisma.user.count({ where: { isActive: false } }),
@@ -298,7 +302,7 @@ router.get(
         endDate,
       },
     });
-  }
+  },
 );
 
 // Get specific user details
@@ -380,7 +384,7 @@ router.get(
     });
 
     res.json(user);
-  }
+  },
 );
 
 // Update user status
@@ -392,7 +396,7 @@ router.patch(
     Joi.object({
       isActive: Joi.boolean().required(),
       reason: Joi.string().min(5).max(500).required(),
-    })
+    }),
   ),
   async (req, res) => {
     const { userId } = req.params;
@@ -412,7 +416,7 @@ router.patch(
       throw new AppError(
         `User is already ${isActive ? "active" : "inactive"}`,
         400,
-        "NO_CHANGE_REQUIRED"
+        "NO_CHANGE_REQUIRED",
       );
     }
 
@@ -460,7 +464,7 @@ router.patch(
       user: updatedUser,
       message: `User ${isActive ? "activated" : "deactivated"} successfully`,
     });
-  }
+  },
 );
 
 // Verify teacher
@@ -472,7 +476,7 @@ router.patch(
     Joi.object({
       isVerified: Joi.boolean().required(),
       verificationNotes: Joi.string().max(1000).optional(),
-    })
+    }),
   ),
   async (req, res) => {
     const { teacherId } = req.params;
@@ -542,7 +546,7 @@ router.patch(
       teacher: updatedTeacher,
       message: `Teacher ${isVerified ? "verified" : "unverified"} successfully`,
     });
-  }
+  },
 );
 
 // Bulk user actions
@@ -555,7 +559,11 @@ router.post(
     const adminId = req.user!.id;
 
     if (userIds.length === 0) {
-      throw new AppError("No users provided for bulk action", 400, "EMPTY_USER_LIST");
+      throw new AppError(
+        "No users provided for bulk action",
+        400,
+        "EMPTY_USER_LIST",
+      );
     }
 
     // Verify all users exist
@@ -631,7 +639,7 @@ router.post(
       action,
       reason,
     });
-  }
+  },
 );
 
 // System configuration
@@ -700,7 +708,7 @@ router.patch(
       message: "System configuration updated successfully",
       updates: configUpdates,
     });
-  }
+  },
 );
 
 // Analytics endpoints
@@ -736,46 +744,42 @@ router.get(
       }
     }
 
-    const [
-      userRegistrations,
-      usersByRole,
-      activeUsers,
-      userRetention,
-    ] = await Promise.all([
-      // User registrations over time
-      prisma.user.groupBy({
-        by: ["createdAt"],
-        where: {
-          createdAt: dateFilter,
-        },
-        _count: { id: true },
-      }),
-
-      // Users by role
-      prisma.user.groupBy({
-        by: ["role"],
-        _count: { id: true },
-      }),
-
-      // Active users (logged in within period)
-      prisma.user.count({
-        where: {
-          lastLoginAt: dateFilter,
-        },
-      }),
-
-      // User retention (simplified)
-      prisma.user.count({
-        where: {
-          createdAt: {
-            lt: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
+    const [userRegistrations, usersByRole, activeUsers, userRetention] =
+      await Promise.all([
+        // User registrations over time
+        prisma.user.groupBy({
+          by: ["createdAt"],
+          where: {
+            createdAt: dateFilter,
           },
-          lastLoginAt: {
-            gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+          _count: { id: true },
+        }),
+
+        // Users by role
+        prisma.user.groupBy({
+          by: ["role"],
+          _count: { id: true },
+        }),
+
+        // Active users (logged in within period)
+        prisma.user.count({
+          where: {
+            lastLoginAt: dateFilter,
           },
-        },
-      }),
-    ]);
+        }),
+
+        // User retention (simplified)
+        prisma.user.count({
+          where: {
+            createdAt: {
+              lt: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
+            },
+            lastLoginAt: {
+              gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+            },
+          },
+        }),
+      ]);
 
     res.json({
       period,
@@ -787,7 +791,7 @@ router.get(
         userRetention,
       },
     });
-  }
+  },
 );
 
 // Content moderation queue
@@ -849,7 +853,9 @@ router.get(
 
     const totalCounts = {
       reviews: await prisma.review.count({ where: { status: "PENDING" } }),
-      teachers: await prisma.teacherProfile.count({ where: { isVerified: false } }),
+      teachers: await prisma.teacherProfile.count({
+        where: { isVerified: false },
+      }),
       reports: 0, // Placeholder for future reporting system
     };
 
@@ -859,12 +865,13 @@ router.get(
       pagination: {
         page,
         limit,
-        total: type === "all" 
-          ? Object.values(totalCounts).reduce((a, b) => a + b, 0)
-          : totalCounts[type as keyof typeof totalCounts] || 0,
+        total:
+          type === "all"
+            ? Object.values(totalCounts).reduce((a, b) => a + b, 0)
+            : totalCounts[type as keyof typeof totalCounts] || 0,
       },
     });
-  }
+  },
 );
 
 // System health check
@@ -891,7 +898,7 @@ router.get("/system/health", requireRole("ADMIN"), async (req, res) => {
   // Add other health checks here (Redis, Email service, etc.)
 
   const isHealthy = Object.values(healthCheck).every(
-    (status) => status === "healthy" || typeof status !== "string"
+    (status) => status === "healthy" || typeof status !== "string",
   );
 
   res.status(isHealthy ? 200 : 503).json({
@@ -904,16 +911,16 @@ router.get("/system/health", requireRole("ADMIN"), async (req, res) => {
 // Export/backup data
 router.post("/backup/create", requireRole("ADMIN"), async (req, res) => {
   const adminId = req.user!.id;
-  
+
   try {
     // Create a backup identifier
     const backupId = `backup_${Date.now()}`;
-    
+
     // In a real implementation, this would:
     // 1. Create a database dump
     // 2. Export files/media
     // 3. Create a downloadable archive
-    
+
     logger.info("Backup initiated", {
       adminId,
       backupId,

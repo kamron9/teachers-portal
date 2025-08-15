@@ -39,7 +39,7 @@ const queryClient = new QueryClient({
     queries: {
       retry: (failureCount, error: any) => {
         // Don't retry on 401/403 errors
-        if (error?.error === 'Unauthorized' || error?.error === 'Forbidden') {
+        if (error?.error === "Unauthorized" || error?.error === "Forbidden") {
           return false;
         }
         return failureCount < 3;
@@ -92,7 +92,7 @@ const App = () => {
             <Route
               path="/teacher-profile"
               element={
-                <ProtectedRoute roles={['TEACHER']}>
+                <ProtectedRoute roles={["TEACHER"]}>
                   <TeacherProfile />
                 </ProtectedRoute>
               }
@@ -100,7 +100,7 @@ const App = () => {
             <Route
               path="/teacher-dashboard"
               element={
-                <ProtectedRoute roles={['TEACHER']}>
+                <ProtectedRoute roles={["TEACHER"]}>
                   <TeacherDashboard />
                 </ProtectedRoute>
               }
@@ -108,7 +108,7 @@ const App = () => {
             <Route
               path="/teacher-schedule"
               element={
-                <ProtectedRoute roles={['TEACHER']}>
+                <ProtectedRoute roles={["TEACHER"]}>
                   <TeacherSchedule />
                 </ProtectedRoute>
               }
@@ -118,7 +118,7 @@ const App = () => {
             <Route
               path="/student-profile"
               element={
-                <ProtectedRoute roles={['STUDENT']}>
+                <ProtectedRoute roles={["STUDENT"]}>
                   <StudentProfile />
                 </ProtectedRoute>
               }
@@ -126,7 +126,7 @@ const App = () => {
             <Route
               path="/student-dashboard"
               element={
-                <ProtectedRoute roles={['STUDENT']}>
+                <ProtectedRoute roles={["STUDENT"]}>
                   <StudentDashboard />
                 </ProtectedRoute>
               }
@@ -134,7 +134,7 @@ const App = () => {
             <Route
               path="/student-reviews"
               element={
-                <ProtectedRoute roles={['STUDENT']}>
+                <ProtectedRoute roles={["STUDENT"]}>
                   <StudentReviews />
                 </ProtectedRoute>
               }
@@ -142,7 +142,7 @@ const App = () => {
             <Route
               path="/student-payments"
               element={
-                <ProtectedRoute roles={['STUDENT']}>
+                <ProtectedRoute roles={["STUDENT"]}>
                   <StudentPayments />
                 </ProtectedRoute>
               }
@@ -152,7 +152,7 @@ const App = () => {
             <Route
               path="/book-lesson/:teacherId"
               element={
-                <ProtectedRoute roles={['STUDENT']}>
+                <ProtectedRoute roles={["STUDENT"]}>
                   <BookLesson />
                 </ProtectedRoute>
               }
@@ -168,7 +168,7 @@ const App = () => {
             <Route
               path="/review/:lessonId"
               element={
-                <ProtectedRoute roles={['STUDENT']}>
+                <ProtectedRoute roles={["STUDENT"]}>
                   <ReviewTeacher />
                 </ProtectedRoute>
               }
@@ -187,7 +187,7 @@ const App = () => {
             <Route
               path="/admin-dashboard"
               element={
-                <ProtectedRoute roles={['ADMIN']}>
+                <ProtectedRoute roles={["ADMIN"]}>
                   <AdminDashboard />
                 </ProtectedRoute>
               }
@@ -195,7 +195,7 @@ const App = () => {
             <Route
               path="/admin-users"
               element={
-                <ProtectedRoute roles={['ADMIN']}>
+                <ProtectedRoute roles={["ADMIN"]}>
                   <AdminUsers />
                 </ProtectedRoute>
               }
