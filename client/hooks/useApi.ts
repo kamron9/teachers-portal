@@ -30,6 +30,9 @@ export const queryKeys = {
   // Students
   studentProfile: ['student', 'profile'] as const,
   
+  // Subjects
+  subjects: (params?: any) => ['subjects', params] as const,
+
   // Subject Offerings
   subjectOfferings: ['subjectOfferings'] as const,
   
