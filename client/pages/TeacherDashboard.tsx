@@ -201,7 +201,7 @@ export default function TeacherDashboard() {
   const deliveryOptions = ['Online', 'Offline', 'Hybrid'];
   const iconOptions = [
     { value: 'book', label: '📚 Book', component: BookOpen },
-    { value: 'bar-chart', label: '���� Chart', component: BarChart3 },
+    { value: 'bar-chart', label: '📊 Chart', component: BarChart3 },
     { value: 'briefcase', label: '💼 Briefcase', component: null },
     { value: 'speech-bubble', label: '💬 Speech', component: MessageCircle }
   ];
@@ -805,7 +805,7 @@ export default function TeacherDashboard() {
                 </Button>
               )}
               <div className="text-xs text-gray-500 mt-3">
-                • Max file size: 50MB • Formats: MP4, MOV ��� Recommended: 2-3 minutes
+                • Max file size: 50MB • Formats: MP4, MOV • Recommended: 2-3 minutes
               </div>
             </div>
           </CardContent>
@@ -1069,7 +1069,11 @@ export default function TeacherDashboard() {
                       </div>
 
                       <div className="flex gap-2">
-                        <Button onClick={addSubject} disabled={!newSubject.name.trim()}>
+                        <Button
+                          onClick={addSubject}
+                          disabled={!newSubject.name.trim() || newSubject.price <= 0}
+                          className={(!newSubject.name.trim() || newSubject.price <= 0) ? 'opacity-50 cursor-not-allowed' : ''}
+                        >
                           <Plus className="h-4 w-4 mr-2" />
                           Add Subject
                         </Button>
