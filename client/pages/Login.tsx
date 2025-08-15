@@ -57,41 +57,43 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsLoading(true);
     setErrors({});
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock authentication logic
-      const loginIdentifier = loginMethod === 'email' ? credentials.email : credentials.phone;
-      
-      if (loginIdentifier && credentials.password === 'demo123') {
-        // Store authentication data
-        localStorage.setItem('userAuth', JSON.stringify({
-          type: userType,
-          method: loginMethod,
-          identifier: loginIdentifier,
-          rememberMe
-        }));
-        
-        // Redirect based on user type
-        if (userType === 'student') {
+      const loginData = {
+        identifier: loginMethod === 'email' ? credentials.email : credentials.phone,
+        password: credentials.password,
+        loginType: loginMethod,
+        rememberMe
+      };
+
+      const result = await login(loginData);
+
+      if (result.success) {
+        // Redirect based on user role from the actual user data
+        const user = result.user;
+        if (user?.role === 'STUDENT') {
           navigate('/student-dashboard');
-        } else {
+        } else if (user?.role === 'TEACHER') {
           navigate('/teacher-dashboard');
+        } else if (user?.role === 'ADMIN') {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/');
         }
       } else {
-        setErrors({ general: 'Invalid credentials. Use password "demo123" to sign in.' });
+        setErrors({ general: result.message || 'Noto\'g\'ri ma\'lumotlar kiritildi.' });
       }
-    } catch (error) {
-      setErrors({ general: 'Login failed. Please try again.' });
+    } catch (error: any) {
+      setErrors({
+        general: error?.message || 'Tizimga kirishda xatolik yuz berdi. Qayta urinib ko\'ring.'
+      });
     } finally {
       setIsLoading(false);
     }
