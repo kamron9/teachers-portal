@@ -146,6 +146,54 @@ export default function TeacherDashboard() {
   const [profileImage, setProfileImage] = useState("/placeholder.svg");
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+  // Subjects & Pricing management state
+  const [subjectCards, setSubjectCards] = useState([
+    {
+      id: '1',
+      name: 'General English',
+      level: 'All Levels',
+      price: 50000,
+      delivery: 'Online',
+      icon: 'book'
+    },
+    {
+      id: '2',
+      name: 'IELTS Preparation',
+      level: 'Intermediate+',
+      price: 65000,
+      delivery: 'Online',
+      icon: 'bar-chart'
+    },
+    {
+      id: '3',
+      name: 'Business English',
+      level: 'Intermediate+',
+      price: 70000,
+      delivery: 'Online',
+      icon: 'briefcase'
+    },
+    {
+      id: '4',
+      name: 'Conversation Practice',
+      level: 'All Levels',
+      price: 40000,
+      delivery: 'Online',
+      icon: 'speech-bubble'
+    }
+  ]);
+  const [teachingLevels, setTeachingLevels] = useState(['Beginner', 'Elementary', 'Intermediate', 'Upper-Intermediate', 'Advanced']);
+  const [examPreparation, setExamPreparation] = useState(['IELTS', 'TOEFL', 'Cambridge English', 'Business English Certificate']);
+  const [editingSubjectId, setEditingSubjectId] = useState<string | null>(null);
+  const [newSubject, setNewSubject] = useState({
+    name: '',
+    level: 'All Levels',
+    price: 50000,
+    delivery: 'Online',
+    icon: 'book'
+  });
+  const [showAddSubject, setShowAddSubject] = useState(false);
+  const [draggedSubject, setDraggedSubject] = useState<string | null>(null);
+
   // Mock teacher data
   const teacher = {
     name: "Aziza Karimova",
