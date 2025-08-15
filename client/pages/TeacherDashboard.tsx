@@ -280,8 +280,16 @@ export default function TeacherDashboard() {
   };
 
   const deleteSubject = (id: string) => {
+    const subject = subjectCards.find(card => card.id === id);
     setSubjectCards(cards => cards.filter(card => card.id !== id));
     setHasUnsavedChanges(true);
+
+    if (subject) {
+      toast({
+        title: "Subject Removed",
+        description: `${subject.name} has been removed from your offerings.`
+      });
+    }
   };
 
   const moveSubject = (dragIndex: number, hoverIndex: number) => {
