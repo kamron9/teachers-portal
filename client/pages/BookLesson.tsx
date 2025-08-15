@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { useTeacherById, useAvailableSlots, useCreateBooking } from "@/hooks/useApi";
+import { formatPrice } from "@/lib/api";
 import { ArrowLeft, Calendar, Clock, Video, CreditCard, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
