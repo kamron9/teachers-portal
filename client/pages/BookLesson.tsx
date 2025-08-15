@@ -13,27 +13,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function BookLesson() {
   const { teacherId } = useParams();
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [selectedPackage, setSelectedPackage] = useState("trial");
   const [lessonNotes, setLessonNotes] = useState("");
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Mock teacher data
-  const teacher = {
-    id: 1,
-    name: "Aziza Karimova",
-    title: "English Language Expert",
-    image: "/placeholder.svg",
-    subjects: ["English", "IELTS", "Business English"],
-    timezone: "Tashkent (UTC+5)",
-    pricing: {
-      trial: { price: 25000, duration: 30, discount: "50% off" },
-      single: { price: 50000, duration: 60 },
-      package5: { price: 225000, duration: 60, savings: "Save 10%" },
-      package10: { price: 425000, duration: 60, savings: "Save 15%" }
-    }
-  };
+  // Fetch teacher data
+  const { data: teacher, isLoading: teacherLoading, error: teacherError } = useTeacherById(teacherId || '', !!teacherId);
+
+  // Get available slots for selected date range
+  const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+  const endDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+
+  const { data: slotsData } = useAvailableSlots(
+    teacherId || '',
+    {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      timezone: 'Asia/Tashkent',
+      duration: 60
+    },
+    !!teacherId && !!selectedDate
+  );
+
+  // Booking mutation
+  const createBookingMutation = useCreateBooking();
 
   const packages = [
     { id: "trial", name: "Trial Lesson", ...teacher.pricing.trial },
