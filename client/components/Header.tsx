@@ -104,13 +104,13 @@ export default function Header() {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost">Log in</Button>
+                  <Button variant="ghost">Kirish</Button>
                 </Link>
                 <Link to="/register">
-                  <Button>Sign up</Button>
+                  <Button>Ro'yxatdan o'tish</Button>
                 </Link>
                 <Link to="/teacher-signup">
-                  <Button variant="outline">Teach on TutorUZ</Button>
+                  <Button variant="outline">O'qituvchi bo'ling</Button>
                 </Link>
               </>
             )}
