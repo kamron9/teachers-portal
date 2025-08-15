@@ -58,35 +58,35 @@ export default function Payment() {
       id: "payme",
       name: "Payme",
       logo: "💳",
-      description: "Most popular payment method in Uzbekistan",
+      description: "O'zbekistonda eng mashhur to'lov usuli",
       fee: 0
     },
     {
       id: "click",
       name: "Click",
       logo: "📱",
-      description: "Fast and secure mobile payments",
+      description: "Tez va xavfsiz mobil to'lovlar",
       fee: 0
     },
     {
       id: "uzum",
       name: "Uzum Pay",
       logo: "🟣",
-      description: "New digital payment solution",
+      description: "Yangi raqamli to'lov yechimi",
       fee: 0
     },
     {
       id: "stripe",
-      name: "Credit/Debit Card",
+      name: "Kredit/Debit Karta",
       logo: "💳",
-      description: "International cards (Visa, MasterCard)",
+      description: "Xalqaro kartalar (Visa, MasterCard)",
       fee: Math.round(bookingDetails.lesson.price * 0.03)
     },
     {
       id: "paypal",
       name: "PayPal",
       logo: "🅿️",
-      description: "Secure international payments",
+      description: "Xavfsiz xalqaro to'lovlar",
       fee: Math.round(bookingDetails.lesson.price * 0.035)
     }
   ];
@@ -143,8 +143,8 @@ export default function Payment() {
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Complete Payment</h1>
-              <p className="text-gray-600">Secure checkout for your lesson booking</p>
+              <h1 className="text-3xl font-bold text-gray-900">To'lovni yakunlash</h1>
+              <p className="text-gray-600">Dars buyurtmangiz uchun xavfsiz to'lov</p>
             </div>
           </div>
 
@@ -157,8 +157,8 @@ export default function Payment() {
                   <div className="flex items-center gap-3 text-green-800">
                     <Shield className="h-5 w-5" />
                     <div>
-                      <div className="font-medium">Secure Payment</div>
-                      <div className="text-sm">Your payment information is encrypted and protected</div>
+                      <div className="font-medium">Xavfsiz to'lov</div>
+                      <div className="text-sm">To'lov ma'lumotlaringiz shifrlangan va himoyalangan</div>
                     </div>
                   </div>
                 </CardContent>
@@ -169,7 +169,7 @@ export default function Payment() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CreditCard className="h-5 w-5" />
-                    Choose Payment Method
+                    To'lov usulini tanlang
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -190,7 +190,7 @@ export default function Payment() {
                           </div>
                           {method.fee > 0 && (
                             <div className="text-sm text-gray-600">
-                              +{method.fee.toLocaleString()} UZS fee
+                              +{formatPrice(method.fee * 100)} komissiya
                             </div>
                           )}
                         </label>
@@ -206,22 +206,22 @@ export default function Payment() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Lock className="h-5 w-5" />
-                      Card Details
+                      Karta ma'lumotlari
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="cardName">Cardholder Name</Label>
+                      <Label htmlFor="cardName">Karta egasining ismi</Label>
                       <Input
                         id="cardName"
-                        placeholder="John Doe"
+                        placeholder="Ism Familiya"
                         value={cardDetails.name}
                         onChange={(e) => setCardDetails(prev => ({...prev, name: e.target.value}))}
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="cardNumber">Card Number</Label>
+                      <Label htmlFor="cardNumber">Karta raqami</Label>
                       <Input
                         id="cardNumber"
                         placeholder="1234 5678 9012 3456"
@@ -232,7 +232,7 @@ export default function Payment() {
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="expiry">Expiry Date</Label>
+                        <Label htmlFor="expiry">Amal qilish muddati</Label>
                         <Input
                           id="expiry"
                           placeholder="MM/YY"
@@ -265,24 +265,24 @@ export default function Payment() {
                         onCheckedChange={setAgreedToTerms}
                       />
                       <label htmlFor="terms" className="text-sm text-gray-700 leading-relaxed">
-                        I agree to the{" "}
+                        Men{" "}
                         <Link to="/terms" className="text-primary hover:underline">
-                          Terms and Conditions
+                          Foydalanish shartlari
                         </Link>{" "}
-                        and{" "}
+                        va{" "}
                         <Link to="/privacy" className="text-primary hover:underline">
-                          Privacy Policy
+                          Maxfiylik siyosati
                         </Link>
-                        . I understand the cancellation policy and payment terms.
+                        ni qabul qilaman. Bekor qilish siyosati va to'lov shartlarini tushunaman.
                       </label>
                     </div>
 
                     <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
-                      <div className="font-medium mb-2">Cancellation Policy:</div>
+                      <div className="font-medium mb-2">Bekor qilish siyosati:</div>
                       <ul className="space-y-1 text-xs">
-                        <li>• Free cancellation up to 24 hours before the lesson</li>
-                        <li>• 50% refund for cancellations 12-24 hours before</li>
-                        <li>• No refund for cancellations less than 12 hours before</li>
+                        <li>• Darsdan 24 soat oldin bepul bekor qilish</li>
+                        <li>• 12-24 soat oldin bekor qilganda 50% qaytariladi</li>
+                        <li>• 12 soatdan kam vaqt qolganda pul qaytarilmaydi</li>
                       </ul>
                     </div>
                   </div>
