@@ -120,26 +120,10 @@ export default function FindTeachers() {
     }
   }, [searchQuery, selectedSubject, selectedLanguage, priceRange, searchParams, setSearchParams]);
 
-  if (!currentSubject) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Subject Not Found
-          </h1>
-          <p className="text-gray-600 mb-6">
-            The subject you're looking for doesn't exist.
-          </p>
-          <Link to="/subjects">
-            <Button>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Subjects
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const pageTitle = currentSubject ? `${currentSubject.name} o'qituvchilari` : "O'qituvchilarni qidirish";
+  const pageDescription = currentSubject
+    ? `${currentSubject.name} fani bo'yicha malakali o'qituvchilar`
+    : "Barcha fanlar bo'yicha malakali o'qituvchilarni toping";
 
   return (
     <div className="min-h-screen bg-gray-50">
