@@ -194,6 +194,100 @@ export default function TeacherDashboard() {
   const [showAddSubject, setShowAddSubject] = useState(false);
   const [draggedSubject, setDraggedSubject] = useState<string | null>(null);
 
+  // Helper functions for subjects & pricing
+  const levelOptions = ['All Levels', 'Beginner', 'Elementary', 'Intermediate', 'Upper-Intermediate', 'Advanced', 'Intermediate+'];
+  const deliveryOptions = ['Online', 'Offline', 'Hybrid'];
+  const iconOptions = [
+    { value: 'book', label: '📚 Book', component: BookOpen },
+    { value: 'bar-chart', label: '📊 Chart', component: BarChart3 },
+    { value: 'briefcase', label: '💼 Briefcase', component: null },
+    { value: 'speech-bubble', label: '💬 Speech', component: MessageCircle }
+  ];
+  const allTeachingLevels = ['Beginner', 'Elementary', 'Intermediate', 'Upper-Intermediate', 'Advanced'];
+  const allExamPreparations = ['IELTS', 'TOEFL', 'Cambridge English', 'Business English Certificate', 'OET', 'TOEIC', 'PTE'];
+
+  const formatPrice = (price: number) => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' UZS';
+  };
+
+  const getIconComponent = (iconValue: string) => {
+    switch (iconValue) {
+      case 'book': return BookOpen;
+      case 'bar-chart': return BarChart3;
+      case 'briefcase': return null; // Will use emoji
+      case 'speech-bubble': return MessageCircle;
+      default: return BookOpen;
+    }
+  };
+
+  const getIconEmoji = (iconValue: string) => {
+    switch (iconValue) {
+      case 'book': return '📚';
+      case 'bar-chart': return '📊';
+      case 'briefcase': return '💼';
+      case 'speech-bubble': return '💬';
+      default: return '📚';
+    }
+  };
+
+  const addSubject = () => {
+    if (!newSubject.name.trim()) return;
+
+    const subject = {
+      ...newSubject,
+      id: Date.now().toString()
+    };
+    setSubjectCards([...subjectCards, subject]);
+    setNewSubject({
+      name: '',
+      level: 'All Levels',
+      price: 50000,
+      delivery: 'Online',
+      icon: 'book'
+    });
+    setShowAddSubject(false);
+    setHasUnsavedChanges(true);
+  };
+
+  const updateSubject = (id: string, updates: any) => {
+    setSubjectCards(cards => cards.map(card =>
+      card.id === id ? { ...card, ...updates } : card
+    ));
+    setHasUnsavedChanges(true);
+  };
+
+  const deleteSubject = (id: string) => {
+    setSubjectCards(cards => cards.filter(card => card.id !== id));
+    setHasUnsavedChanges(true);
+  };
+
+  const moveSubject = (dragIndex: number, hoverIndex: number) => {
+    const draggedCard = subjectCards[dragIndex];
+    const newCards = [...subjectCards];
+    newCards.splice(dragIndex, 1);
+    newCards.splice(hoverIndex, 0, draggedCard);
+    setSubjectCards(newCards);
+    setHasUnsavedChanges(true);
+  };
+
+  const toggleTeachingLevel = (level: string) => {
+    setTeachingLevels(prev =>
+      prev.includes(level)
+        ? prev.filter(l => l !== level)
+        : [...prev, level]
+    );
+    setHasUnsavedChanges(true);
+  };
+
+  const toggleExamPreparation = (exam: string) => {
+    setExamPreparation(prev =>
+      prev.includes(exam)
+        ? prev.filter(e => e !== exam)
+        : [...prev, exam]
+    );
+    setHasUnsavedChanges(true);
+  };
+
   // Mock teacher data
   const teacher = {
     name: "Aziza Karimova",
