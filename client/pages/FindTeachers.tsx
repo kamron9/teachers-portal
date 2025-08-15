@@ -79,60 +79,25 @@ export default function FindTeachers() {
   const [sortBy, setSortBy] = useState("rating");
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>("desc");
 
-  // Subject information mapping
-  const subjectInfo: Record<string, any> = {
-    algebra: {
-      name: "Algebra",
-      category: "Mathematics",
-      description:
-        "Master algebraic equations, functions, and problem-solving techniques",
-      icon: "🔢",
-    },
-    calculus: {
-      name: "Calculus",
-      category: "Mathematics",
-      description:
-        "Differential and integral calculus for advanced mathematics",
-      icon: "📊",
-    },
-    geometry: {
-      name: "Geometry",
-      category: "Mathematics",
-      description: "Shapes, angles, proofs, and spatial reasoning",
-      icon: "📐",
-    },
-    physics: {
-      name: "Physics",
-      category: "Sciences",
-      description:
-        "Mechanics, thermodynamics, electromagnetism, and quantum physics",
-      icon: "⚛️",
-    },
-    chemistry: {
-      name: "Chemistry",
-      category: "Sciences",
-      description: "Organic, inorganic, and physical chemistry concepts",
-      icon: "🧪",
-    },
-    biology: {
-      name: "Biology",
-      category: "Sciences",
-      description: "Cell biology, genetics, ecology, and human anatomy",
-      icon: "🧬",
-    },
-    english: {
-      name: "English",
-      category: "Languages",
-      description: "Grammar, literature, writing, and communication skills",
-      icon: "📚",
-    },
-    spanish: {
-      name: "Spanish",
-      category: "Languages",
-      description: "Conversational Spanish, grammar, and cultural immersion",
-      icon: "🇪🇸",
-    },
+  // Fetch subjects and teachers data
+  const { data: subjectsData } = useSubjects();
+  const subjects = subjectsData?.subjects || [];
+
+  // Build search parameters for API
+  const searchApiParams = {
+    query: searchQuery || undefined,
+    subjects: selectedSubject ? [selectedSubject] : undefined,
+    languages: selectedLanguage ? [selectedLanguage] : undefined,
+    minPrice: priceRange !== "all" ? parseInt(priceRange.split("-")[0]) * 100 : undefined, // Convert UZS to kopeks
+    maxPrice: priceRange !== "all" ? parseInt(priceRange.split("-")[1]) * 100 : undefined, // Convert UZS to kopeks
+    minRating: rating !== "all" ? parseFloat(rating) : undefined,
+    experienceLevel: experience !== "all" ? [`${experience}+`] : undefined,
+    sortBy,
+    sortOrder,
+    limit: 50,
   };
+
+  const { data: teachersData, isLoading, error } = useTeacherSearch(searchApiParams);
 
   // Mock teachers data - in real app this would come from API
   const allTeachers = [
