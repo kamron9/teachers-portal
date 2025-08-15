@@ -328,7 +328,23 @@ export default function Teachers() {
                           <MessageCircle className="h-4 w-4 mr-1" />
                           Message
                         </Button>
-                        <Button size="sm">
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            const params = new URLSearchParams({
+                              tutorId: teacher.id.toString(),
+                              tutorName: teacher.name,
+                              tutorAvatar: teacher.avatar || '',
+                              tutorRating: teacher.rating.toString(),
+                              subject: teacher.subject,
+                              slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+                              slotEnd: new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString(), // +1 hour
+                              price: teacher.price.toString(),
+                              serviceFee: '0'
+                            });
+                            navigate(`/booking?${params.toString()}`);
+                          }}
+                        >
                           <Video className="h-4 w-4 mr-1" />
                           Book Trial
                         </Button>
