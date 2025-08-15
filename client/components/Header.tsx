@@ -239,23 +239,101 @@ export default function Header() {
                 </Link>
               ))}
               
-              {!isAuthenticated && (
-                <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start">
-                      Kirish
+              <div className="pt-4 border-t border-gray-200">
+                {isAuthenticated ? (
+                  <div className="flex flex-col space-y-2">
+                    {/* User info */}
+                    <div className="flex items-center space-x-3 px-3 py-2 bg-gray-50 rounded-md">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user?.profileImage || "/placeholder.svg"} alt={getUserDisplayName()} />
+                        <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {getUserDisplayName()}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {user?.email}
+                        </p>
+                      </div>
+                      {unreadCount > 0 && (
+                        <Badge variant="destructive" className="h-5 w-5 text-xs p-0 flex items-center justify-center">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Menu items */}
+                    <Link to={getDashboardLink()} onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        <User className="mr-2 h-4 w-4" />
+                        Bosh sahifa
+                      </Button>
+                    </Link>
+                    <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        <User className="mr-2 h-4 w-4" />
+                        Profil
+                      </Button>
+                    </Link>
+                    {(isTeacher || isStudent) && (
+                      <Link to={isTeacher ? "/teacher/lessons" : "/student/lessons"} onClick={() => setMobileMenuOpen(false)}>
+                        <Button variant="ghost" className="w-full justify-start">
+                          <BookOpen className="mr-2 h-4 w-4" />
+                          Darslarim
+                        </Button>
+                      </Link>
+                    )}
+                    <Link to="/messages" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        Xabarlar
+                      </Button>
+                    </Link>
+                    <Link to="/notifications" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        <Bell className="mr-2 h-4 w-4" />
+                        Bildirishnomalar
+                        {unreadCount > 0 && (
+                          <Badge variant="destructive" className="ml-auto h-5 w-5 text-xs p-0 flex items-center justify-center">
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                          </Badge>
+                        )}
+                      </Button>
+                    </Link>
+                    <Link to="/settings" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Sozlamalar
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Chiqish
                     </Button>
-                  </Link>
-                  <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full">Ro'yxatdan o'tish</Button>
-                  </Link>
-                  <Link to="/teacher-signup" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">
-                      O'qituvchi bo'ling
-                    </Button>
-                  </Link>
-                </div>
-              )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col space-y-2">
+                    <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        Kirish
+                      </Button>
+                    </Link>
+                    <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
+                      <Button className="w-full">Ro'yxatdan o'tish</Button>
+                    </Link>
+                    <Link to="/teacher-signup" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" className="w-full">
+                        O'qituvchi bo'ling
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
         )}
