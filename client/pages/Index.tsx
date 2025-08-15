@@ -31,7 +31,7 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
         
         <div className="flex-1">
           <h3 className="font-semibold text-lg text-gray-900">{tutor.firstName} {tutor.lastName}</h3>
-          <p className="text-primary font-medium">{tutor.subjects?.[0]?.name || 'Fan belgilanmagan'}</p>
+          <p className="text-primary font-medium">{tutor.subjectOfferings?.[0]?.subjectName || 'Fan belgilanmagan'}</p>
           
           <div className="flex items-center gap-2 mt-2">
             <div className="flex items-center gap-1">
