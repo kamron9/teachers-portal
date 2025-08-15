@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useTeacherById, useTeacherReviews } from "@/hooks/useApi";
+import { formatPrice } from "@/lib/api";
 import {
   ArrowLeft,
   Share2,
@@ -52,301 +54,49 @@ import {
   SelectValue,
 } from "../components/ui/select";
 
-interface TeacherData {
-  id: string;
-  name: string;
-  title: string;
-  profileImage: string;
-  isOnline: boolean;
-  isVerified: boolean;
-  location: string;
-  countryFlag: string;
-  languages: Array<{ language: string; proficiency: string }>;
-  responseTime: string;
-  rating: number;
-  totalReviews: number;
-  totalLessons: number;
-  studentsCount: number;
-  experienceYears: number;
-
-  bio: string;
-  teachingPhilosophy: string;
-  whyITeach: string;
-
-  subjects: Array<{
-    name: string;
-    price: number;
-    level: string;
-    format: string;
-    icon: string;
-  }>;
-
-  teachingLevels: string[];
-  examPrep: string[];
-
-  education: Array<{
-    degree: string;
-    institution: string;
-    year: string;
-    verified: boolean;
-  }>;
-
-  certifications: Array<{
-    name: string;
-    issuer: string;
-    year: string;
-    verified: boolean;
-  }>;
-
-  schedule: {
-    timezone: string;
-    nextAvailable: string;
-    recurringSlots: string[];
-  };
-
-  reviews: Array<{
-    id: string;
-    studentName: string;
-    studentAvatar: string;
-    rating: number;
-    comment: string;
-    date: string;
-    subject: string;
-    lessonCount: number;
-    helpful: number;
-    teacherResponse?: string;
-  }>;
-
-  materials: {
-    introVideo: string;
-    sampleLessons: string[];
-    resources: Array<{ name: string; type: string; url: string }>;
-  };
-
-  pricing: {
-    trialPrice: number;
-    regularPrice: number;
-    packages: Array<{ lessons: number; price: number; discount: number }>;
-  };
-}
-
-const mockTeacher: TeacherData = {
-  id: "1",
-  name: "Aziza Karimova",
-  title: "English Language Expert & IELTS Specialist",
-  profileImage: "/placeholder.svg",
-  isOnline: true,
-  isVerified: true,
-  location: "Tashkent, Uzbekistan",
-  countryFlag: "🇺🇿",
-  languages: [
-    { language: "English", proficiency: "Native" },
-    { language: "Uzbek", proficiency: "Native" },
-    { language: "Russian", proficiency: "Fluent" },
-  ],
-  responseTime: "Usually responds in 2 hours",
-  rating: 4.9,
-  totalReviews: 234,
-  totalLessons: 1247,
-  studentsCount: 156,
-  experienceYears: 5,
-
-  bio: "Hello! I'm Aziza, a passionate English teacher with over 5 years of experience helping students achieve their language goals. I specialize in IELTS preparation, business English, and conversation practice. My interactive teaching style combines proven methodologies with modern technology to create engaging and effective lessons.",
-
-  teachingPhilosophy:
-    "I believe that language learning should be fun, practical, and tailored to each student's needs. My approach focuses on building confidence through real-world applications and interactive practice.",
-
-  whyITeach:
-    "Teaching allows me to share my passion for languages while helping students unlock new opportunities. There's nothing more rewarding than seeing a student achieve their language goals and gain confidence in communication.",
-
-  subjects: [
-    {
-      name: "General English",
-      price: 50000,
-      level: "All Levels",
-      format: "Online",
-      icon: "🇬🇧",
-    },
-    {
-      name: "IELTS Preparation",
-      price: 65000,
-      level: "Intermediate+",
-      format: "Online",
-      icon: "📊",
-    },
-    {
-      name: "Business English",
-      price: 70000,
-      level: "Intermediate+",
-      format: "Online",
-      icon: "💼",
-    },
-    {
-      name: "Conversation Practice",
-      price: 40000,
-      level: "All Levels",
-      format: "Online",
-      icon: "💬",
-    },
-  ],
-
-  teachingLevels: [
-    "Beginner",
-    "Elementary",
-    "Intermediate",
-    "Upper-Intermediate",
-    "Advanced",
-  ],
-  examPrep: [
-    "IELTS",
-    "TOEFL",
-    "Cambridge English",
-    "Business English Certificate",
-  ],
-
-  education: [
-    {
-      degree: "Master's in English Literature",
-      institution: "National University of Uzbekistan",
-      year: "2018",
-      verified: true,
-    },
-    {
-      degree: "Bachelor's in English Language",
-      institution: "Tashkent State University",
-      year: "2016",
-      verified: true,
-    },
-  ],
-
-  certifications: [
-    {
-      name: "TESOL Certificate",
-      issuer: "British Council",
-      year: "2019",
-      verified: true,
-    },
-    {
-      name: "IELTS Teacher Training",
-      issuer: "IDP Education",
-      year: "2020",
-      verified: true,
-    },
-    {
-      name: "Business English Certification",
-      issuer: "Cambridge English",
-      year: "2021",
-      verified: false,
-    },
-  ],
-
-  schedule: {
-    timezone: "Asia/Tashkent (UTC+5)",
-    nextAvailable: "Today at 14:00",
-    recurringSlots: [
-      "Mon 09:00-17:00",
-      "Tue 09:00-17:00",
-      "Wed 09:00-17:00",
-      "Thu 09:00-17:00",
-      "Fri 09:00-17:00",
-    ],
-  },
-
-  reviews: [
-    {
-      id: "1",
-      studentName: "John Smith",
-      studentAvatar: "/placeholder.svg",
-      rating: 5,
-      comment:
-        "Aziza is an excellent teacher! Her IELTS preparation course helped me achieve band 7.5. She's patient, knowledgeable, and always prepared with engaging materials.",
-      date: "2024-01-15",
-      subject: "IELTS Preparation",
-      lessonCount: 20,
-      helpful: 12,
-      teacherResponse:
-        "Thank you so much, John! I'm thrilled to hear about your success. Keep up the great work!",
-    },
-    {
-      id: "2",
-      studentName: "Maria Garcia",
-      studentAvatar: "/placeholder.svg",
-      rating: 5,
-      comment:
-        "Amazing teacher for business English. Really helped me improve my presentation skills and confidence in meetings.",
-      date: "2024-01-10",
-      subject: "Business English",
-      lessonCount: 15,
-      helpful: 8,
-    },
-    {
-      id: "3",
-      studentName: "Ahmed Hassan",
-      studentAvatar: "/placeholder.svg",
-      rating: 4,
-      comment:
-        "Good teacher, clear explanations. Sometimes the lessons feel a bit rushed but overall very helpful.",
-      date: "2024-01-05",
-      subject: "General English",
-      lessonCount: 8,
-      helpful: 3,
-    },
-  ],
-
-  materials: {
-    introVideo: "/sample-intro.mp4",
-    sampleLessons: ["/sample-lesson-1.mp4", "/sample-lesson-2.mp4"],
-    resources: [
-      { name: "IELTS Writing Guide", type: "PDF", url: "/ielts-guide.pdf" },
-      {
-        name: "Business English Vocabulary",
-        type: "PDF",
-        url: "/business-vocab.pdf",
-      },
-      { name: "Grammar Reference", type: "PDF", url: "/grammar-ref.pdf" },
-    ],
-  },
-
-  pricing: {
-    trialPrice: 25000,
-    regularPrice: 50000,
-    packages: [
-      { lessons: 5, price: 225000, discount: 10 },
-      { lessons: 10, price: 425000, discount: 15 },
-      { lessons: 20, price: 800000, discount: 20 },
-    ],
-  },
-};
+// Interface is imported from API client
 
 const TeacherDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [teacher, setTeacher] = useState<TeacherData | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [reviewFilter, setReviewFilter] = useState("all");
   const [isSaved, setIsSaved] = useState(false);
 
+  // Fetch teacher data
+  const { data: teacher, isLoading, error } = useTeacherById(id || "", !!id);
+
+  // Fetch teacher reviews
+  const { data: reviewsData } = useTeacherReviews(
+    id || "",
+    {
+      rating: reviewFilter !== "all" ? [parseInt(reviewFilter)] : undefined,
+      limit: 20,
+    },
+    { enabled: !!id },
+  );
+
   useEffect(() => {
-    // Simulate API call
-    setTeacher(mockTeacher);
-    setSelectedSubject(mockTeacher.subjects[0]?.name || "");
-  }, [id]);
+    if (teacher?.subjectOfferings?.[0]) {
+      setSelectedSubject(teacher.subjectOfferings[0].subjectName);
+    }
+  }, [teacher]);
 
   const handleBookTrial = () => {
     if (!teacher) return;
 
     const params = new URLSearchParams({
       tutorId: teacher.id,
-      tutorName: teacher.name,
-      tutorAvatar: teacher.profileImage,
-      tutorRating: teacher.rating.toString(),
+      tutorName: `${teacher.firstName} ${teacher.lastName}`,
+      tutorAvatar: teacher.profileImage || "/placeholder.svg",
+      tutorRating: teacher.averageRating?.toString() || "0",
       subject: selectedSubject,
       slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       slotEnd: new Date(
         Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000,
       ).toISOString(),
-      price: teacher.pricing.trialPrice.toString(),
+      price: "2500000", // 25,000 UZS trial in kopeks
       serviceFee: "0",
     });
 
@@ -356,48 +106,67 @@ const TeacherDetails: React.FC = () => {
   const handleBookRegular = () => {
     if (!teacher) return;
 
-    const selectedSubjectData = teacher.subjects.find(
-      (s) => s.name === selectedSubject,
+    const selectedSubjectData = teacher.subjectOfferings?.find(
+      (s) => s.subjectName === selectedSubject,
     );
-    const price = selectedSubjectData?.price || teacher.pricing.regularPrice;
+    const price = selectedSubjectData?.pricePerHour || 5000000; // Default 50,000 UZS in kopeks
 
     const params = new URLSearchParams({
       tutorId: teacher.id,
-      tutorName: teacher.name,
-      tutorAvatar: teacher.profileImage,
-      tutorRating: teacher.rating.toString(),
+      tutorName: `${teacher.firstName} ${teacher.lastName}`,
+      tutorAvatar: teacher.profileImage || "/placeholder.svg",
+      tutorRating: teacher.averageRating?.toString() || "0",
       subject: selectedSubject,
       slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       slotEnd: new Date(
         Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000,
       ).toISOString(),
       price: price.toString(),
-      serviceFee: "5000",
+      serviceFee: "500000", // 5,000 UZS in kopeks
     });
 
     navigate(`/booking?${params.toString()}`);
   };
 
-  const filteredReviews =
-    teacher?.reviews.filter((review) => {
-      if (reviewFilter === "all") return true;
-      return review.rating === parseInt(reviewFilter);
-    }) || [];
+  const reviews = reviewsData?.reviews || [];
+  const filteredReviews = reviews.filter((review) => {
+    if (reviewFilter === "all") return true;
+    return review.rating === parseInt(reviewFilter);
+  });
 
+  const totalReviews = reviewsData?.totalCount || 0;
   const ratingDistribution = teacher
     ? [
-        { stars: 5, count: Math.floor(teacher.totalReviews * 0.8) },
-        { stars: 4, count: Math.floor(teacher.totalReviews * 0.15) },
-        { stars: 3, count: Math.floor(teacher.totalReviews * 0.03) },
-        { stars: 2, count: Math.floor(teacher.totalReviews * 0.01) },
-        { stars: 1, count: Math.floor(teacher.totalReviews * 0.01) },
+        { stars: 5, count: Math.floor(totalReviews * 0.8) },
+        { stars: 4, count: Math.floor(totalReviews * 0.15) },
+        { stars: 3, count: Math.floor(totalReviews * 0.03) },
+        { stars: 2, count: Math.floor(totalReviews * 0.01) },
+        { stars: 1, count: Math.floor(totalReviews * 0.01) },
       ]
     : [];
 
-  if (!teacher) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error || !teacher) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            O'qituvchi topilmadi
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Siz qidirayotgan o'qituvchi mavjud emas.
+          </p>
+          <Button onClick={() => navigate("/teachers")}>
+            O'qituvchilar ro'yxatiga qaytish
+          </Button>
+        </div>
       </div>
     );
   }
@@ -426,7 +195,9 @@ const TeacherDetails: React.FC = () => {
                   Teachers
                 </Link>
                 <ChevronRight className="h-4 w-4 mx-2" />
-                <span className="text-foreground">{teacher.name}</span>
+                <span className="text-foreground">
+                  {teacher.firstName} {teacher.lastName}
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-2">

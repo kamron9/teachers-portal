@@ -1,109 +1,47 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Star, MapPin, Users, ArrowRight, BookOpen, Heart, MessageCircle, Calculator, Atom, Globe } from "lucide-react";
+import {
+  Search,
+  Star,
+  MapPin,
+  Users,
+  ArrowRight,
+  BookOpen,
+  Heart,
+  MessageCircle,
+  Calculator,
+  Atom,
+  Globe,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// Mock data - TZ bo'yicha API GET /tutors?limit=6&sort=rating_desc
-const featuredTutors = [
-  {
-    id: 1,
-    name: "Aziza Karimova",
-    avatar: "/placeholder.svg",
-    rating: 4.9,
-    totalStudents: 127,
-    subject: "Ingliz tili",
-    pricePerHour: 50000,
-    isVerified: true,
-    languages: ["O'zbek", "Ingliz", "Rus"],
-    experience: "5+ yil tajriba"
-  },
-  {
-    id: 2,
-    name: "Bobur Umarov", 
-    avatar: "/placeholder.svg",
-    rating: 4.8,
-    totalStudents: 98,
-    subject: "Matematika",
-    pricePerHour: 45000,
-    isVerified: true,
-    languages: ["O'zbek", "Rus"],
-    experience: "8+ yil tajriba"
-  },
-  {
-    id: 3,
-    name: "Sarah Johnson",
-    avatar: "/placeholder.svg",
-    rating: 5.0,
-    totalStudents: 84,
-    subject: "IELTS",
-    pricePerHour: 65000,
-    isVerified: true,
-    languages: ["Ingliz"],
-    experience: "6+ yil tajriba"
-  },
-  {
-    id: 4,
-    name: "Malika Tosheva",
-    avatar: "/placeholder.svg", 
-    rating: 4.7,
-    totalStudents: 156,
-    subject: "Fizika",
-    pricePerHour: 40000,
-    isVerified: true,
-    languages: ["O'zbek", "Rus", "Ingliz"],
-    experience: "4+ yil tajriba"
-  },
-  {
-    id: 5,
-    name: "John Smith",
-    avatar: "/placeholder.svg",
-    rating: 4.9,
-    totalStudents: 203,
-    subject: "Dasturlash",
-    pricePerHour: 75000,
-    isVerified: true,
-    languages: ["Ingliz", "Rus"],
-    experience: "10+ yil tajriba"
-  },
-  {
-    id: 6,
-    name: "Dildora Abdullayeva",
-    avatar: "/placeholder.svg",
-    rating: 4.8,
-    totalStudents: 89,
-    subject: "Kimyo",
-    pricePerHour: 35000,
-    isVerified: true,
-    languages: ["O'zbek", "Rus"],
-    experience: "3+ yil tajriba"
-  }
-];
-
-// Popular categories data
-const popularCategories = [
-  { id: 'english', name: 'English', count: 150 },
-  { id: 'math', name: 'Math', count: 120 },
-  { id: 'ielts', name: 'IELTS', count: 95 },
-  { id: 'programming', name: 'Dasturlash', count: 80 },
-  { id: 'physics', name: 'Fizika', count: 70 },
-  { id: 'chemistry', name: 'Kimyo', count: 65 }
-];
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useTeacherSearch, useSubjects } from "@/hooks/useApi";
+import { formatPrice, Subject } from "@/lib/api";
 
 // TutorCard component
-const TutorCard = ({ tutor }: { tutor: typeof featuredTutors[0] }) => (
+const TutorCard = ({ tutor }: { tutor: any }) => (
   <Card className="hover:shadow-lg transition-shadow duration-300">
     <CardContent className="p-6">
       <div className="flex items-start gap-4">
         <div className="relative">
           <Avatar className="w-16 h-16">
-            <AvatarImage src={tutor.avatar} alt={tutor.name} />
+            <AvatarImage
+              src={tutor.profileImage || "/placeholder.svg"}
+              alt={`${tutor.firstName} ${tutor.lastName}`}
+            />
             <AvatarFallback>
-              {tutor.name.split(' ').map(n => n[0]).join('')}
+              {tutor.firstName?.[0]}
+              {tutor.lastName?.[0]}
             </AvatarFallback>
           </Avatar>
           {tutor.isVerified && (
@@ -112,39 +50,49 @@ const TutorCard = ({ tutor }: { tutor: typeof featuredTutors[0] }) => (
             </div>
           )}
         </div>
-        
+
         <div className="flex-1">
-          <h3 className="font-semibold text-lg text-gray-900">{tutor.name}</h3>
-          <p className="text-primary font-medium">{tutor.subject}</p>
-          
+          <h3 className="font-semibold text-lg text-gray-900">
+            {tutor.firstName} {tutor.lastName}
+          </h3>
+          <p className="text-primary font-medium">
+            {tutor.subjectOfferings?.[0]?.subjectName || "Fan belgilanmagan"}
+          </p>
+
           <div className="flex items-center gap-2 mt-2">
             <div className="flex items-center gap-1">
               <Star className="h-4 w-4 text-yellow-500 fill-current" />
-              <span className="font-medium">{tutor.rating}</span>
+              <span className="font-medium">
+                {tutor.averageRating?.toFixed(1) || "N/A"}
+              </span>
             </div>
             <span className="text-gray-400">•</span>
-            <span className="text-sm text-gray-600">{tutor.totalStudents} o'quvchi</span>
+            <span className="text-sm text-gray-600">
+              {tutor.totalStudents || 0} o'quvchi
+            </span>
           </div>
-          
+
           <div className="flex flex-wrap gap-1 mt-2">
-            {tutor.languages.slice(0, 2).map((lang) => (
-              <Badge key={lang} variant="secondary" className="text-xs">
+            {tutor.languages?.slice(0, 2).map((lang: string, index: number) => (
+              <Badge key={index} variant="secondary" className="text-xs">
                 {lang}
               </Badge>
-            ))}
+            )) || (
+              <Badge variant="secondary" className="text-xs">
+                O'zbek
+              </Badge>
+            )}
           </div>
-          
+
           <div className="flex items-center justify-between mt-4">
             <div>
               <span className="text-xl font-bold text-gray-900">
-                {tutor.pricePerHour.toLocaleString()} so'm
+                {formatPrice(tutor.subjectOfferings?.[0]?.pricePerHour || 0)}
               </span>
               <span className="text-gray-600 text-sm">/soat</span>
             </div>
             <Link to={`/tutor/${tutor.id}`}>
-              <Button size="sm">
-                Ko'rish
-              </Button>
+              <Button size="sm">Ko'rish</Button>
             </Link>
           </div>
         </div>
@@ -155,59 +103,42 @@ const TutorCard = ({ tutor }: { tutor: typeof featuredTutors[0] }) => (
 
 export default function Index() {
   const navigate = useNavigate();
-  
+
   // Search state - TZ bo'yicha SearchBar (Subject, Language, PriceFrom/To)
   const [searchData, setSearchData] = useState({
     subject: "",
     language: "",
     priceFrom: "",
-    priceTo: ""
+    priceTo: "",
   });
-  
-  // Loading states - TZ talabi
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [tutors, setTutors] = useState(featuredTutors);
 
-  // Mock API call - TZ bo'yicha GET /tutors?limit=6&sort=rating_desc
-  useEffect(() => {
-    const fetchTutors = async () => {
-      try {
-        setIsLoading(true);
-        // Mock API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock error for demo (10% chance)
-        if (Math.random() < 0.1) {
-          throw new Error('API Error');
-        }
-        
-        setTutors(featuredTutors);
-        setError(false);
-      } catch (err) {
-        setError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Fetch featured teachers - TZ bo'yicha GET /teachers?limit=6&sort=rating_desc
+  const {
+    data: teachersData,
+    isLoading,
+    error,
+  } = useTeacherSearch(
+    { limit: 6, sortBy: "rating", sortOrder: "desc" },
+    { staleTime: 1000 * 60 * 5 }, // 5 minutes
+  );
 
-    fetchTutors();
-    
-    // Analytics - TZ bo'yicha home_view
-    // analytics.track('home_view');
-  }, []);
+  // Fetch subjects for search dropdown
+  const { data: subjectsData } = useSubjects({}, { staleTime: 1000 * 60 * 10 }); // 10 minutes
+
+  const tutors = teachersData?.teachers || [];
+  const subjects = subjectsData?.subjects || [];
 
   // Search handler - TZ bo'yicha /search?subject=&language=&priceFrom=&priceTo=
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (searchData.subject) params.set('subject', searchData.subject);
-    if (searchData.language) params.set('language', searchData.language);
-    if (searchData.priceFrom) params.set('priceFrom', searchData.priceFrom);
-    if (searchData.priceTo) params.set('priceTo', searchData.priceTo);
-    
+    if (searchData.subject) params.set("subject", searchData.subject);
+    if (searchData.language) params.set("language", searchData.language);
+    if (searchData.priceFrom) params.set("priceFrom", searchData.priceFrom);
+    if (searchData.priceTo) params.set("priceTo", searchData.priceTo);
+
     // Analytics - TZ bo'yicha search_from_home
     // analytics.track('search_from_home', searchData);
-    
+
     navigate(`/search?${params.toString()}`);
   };
 
@@ -216,10 +147,17 @@ export default function Index() {
     navigate(`/search?subject=${categoryId}`);
   };
 
+  // Get popular categories from subjects data
+  const popularCategories = subjects.slice(0, 6).map((subject) => ({
+    id: subject.id,
+    name: subject.name,
+    count: subject.teacherCount || 0,
+  }));
+
   // CTA tutor click handler - TZ bo'yicha cta_tutor_clicked
   const handleTutorCTAClick = () => {
     // analytics.track('cta_tutor_clicked');
-    navigate('/auth/register?role=tutor');
+    navigate("/teacher-signup");
   };
 
   return (
@@ -234,8 +172,8 @@ export default function Index() {
               <span className="text-primary block">o'rganing</span>
             </h1>
             <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-              Malakali o'qituvchilar bilan individual onlayn darslar. 
-              Istalgan fanni uydan turib o'rganing.
+              Malakali o'qituvchilar bilan individual onlayn darslar. Istalgan
+              fanni uydan turib o'rganing.
             </p>
 
             {/* SearchBar - TZ bo'yicha (Subject, Language, PriceFrom/To) */}
@@ -243,24 +181,33 @@ export default function Index() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Fan</label>
-                  <Select value={searchData.subject} onValueChange={(value) => setSearchData({...searchData, subject: value})}>
+                  <Select
+                    value={searchData.subject}
+                    onValueChange={(value) =>
+                      setSearchData({ ...searchData, subject: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Fanni tanlang" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="english">Ingliz tili</SelectItem>
-                      <SelectItem value="math">Matematika</SelectItem>
-                      <SelectItem value="physics">Fizika</SelectItem>
-                      <SelectItem value="chemistry">Kimyo</SelectItem>
-                      <SelectItem value="programming">Dasturlash</SelectItem>
-                      <SelectItem value="ielts">IELTS</SelectItem>
+                      {subjects.map((subject) => (
+                        <SelectItem key={subject.id} value={subject.id}>
+                          {subject.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-medium mb-2 block">Til</label>
-                  <Select value={searchData.language} onValueChange={(value) => setSearchData({...searchData, language: value})}>
+                  <Select
+                    value={searchData.language}
+                    onValueChange={(value) =>
+                      setSearchData({ ...searchData, language: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Tilni tanlang" />
                     </SelectTrigger>
@@ -271,10 +218,17 @@ export default function Index() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Narx (dan)</label>
-                  <Select value={searchData.priceFrom} onValueChange={(value) => setSearchData({...searchData, priceFrom: value})}>
+                  <label className="text-sm font-medium mb-2 block">
+                    Narx (dan)
+                  </label>
+                  <Select
+                    value={searchData.priceFrom}
+                    onValueChange={(value) =>
+                      setSearchData({ ...searchData, priceFrom: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="0 so'm" />
                     </SelectTrigger>
@@ -286,10 +240,17 @@ export default function Index() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Narx (gacha)</label>
-                  <Select value={searchData.priceTo} onValueChange={(value) => setSearchData({...searchData, priceTo: value})}>
+                  <label className="text-sm font-medium mb-2 block">
+                    Narx (gacha)
+                  </label>
+                  <Select
+                    value={searchData.priceTo}
+                    onValueChange={(value) =>
+                      setSearchData({ ...searchData, priceTo: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="100,000 so'm" />
                     </SelectTrigger>
@@ -302,7 +263,7 @@ export default function Index() {
                   </Select>
                 </div>
               </div>
-              
+
               <Button className="w-full mt-6" size="lg" onClick={handleSearch}>
                 <Search className="h-5 w-5 mr-2" />
                 O'qituvchi qidirish
@@ -310,22 +271,24 @@ export default function Index() {
             </Card>
 
             {/* Popular categories - TZ bo'yicha tez filter chiplar */}
-            <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {popularCategories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleCategoryClick(category.id)}
-                  className="rounded-full"
-                >
-                  {category.name}
-                  <Badge variant="secondary" className="ml-2 text-xs">
-                    {category.count}
-                  </Badge>
-                </Button>
-              ))}
-            </div>
+            {popularCategories.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-3 mb-12">
+                {popularCategories.map((category) => (
+                  <Button
+                    key={category.id}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCategoryClick(category.id)}
+                    className="rounded-full"
+                  >
+                    {category.name}
+                    <Badge variant="secondary" className="ml-2 text-xs">
+                      {category.count}
+                    </Badge>
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -415,11 +378,12 @@ export default function Index() {
               O'qituvchi bo'lib ishlashni xohlaysizmi?
             </h2>
             <p className="text-xl mb-8 opacity-90">
-              Minglab o'quvchilar sizni kutmoqda. Bilimingizni ulashing va daromad oling.
+              Minglab o'quvchilar sizni kutmoqda. Bilimingizni ulashing va
+              daromad oling.
             </p>
-            <Button 
-              size="lg" 
-              variant="secondary" 
+            <Button
+              size="lg"
+              variant="secondary"
               className="text-primary"
               onClick={handleTutorCTAClick}
             >
@@ -445,23 +409,39 @@ export default function Index() {
                 O'zbekistondagi eng yaxshi onlayn ta'lim platformasi
               </p>
             </div>
-            
+
             <div>
               <h3 className="font-semibold mb-4">Yordam</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to="/faq" className="hover:text-white">FAQ</Link></li>
-                <li><Link to="/support" className="hover:text-white">Qo'llab-quvvatlash</Link></li>
+                <li>
+                  <Link to="/faq" className="hover:text-white">
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/support" className="hover:text-white">
+                    Qo'llab-quvvatlash
+                  </Link>
+                </li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="font-semibold mb-4">Kompaniya</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to="/about" className="hover:text-white">Biz haqimizda</Link></li>
-                <li><Link to="/careers" className="hover:text-white">Karyera</Link></li>
+                <li>
+                  <Link to="/about" className="hover:text-white">
+                    Biz haqimizda
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/careers" className="hover:text-white">
+                    Karyera
+                  </Link>
+                </li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="font-semibold mb-4">Bog'lanish</h3>
               <ul className="space-y-2 text-gray-400">
@@ -470,7 +450,7 @@ export default function Index() {
               </ul>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
             <p>&copy; 2024 TutorUZ. Barcha huquqlar himoyalangan.</p>
           </div>

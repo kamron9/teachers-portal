@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  Link,
+  useSearchParams,
+} from "react-router-dom";
 import {
   Star,
   MapPin,
@@ -22,7 +27,10 @@ import {
   Target,
   SortAsc,
   SortDesc,
+  User,
 } from "lucide-react";
+import { useTeacherSearch, useSubjects } from "@/hooks/useApi";
+import { formatPrice } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -51,310 +59,96 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function FindTeachers() {
-  const { subject } = useParams<{ subject: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  // Get initial search parameters from URL
+  const initialSubject = searchParams.get("subject") || "";
+  const initialQuery = searchParams.get("query") || "";
+  const initialLanguage = searchParams.get("language") || "";
+  const initialPriceFrom = searchParams.get("priceFrom") || "";
+  const initialPriceTo = searchParams.get("priceTo") || "";
+
   // Filter and search state
-  const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState("all");
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [selectedSubject, setSelectedSubject] = useState(initialSubject);
+  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
+  const [priceRange, setPriceRange] = useState(() => {
+    if (initialPriceFrom && initialPriceTo) {
+      return `${initialPriceFrom}-${initialPriceTo}`;
+    }
+    return "all";
+  });
   const [experience, setExperience] = useState("all");
   const [rating, setRating] = useState("all");
   const [availability, setAvailability] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  // Subject information mapping
-  const subjectInfo: Record<string, any> = {
-    algebra: {
-      name: "Algebra",
-      category: "Mathematics",
-      description:
-        "Master algebraic equations, functions, and problem-solving techniques",
-      icon: "🔢",
-    },
-    calculus: {
-      name: "Calculus",
-      category: "Mathematics",
-      description:
-        "Differential and integral calculus for advanced mathematics",
-      icon: "📊",
-    },
-    geometry: {
-      name: "Geometry",
-      category: "Mathematics",
-      description: "Shapes, angles, proofs, and spatial reasoning",
-      icon: "📐",
-    },
-    physics: {
-      name: "Physics",
-      category: "Sciences",
-      description:
-        "Mechanics, thermodynamics, electromagnetism, and quantum physics",
-      icon: "⚛️",
-    },
-    chemistry: {
-      name: "Chemistry",
-      category: "Sciences",
-      description: "Organic, inorganic, and physical chemistry concepts",
-      icon: "🧪",
-    },
-    biology: {
-      name: "Biology",
-      category: "Sciences",
-      description: "Cell biology, genetics, ecology, and human anatomy",
-      icon: "🧬",
-    },
-    english: {
-      name: "English",
-      category: "Languages",
-      description: "Grammar, literature, writing, and communication skills",
-      icon: "📚",
-    },
-    spanish: {
-      name: "Spanish",
-      category: "Languages",
-      description: "Conversational Spanish, grammar, and cultural immersion",
-      icon: "🇪🇸",
-    },
+  // Fetch subjects and teachers data
+  const { data: subjectsData } = useSubjects();
+  const subjects = subjectsData?.subjects || [];
+
+  // Build search parameters for API
+  const searchApiParams = {
+    query: searchQuery || undefined,
+    subjects: selectedSubject ? [selectedSubject] : undefined,
+    languages: selectedLanguage ? [selectedLanguage] : undefined,
+    minPrice:
+      priceRange !== "all"
+        ? parseInt(priceRange.split("-")[0]) * 100
+        : undefined, // Convert UZS to kopeks
+    maxPrice:
+      priceRange !== "all"
+        ? parseInt(priceRange.split("-")[1]) * 100
+        : undefined, // Convert UZS to kopeks
+    minRating: rating !== "all" ? parseFloat(rating) : undefined,
+    experienceLevel: experience !== "all" ? [`${experience}+`] : undefined,
+    sortBy,
+    sortOrder,
+    limit: 50,
   };
 
-  // Mock teachers data - in real app this would come from API
-  const allTeachers = [
-    {
-      id: 1,
-      name: "Dr. Sarah Johnson",
-      image: "/placeholder.svg",
-      rating: 4.9,
-      totalStudents: 127,
-      subjects: ["algebra", "calculus", "geometry"],
-      hourlyRate: 65000,
-      experience: 8,
-      location: "Tashkent",
-      languages: ["English", "Uzbek"],
-      verified: true,
-      online: true,
-      bio: "Mathematics PhD with 8+ years of teaching experience. Specializes in making complex concepts easy to understand.",
-      availability: "Available today",
-      responseTime: "Usually responds within 1 hour",
-      completedLessons: 450,
-      badges: ["Top Rated", "Quick Responder"],
-      specializations: [
-        "Exam Preparation",
-        "University Level",
-        "Problem Solving",
-      ],
-    },
-    {
-      id: 2,
-      name: "Prof. Ahmed Hassan",
-      image: "/placeholder.svg",
-      rating: 4.8,
-      totalStudents: 98,
-      subjects: ["physics", "chemistry"],
-      hourlyRate: 70000,
-      experience: 12,
-      location: "Samarkand",
-      languages: ["English", "Arabic", "Uzbek"],
-      verified: true,
-      online: false,
-      bio: "Former university professor with expertise in advanced physics and chemistry. Published researcher.",
-      availability: "Available tomorrow",
-      responseTime: "Usually responds within 2 hours",
-      completedLessons: 380,
-      badges: ["Expert", "University Professor"],
-      specializations: ["Research Methods", "Advanced Topics", "Lab Work"],
-    },
-    {
-      id: 3,
-      name: "Maria Rodriguez",
-      image: "/placeholder.svg",
-      rating: 5.0,
-      totalStudents: 85,
-      subjects: ["biology", "chemistry"],
-      hourlyRate: 55000,
-      experience: 6,
-      location: "Tashkent",
-      languages: ["English", "Spanish", "Uzbek"],
-      verified: true,
-      online: true,
-      bio: "Biology specialist with medical background. Excellent at explaining life sciences concepts.",
-      availability: "Available now",
-      responseTime: "Usually responds within 30 minutes",
-      completedLessons: 320,
-      badges: ["Fast Responder", "Medical Background"],
-      specializations: ["Medical Prep", "Life Sciences", "Lab Techniques"],
-    },
-    {
-      id: 4,
-      name: "John Smith",
-      image: "/placeholder.svg",
-      rating: 4.7,
-      totalStudents: 156,
-      subjects: ["english", "spanish"],
-      hourlyRate: 45000,
-      experience: 5,
-      location: "Tashkent",
-      languages: ["English", "Spanish"],
-      verified: true,
-      online: true,
-      bio: "Native English speaker with TESOL certification. Specializes in conversational practice and exam preparation.",
-      availability: "Available today",
-      responseTime: "Usually responds within 1 hour",
-      completedLessons: 520,
-      badges: ["Native Speaker", "TESOL Certified"],
-      specializations: ["Conversation", "IELTS Prep", "Business English"],
-    },
-    {
-      id: 5,
-      name: "Elena Petrov",
-      image: "/placeholder.svg",
-      rating: 4.6,
-      totalStudents: 72,
-      subjects: ["algebra", "geometry"],
-      hourlyRate: 40000,
-      experience: 4,
-      location: "Bukhara",
-      languages: ["Russian", "Uzbek", "English"],
-      verified: true,
-      online: true,
-      bio: "Mathematics teacher with focus on foundational concepts. Great with students who struggle with math.",
-      availability: "Available this week",
-      responseTime: "Usually responds within 3 hours",
-      completedLessons: 280,
-      badges: ["Patient Teacher", "Foundation Builder"],
-      specializations: ["Basic Math", "Confidence Building", "School Support"],
-    },
-    {
-      id: 6,
-      name: "Dr. Carlos Martinez",
-      image: "/placeholder.svg",
-      rating: 4.9,
-      totalStudents: 103,
-      subjects: ["physics", "calculus"],
-      hourlyRate: 80000,
-      experience: 10,
-      location: "Tashkent",
-      languages: ["Spanish", "English", "Uzbek"],
-      verified: true,
-      online: true,
-      bio: "Physics PhD with industry experience. Combines theoretical knowledge with practical applications.",
-      availability: "Available today",
-      responseTime: "Usually responds within 1 hour",
-      completedLessons: 410,
-      badges: ["PhD Holder", "Industry Expert"],
-      specializations: ["Applied Physics", "Engineering Prep", "Research"],
-    },
-  ];
+  const {
+    data: teachersData,
+    isLoading,
+    error,
+  } = useTeacherSearch(searchApiParams);
 
-  // Get current subject info
-  const currentSubject = subject ? subjectInfo[subject] : null;
+  const teachers = teachersData?.teachers || [];
+  const currentSubject = subjects.find((s) => s.id === selectedSubject);
 
-  // Filter teachers based on subject and other criteria
-  const filteredTeachers = allTeachers.filter((teacher) => {
-    // Filter by subject
-    if (subject && !teacher.subjects.includes(subject)) {
-      return false;
-    }
-
-    // Filter by search query
-    if (
-      searchQuery &&
-      !teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !teacher.bio.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
-    }
-
-    // Filter by price range
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set("query", searchQuery);
+    if (selectedSubject) params.set("subject", selectedSubject);
+    if (selectedLanguage) params.set("language", selectedLanguage);
     if (priceRange !== "all") {
-      const [min, max] = priceRange.split("-").map(Number);
-      if (teacher.hourlyRate < min || teacher.hourlyRate > max) {
-        return false;
-      }
+      const [min, max] = priceRange.split("-");
+      params.set("priceFrom", min);
+      params.set("priceTo", max);
     }
 
-    // Filter by experience
-    if (experience !== "all") {
-      const expNum = parseInt(experience);
-      if (teacher.experience < expNum) {
-        return false;
-      }
+    const newSearch = params.toString();
+    if (newSearch !== searchParams.toString()) {
+      setSearchParams(params);
     }
+  }, [
+    searchQuery,
+    selectedSubject,
+    selectedLanguage,
+    priceRange,
+    searchParams,
+    setSearchParams,
+  ]);
 
-    // Filter by rating
-    if (rating !== "all") {
-      const ratingNum = parseFloat(rating);
-      if (teacher.rating < ratingNum) {
-        return false;
-      }
-    }
-
-    // Filter by availability
-    if (availability !== "all") {
-      if (availability === "online" && !teacher.online) {
-        return false;
-      }
-      if (
-        availability === "today" &&
-        !teacher.availability.includes("today") &&
-        !teacher.availability.includes("now")
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-
-  // Sort teachers
-  const sortedTeachers = [...filteredTeachers].sort((a, b) => {
-    let aValue, bValue;
-
-    switch (sortBy) {
-      case "rating":
-        aValue = a.rating;
-        bValue = b.rating;
-        break;
-      case "price":
-        aValue = a.hourlyRate;
-        bValue = b.hourlyRate;
-        break;
-      case "experience":
-        aValue = a.experience;
-        bValue = b.experience;
-        break;
-      case "students":
-        aValue = a.totalStudents;
-        bValue = b.totalStudents;
-        break;
-      default:
-        aValue = a.rating;
-        bValue = b.rating;
-    }
-
-    return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
-  });
-
-  if (!currentSubject) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Subject Not Found
-          </h1>
-          <p className="text-gray-600 mb-6">
-            The subject you're looking for doesn't exist.
-          </p>
-          <Link to="/subjects">
-            <Button>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Subjects
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const pageTitle = currentSubject
+    ? `${currentSubject.name} o'qituvchilari`
+    : "O'qituvchilarni qidirish";
+  const pageDescription = currentSubject
+    ? `${currentSubject.name} fani bo'yicha malakali o'qituvchilar`
+    : "Barcha fanlar bo'yicha malakali o'qituvchilarni toping";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -365,37 +159,47 @@ export default function FindTeachers() {
           <Breadcrumb className="mb-4">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BCLink href="/">Home</BCLink>
+                <BCLink href="/">Bosh sahifa</BCLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BCLink href="/subjects">Subjects</BCLink>
+                <BCLink href="/teachers">O'qituvchilar</BCLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{currentSubject.name} Teachers</BreadcrumbPage>
-              </BreadcrumbItem>
+              {currentSubject && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{currentSubject.name}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </>
+              )}
             </BreadcrumbList>
           </Breadcrumb>
 
-          {/* Subject Header */}
+          {/* Page Header */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="text-4xl">{currentSubject.icon}</div>
+            <div className="text-4xl">{currentSubject ? "📚" : "👨‍🏫"}</div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {currentSubject.name} Teachers
-              </h1>
-              <p className="text-gray-600">{currentSubject.description}</p>
+              <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
+              <p className="text-gray-600">{pageDescription}</p>
               <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                <span>{sortedTeachers.length} teachers available</span>
-                <span>•</span>
-                <span>
-                  Starting from{" "}
-                  {Math.min(
-                    ...sortedTeachers.map((t) => t.hourlyRate),
-                  ).toLocaleString()}{" "}
-                  UZS/hour
-                </span>
+                <span>{teachers.length} o'qituvchi mavjud</span>
+                {teachers.length > 0 && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      Boshlang'ich narx{" "}
+                      {formatPrice(
+                        Math.min(
+                          ...teachers.map(
+                            (t) => t.subjectOfferings?.[0]?.pricePerHour || 0,
+                          ),
+                        ),
+                      )}
+                      /soat
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -417,12 +221,12 @@ export default function FindTeachers() {
                 {/* Search */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Search Teachers
+                    O'qituvchi qidirish
                   </label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                      placeholder="Search by name or description..."
+                      placeholder="Ism yoki tavsif bo'yicha qidirish..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10"
@@ -430,25 +234,67 @@ export default function FindTeachers() {
                   </div>
                 </div>
 
+                {/* Subject Filter */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Fan</label>
+                  <Select
+                    value={selectedSubject}
+                    onValueChange={setSelectedSubject}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Fanni tanlang" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Barcha fanlar</SelectItem>
+                      {subjects.map((subject) => (
+                        <SelectItem key={subject.id} value={subject.id}>
+                          {subject.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Language Filter */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Til</label>
+                  <Select
+                    value={selectedLanguage}
+                    onValueChange={setSelectedLanguage}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tilni tanlang" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Barcha tillar</SelectItem>
+                      <SelectItem value="uzbek">O'zbek</SelectItem>
+                      <SelectItem value="russian">Rus</SelectItem>
+                      <SelectItem value="english">Ingliz</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Price Range */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Price Range (UZS/hour)
+                    Narx oralig'i (so'm/soat)
                   </label>
                   <Select value={priceRange} onValueChange={setPriceRange}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Any Price" />
+                      <SelectValue placeholder="Har qanday narx" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Any Price</SelectItem>
-                      <SelectItem value="0-40000">Under 40,000</SelectItem>
+                      <SelectItem value="all">Har qanday narx</SelectItem>
+                      <SelectItem value="0-40000">40,000 gacha</SelectItem>
                       <SelectItem value="40000-60000">
                         40,000 - 60,000
                       </SelectItem>
                       <SelectItem value="60000-80000">
                         60,000 - 80,000
                       </SelectItem>
-                      <SelectItem value="80000-999999">Above 80,000</SelectItem>
+                      <SelectItem value="80000-999999">
+                        80,000 dan yuqori
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -456,17 +302,17 @@ export default function FindTeachers() {
                 {/* Experience */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Experience
+                    Tajriba
                   </label>
                   <Select value={experience} onValueChange={setExperience}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Any Experience" />
+                      <SelectValue placeholder="Har qanday tajriba" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Any Experience</SelectItem>
-                      <SelectItem value="2">2+ Years</SelectItem>
-                      <SelectItem value="5">5+ Years</SelectItem>
-                      <SelectItem value="10">10+ Years</SelectItem>
+                      <SelectItem value="all">Har qanday tajriba</SelectItem>
+                      <SelectItem value="2">2+ yil</SelectItem>
+                      <SelectItem value="5">5+ yil</SelectItem>
+                      <SelectItem value="10">10+ yil</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -474,17 +320,17 @@ export default function FindTeachers() {
                 {/* Rating */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Minimum Rating
+                    Minimal reyting
                   </label>
                   <Select value={rating} onValueChange={setRating}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Any Rating" />
+                      <SelectValue placeholder="Har qanday reyting" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Any Rating</SelectItem>
-                      <SelectItem value="4.5">4.5+ Stars</SelectItem>
-                      <SelectItem value="4.7">4.7+ Stars</SelectItem>
-                      <SelectItem value="4.9">4.9+ Stars</SelectItem>
+                      <SelectItem value="all">Har qanday reyting</SelectItem>
+                      <SelectItem value="4.5">4.5+ yulduz</SelectItem>
+                      <SelectItem value="4.7">4.7+ yulduz</SelectItem>
+                      <SelectItem value="4.9">4.9+ yulduz</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -492,16 +338,16 @@ export default function FindTeachers() {
                 {/* Availability */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Availability
+                    Mavjudlik
                   </label>
                   <Select value={availability} onValueChange={setAvailability}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Any Time" />
+                      <SelectValue placeholder="Har qanday vaqt" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Any Time</SelectItem>
-                      <SelectItem value="online">Online Now</SelectItem>
-                      <SelectItem value="today">Available Today</SelectItem>
+                      <SelectItem value="all">Har qanday vaqt</SelectItem>
+                      <SelectItem value="online">Hozir onlayn</SelectItem>
+                      <SelectItem value="today">Bugun mavjud</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -512,13 +358,15 @@ export default function FindTeachers() {
                   className="w-full"
                   onClick={() => {
                     setSearchQuery("");
+                    setSelectedSubject("");
+                    setSelectedLanguage("");
                     setPriceRange("all");
                     setExperience("all");
                     setRating("all");
                     setAvailability("all");
                   }}
                 >
-                  Clear All Filters
+                  Barcha filtrlarni tozalash
                 </Button>
               </CardContent>
             </Card>
