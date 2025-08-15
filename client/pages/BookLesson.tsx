@@ -41,11 +41,36 @@ export default function BookLesson() {
   // Booking mutation
   const createBookingMutation = useCreateBooking();
 
+  // Generate packages based on teacher's hourly rate
+  const basePrice = teacher?.subjectOfferings?.[0]?.pricePerHour || 5000000; // Default 50,000 UZS in kopeks
   const packages = [
-    { id: "trial", name: "Trial Lesson", ...teacher.pricing.trial },
-    { id: "single", name: "Single Lesson", ...teacher.pricing.single },
-    { id: "package5", name: "5 Lessons Package", ...teacher.pricing.package5 },
-    { id: "package10", name: "10 Lessons Package", ...teacher.pricing.package10 }
+    {
+      id: "trial",
+      name: "Sinov darsi",
+      price: Math.round(basePrice * 0.5), // 50% off for trial
+      duration: 30,
+      discount: "50% chegirma"
+    },
+    {
+      id: "single",
+      name: "Yakka dars",
+      price: basePrice,
+      duration: 60
+    },
+    {
+      id: "package5",
+      name: "5 darslik paket",
+      price: Math.round(basePrice * 5 * 0.9), // 10% off
+      duration: 60,
+      savings: "10% tejash"
+    },
+    {
+      id: "package10",
+      name: "10 darslik paket",
+      price: Math.round(basePrice * 10 * 0.85), // 15% off
+      duration: 60,
+      savings: "15% tejash"
+    }
   ];
 
   // Generate calendar days
