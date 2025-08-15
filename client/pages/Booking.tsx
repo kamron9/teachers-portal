@@ -93,35 +93,23 @@ const Booking: React.FC = () => {
 
   const checkSlotAvailability = async () => {
     if (!slotData.tutorId || !slotData.slotStart) return;
-    
-    setBookingState(prev => ({ ...prev, isLoading: true, error: null }));
-    
-    try {
-      const response = await fetch('/api/slots/check', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          tutorId: slotData.tutorId,
-          slotStart: slotData.slotStart,
-          slotEnd: slotData.slotEnd
-        })
-      });
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Slotni tekshirishda xatolik');
-      }
+    setBookingState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      // Mock API call - simulating slot check
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
+
+      // Mock random availability (90% chance available)
+      const isAvailable = Math.random() > 0.1;
 
       setBookingState(prev => ({
         ...prev,
         isLoading: false,
-        slotAvailable: data.available
+        slotAvailable: isAvailable
       }));
 
-      if (data.available) {
+      if (isAvailable) {
         setCurrentStep(2);
       }
     } catch (error) {
