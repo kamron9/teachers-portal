@@ -55,8 +55,9 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Right side - Auth buttons or user menu */}
+          {/* Right side - Language switcher and Auth buttons or user menu */}
           <div className="hidden md:flex items-center space-x-4">
+            <LanguageSwitcher />
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
