@@ -27,6 +27,7 @@ import Login from "./pages/Login";
 import Subjects from "./pages/Subjects";
 import FindTeachers from "./pages/FindTeachers";
 import Search from "./pages/Search";
+import Booking from "./pages/Booking";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 
