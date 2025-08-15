@@ -27,7 +27,39 @@ const navigation = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const isLoggedIn = false; // This will be replaced with actual auth state
+  const { user, isAuthenticated, logout } = useAuth();
+  const { isStudent, isTeacher, isAdmin } = useRole();
+
+  // Get unread notifications count
+  const { data: notificationsData } = useNotifications(
+    { isRead: false, limit: 1 },
+    { enabled: isAuthenticated }
+  );
+  const unreadCount = notificationsData?.unreadCount || 0;
+
+  const handleLogout = async () => {
+    await logout();
+    setMobileMenuOpen(false);
+  };
+
+  const getUserDisplayName = () => {
+    if (!user) return '';
+    // This would need to be enhanced to get the actual profile data
+    return user.email.split('@')[0];
+  };
+
+  const getUserInitials = () => {
+    if (!user) return 'U';
+    const name = getUserDisplayName();
+    return name.charAt(0).toUpperCase();
+  };
+
+  const getDashboardLink = () => {
+    if (isTeacher) return '/teacher-dashboard';
+    if (isStudent) return '/student-dashboard';
+    if (isAdmin) return '/admin-dashboard';
+    return '/';
+  };
 
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 fixed w-full top-0 z-50">
