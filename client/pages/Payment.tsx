@@ -294,7 +294,7 @@ export default function Payment() {
             <div className="space-y-6">
               <Card className="sticky top-24">
                 <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
+                  <CardTitle>Buyurtma xulosasi</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Teacher Info */}
@@ -316,7 +316,7 @@ export default function Payment() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-600">
                         <CalendarIcon className="h-4 w-4" />
-                        <span>Date</span>
+                        <span>Sana</span>
                       </div>
                       <span className="font-medium">{bookingDetails.lesson.date}</span>
                     </div>
@@ -324,7 +324,7 @@ export default function Payment() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-600">
                         <Clock className="h-4 w-4" />
-                        <span>Time</span>
+                        <span>Vaqt</span>
                       </div>
                       <span className="font-medium">{bookingDetails.lesson.time}</span>
                     </div>
@@ -332,20 +332,20 @@ export default function Payment() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-600">
                         <User className="h-4 w-4" />
-                        <span>Package</span>
+                        <span>Paket</span>
                       </div>
                       <span className="font-medium">{bookingDetails.lesson.package}</span>
                     </div>
                     
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Duration</span>
-                      <span className="font-medium">{bookingDetails.lesson.duration} minutes</span>
+                      <span className="text-gray-600">Davomiyligi</span>
+                      <span className="font-medium">{bookingDetails.lesson.duration} daqiqa</span>
                     </div>
                   </div>
 
                   {/* Subjects */}
                   <div>
-                    <div className="text-sm text-gray-600 mb-2">Subjects:</div>
+                    <div className="text-sm text-gray-600 mb-2">Fanlar:</div>
                     <div className="flex flex-wrap gap-1">
                       {bookingDetails.teacher.subjects.map((subject) => (
                         <Badge key={subject} variant="secondary" className="text-xs">
@@ -358,21 +358,21 @@ export default function Payment() {
                   {/* Pricing Breakdown */}
                   <div className="space-y-2 pt-4 border-t">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Lesson price</span>
-                      <span>{bookingDetails.lesson.price.toLocaleString()} UZS</span>
+                      <span className="text-gray-600">Dars narxi</span>
+                      <span>{formatPrice(bookingDetails.lesson.price * 100)}</span>
                     </div>
                     
                     {selectedPaymentMethod?.fee && selectedPaymentMethod.fee > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Payment processing fee</span>
-                        <span>{selectedPaymentMethod.fee.toLocaleString()} UZS</span>
+                        <span className="text-gray-600">To'lov jarayoni komissi</span>
+                        <span>{formatPrice(selectedPaymentMethod.fee * 100)}</span>
                       </div>
                     )}
                     
                     <div className="flex justify-between items-center pt-2 border-t">
-                      <span className="font-semibold">Total</span>
+                      <span className="font-semibold">Jami</span>
                       <span className="text-xl font-bold text-primary">
-                        {totalAmount.toLocaleString()} UZS
+                        {formatPrice(totalAmount * 100)}
                       </span>
                     </div>
                   </div>
@@ -387,12 +387,12 @@ export default function Payment() {
                     {isProcessing ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Processing Payment...
+                        To'lov amalga oshirilmoqda...
                       </>
                     ) : (
                       <>
                         <Lock className="h-4 w-4 mr-2" />
-                        Pay {totalAmount.toLocaleString()} UZS
+                        {formatPrice(totalAmount * 100)} to'lash
                       </>
                     )}
                   </Button>
@@ -400,7 +400,7 @@ export default function Payment() {
                   {!agreedToTerms && (
                     <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
                       <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                      <span>Please agree to terms to continue</span>
+                      <span>Davom etish uchun shartlarni qabul qiling</span>
                     </div>
                   )}
 
@@ -408,15 +408,15 @@ export default function Payment() {
                   <div className="text-xs text-gray-500 space-y-1">
                     <div className="flex items-center gap-1">
                       <Check className="h-3 w-3" />
-                      <span>256-bit SSL encryption</span>
+                      <span>256-bit SSL shifrlash</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Check className="h-3 w-3" />
-                      <span>PCI DSS compliant</span>
+                      <span>PCI DSS standartiga mos</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Check className="h-3 w-3" />
-                      <span>Money-back guarantee</span>
+                      <span>Pul qaytarish kafolati</span>
                     </div>
                   </div>
                 </CardContent>
