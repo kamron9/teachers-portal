@@ -251,6 +251,12 @@ const resources = {
       "selectDate": "Select date",
       "available": "Available",
       "unavailable": "Unavailable",
+
+      // Additional UI elements
+      "notifications": "Notifications",
+      "noNewNotifications": "No new notifications",
+      "viewAllNotifications": "View all notifications",
+      "becomeTeacher": "Become a Teacher",
     }
   }
 };
