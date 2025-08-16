@@ -58,11 +58,11 @@ export default function TeacherRegister() {
 
   const handleSendVerification = async () => {
     if (verificationMethod === 'sms' && !contact.match(/^\+998\d{9}$/)) {
-      alert('Please enter a valid Uzbekistan phone number (+998XXXXXXXXX)');
+      toast.error('To\'g\'ri O\'zbekiston telefon raqamini kiriting (+998XXXXXXXXX)');
       return;
     }
     if (verificationMethod === 'email' && !contact.includes('@')) {
-      alert('Please enter a valid email address');
+      toast.error('To\'g\'ri email manzilini kiriting');
       return;
     }
     
@@ -87,7 +87,7 @@ export default function TeacherRegister() {
 
   const handleVerifyCode = async () => {
     if (verificationCode.length !== 6) {
-      alert('Please enter the complete 6-digit code');
+      toast.error('6 xonali kodni to\'liq kiriting');
       return;
     }
     
@@ -100,7 +100,7 @@ export default function TeacherRegister() {
 
   const handleBasicInfoSubmit = async () => {
     if (!basicInfo.firstName || !basicInfo.lastName || !basicInfo.bio || !basicInfo.hourlyRate) {
-      alert('Please fill in all required fields');
+      toast.error('Barcha majburiy maydonlarni to\'ldiring');
       return;
     }
     
@@ -112,7 +112,7 @@ export default function TeacherRegister() {
 
   const handleCompleteRegistration = async () => {
     if (!qualifications.education || !qualifications.teachingExperience) {
-      alert('Please fill in your education and teaching experience');
+      toast.error('Ta\'lim va o\'qitish tajribangizni kiriting');
       return;
     }
     
@@ -196,11 +196,11 @@ export default function TeacherRegister() {
           <Card>
             <CardHeader>
               <CardTitle className="text-center">
-                {step === 'method' && 'Choose Verification Method'}
-                {step === 'verify' && 'Verify Your Information'}
-                {step === 'basic' && 'Basic Information'}
-                {step === 'qualifications' && 'Teaching Qualifications'}
-                {step === 'complete' && 'Welcome to TutorUZ!'}
+                {step === 'method' && 'Tasdiqlash usulini tanlang'}
+                {step === 'verify' && 'Ma\'lumotlaringizni tasdiqlang'}
+                {step === 'basic' && 'Asosiy ma\'lumotlar'}
+                {step === 'qualifications' && 'O\'qitish malakasi'}
+                {step === 'complete' && 'TutorUZ ga xush kelibsiz!'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
