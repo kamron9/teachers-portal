@@ -348,41 +348,41 @@ export default function TeacherRegister() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name *</Label>
+                      <Label htmlFor="firstName">Ism *</Label>
                       <Input
                         id="firstName"
                         value={basicInfo.firstName}
                         onChange={(e) => setBasicInfo(prev => ({...prev, firstName: e.target.value}))}
-                        placeholder="John"
+                        placeholder="Ali"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name *</Label>
+                      <Label htmlFor="lastName">Familiya *</Label>
                       <Input
                         id="lastName"
                         value={basicInfo.lastName}
                         onChange={(e) => setBasicInfo(prev => ({...prev, lastName: e.target.value}))}
-                        placeholder="Doe"
+                        placeholder="Karimov"
                       />
                     </div>
                   </div>
 
                   {verificationMethod === 'sms' && (
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
+                      <Label htmlFor="email">Email manzili</Label>
                       <Input
                         id="email"
                         type="email"
                         value={basicInfo.email}
                         onChange={(e) => setBasicInfo(prev => ({...prev, email: e.target.value}))}
-                        placeholder="john@example.com"
+                        placeholder="ali@example.com"
                       />
                     </div>
                   )}
 
                   {verificationMethod === 'email' && (
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label htmlFor="phone">Telefon raqami</Label>
                       <Input
                         id="phone"
                         type="tel"
@@ -405,7 +405,7 @@ export default function TeacherRegister() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="experience">Years of Teaching Experience *</Label>
+                    <Label htmlFor="experience">O'qitish tajribasi (yillar) *</Label>
                     <Select value={basicInfo.experience} onValueChange={(value) => setBasicInfo(prev => ({...prev, experience: value}))}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select your experience level" />
