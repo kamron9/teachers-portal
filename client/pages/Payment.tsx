@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useCreatePayment } from "@/hooks/useApi";
 import { formatPrice } from "@/lib/api";
 import {
@@ -120,7 +121,7 @@ export default function Payment() {
 
   const handlePayment = async () => {
     if (!agreedToTerms) {
-      alert("Iltimos, shartlar va qoidalarni qabul qiling");
+      toast.error("Iltimos, shartlar va qoidalarni qabul qiling");
       return;
     }
 
@@ -151,7 +152,9 @@ export default function Payment() {
         navigate(`/payment-success?payment=${result.id}`);
       }
     } catch (error: any) {
-      alert(error?.message || "To'lov amalga oshmadi. Qayta urinib ko'ring.");
+      toast.error(
+        error?.message || "To'lov amalga oshmadi. Qayta urinib ko'ring.",
+      );
     } finally {
       setIsProcessing(false);
     }

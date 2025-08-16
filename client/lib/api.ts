@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 // Base API configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+
+// API base URL configured
 
 // Types from backend
 export interface User {
@@ -335,47 +337,44 @@ class ApiClient {
       headers.Authorization = `Bearer ${this.tokens.accessToken}`;
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      });
 
-    // Handle 401 responses
-    if (response.status === 401 && this.tokens) {
-      const refreshed = await this.refreshTokens();
-      if (refreshed) {
-        // Retry the original request with new token
-        headers.Authorization = `Bearer ${this.tokens!.accessToken}`;
-        const retryResponse = await fetch(url, {
-          ...options,
-          headers,
-        });
-
-        if (!retryResponse.ok) {
-          const error: ApiError = await retryResponse.json().catch(() => ({
-            error: "RequestFailed",
-            message: "Request failed",
-          }));
-          throw error;
-        }
-
-        return retryResponse.json();
-      } else {
-        // Refresh failed, redirect to login
-        window.location.href = "/login";
-        throw new Error("Authentication required");
+      // If response is ok, proceed with normal flow
+      if (response.ok) {
+        const data = await response.json();
+        return data;
       }
-    }
 
-    if (!response.ok) {
-      const error: ApiError = await response.json().catch(() => ({
+      // Handle non-ok responses
+      const errorData = await response.json().catch(() => ({
         error: "RequestFailed",
-        message: "Request failed",
+        message: `Request failed with status ${response.status}`,
       }));
+
+      // Only log errors in development
+      if (import.meta.env.DEV) {
+        console.error(
+          `[API] Error for ${url}:`,
+          JSON.stringify(errorData, null, 2),
+        );
+      }
+      throw errorData;
+    } catch (error) {
+      // Only log errors in development
+      if (import.meta.env.DEV) {
+        console.error(
+          `[API] Fetch error for ${url}:`,
+          error instanceof Error
+            ? error.message
+            : JSON.stringify(error, null, 2),
+        );
+      }
       throw error;
     }
-
-    return response.json();
   }
 
   // Auth methods
@@ -1030,6 +1029,59 @@ class ApiClient {
       };
       pagination: any;
     }>(`/search?${searchParams}`);
+  }
+
+  // Payment status method
+  async getPaymentStatus(paymentId: string): Promise<Payment> {
+    return this.request<Payment>(`/payments/${paymentId}/status`);
+  }
+
+  // Wallet methods
+  async getWalletBalance(): Promise<{
+    availableBalance: number;
+    pendingBalance: number;
+    totalEarnings: number;
+  }> {
+    return this.request<{
+      availableBalance: number;
+      pendingBalance: number;
+      totalEarnings: number;
+    }>("/wallet/balance");
+  }
+
+  async getWalletEntries(params?: {
+    status?: "PENDING" | "AVAILABLE" | "PAID";
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<PaginatedResponse<any>> {
+    const searchParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.set(key, value.toString());
+        }
+      });
+    }
+    return this.request<PaginatedResponse<any>>(
+      `/wallet/entries?${searchParams}`,
+    );
+  }
+
+  async requestPayout(data: {
+    amount: number;
+    method: "bank_transfer" | "card";
+    accountRef: string;
+    note?: string;
+  }): Promise<{ message: string; payoutId: string }> {
+    return this.request<{ message: string; payoutId: string }>(
+      "/wallet/payout",
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+    );
   }
 
   // Get auth state

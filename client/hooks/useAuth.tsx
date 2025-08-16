@@ -46,8 +46,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(currentUser);
       }
     } catch (error) {
-      console.error("Failed to fetch current user:", error);
-      // Clear invalid tokens
+      // Clear invalid tokens on auth error
       await apiClient.logout();
       setUser(null);
     } finally {
@@ -82,7 +81,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
           navigate("/");
       }
     } catch (error: any) {
-      console.error("Login failed:", error);
       toast.error(error.message || "Kirish xatosi");
       throw error;
     } finally {
@@ -117,7 +115,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
           navigate("/");
       }
     } catch (error: any) {
-      console.error("Registration failed:", error);
       toast.error(error.message || "Ro'yxatdan o'tish xatosi");
       throw error;
     } finally {
@@ -132,7 +129,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       toast.success("Chiqish muvaffaqiyatli");
       navigate("/");
     } catch (error) {
-      console.error("Logout failed:", error);
       // Force logout even if API call fails
       setUser(null);
       navigate("/");

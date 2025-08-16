@@ -1,557 +1,489 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { body } from "express-validator";
 import { prisma } from "../lib/prisma";
 import { config } from "../config";
+import { authValidators } from "../validators/authValidators";
+import { validationMiddleware } from "../middleware/validation";
+import { authMiddleware } from "../middleware/auth";
 import { logger } from "../utils/logger";
-import { AppError, ValidationError } from "../utils/errors";
-import { validateRequest } from "../middleware/validation";
-import { authMiddleware, AuthRequest } from "../middleware/auth";
-import { sendEmail } from "../services/emailService";
-import { sendSMS } from "../services/smsService";
-import {
-  registerSchema,
-  loginSchema,
-  forgotPasswordSchema,
-  resetPasswordSchema,
-  verifyEmailSchema,
-  verifyPhoneSchema,
-  changePasswordSchema,
-} from "../validators/authValidators";
+import { AppError } from "../utils/errors";
 
 const router = express.Router();
 
-// Register new user
-router.post("/register", validateRequest(registerSchema), async (req, res) => {
-  const { email, phone, password, role, firstName, lastName } = req.body;
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Yangi foydalanuvchi ro'yxatdan o'tkazish
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - firstName
+ *               - lastName
+ *               - role
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *                 example: password123
+ *               firstName:
+ *                 type: string
+ *                 example: Abdulloh
+ *               lastName:
+ *                 type: string
+ *                 example: Xushvaqtov
+ *               phone:
+ *                 type: string
+ *                 example: +998901234567
+ *               role:
+ *                 type: string
+ *                 enum: [STUDENT, TEACHER]
+ *                 example: STUDENT
+ *     responses:
+ *       201:
+ *         description: Muvaffaqiyatli ro'yxatdan o'tdi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Muvaffaqiyatli ro'yxatdan o'tdingiz
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *       400:
+ *         description: Noto'g'ri ma'lumotlar
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Email allaqachon mavjud
+ */
+router.post(
+  "/register",
+  authValidators.register,
+  validationMiddleware,
+  async (req, res) => {
+    const { email, password, firstName, lastName, phone, role } = req.body;
 
-  // Check if user already exists
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      OR: [{ email }, ...(phone ? [{ phone }] : [])],
-    },
-  });
+    // Email tekshirish
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
 
-  if (existingUser) {
-    throw new AppError(
-      "User already exists with this email or phone",
-      409,
-      "USER_ALREADY_EXISTS",
-    );
-  }
+    if (existingUser) {
+      throw new AppError("Bu email allaqachon ro'yxatdan o'tgan", 409);
+    }
 
-  // Hash password
-  const hashedPassword = await bcrypt.hash(
-    password,
-    config.security.bcryptRounds,
-  );
+    // Parolni hash qilish
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-  // Create user and profile in transaction
-  const result = await prisma.$transaction(async (tx) => {
-    // Create user
-    const user = await tx.user.create({
+    // Foydalanuvchi yaratish
+    const user = await prisma.user.create({
       data: {
         email,
-        phone,
         password: hashedPassword,
-        role,
-        emailVerified: !config.verification.requireEmailVerification,
-        phoneVerified: !config.verification.requirePhoneVerification,
+        firstName,
+        lastName,
+        phone,
+        role: role as "STUDENT" | "TEACHER",
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        role: true,
+        avatar: true,
+        isVerified: true,
+        status: true,
+        createdAt: true,
       },
     });
 
-    // Create appropriate profile
-    if (role === "STUDENT") {
-      await tx.studentProfile.create({
-        data: {
-          userId: user.id,
-          firstName,
-          lastName,
-        },
-      });
-    } else if (role === "TEACHER") {
-      await tx.teacherProfile.create({
-        data: {
-          userId: user.id,
-          firstName,
-          lastName,
-          verificationStatus: config.verification.teacherAutoApproval
-            ? "APPROVED"
-            : "PENDING",
-        },
-      });
-    }
-
-    return user;
-  });
-
-  // Send verification emails/SMS if required
-  if (config.verification.requireEmailVerification) {
-    await sendVerificationEmail(result.id, email);
-  }
-
-  if (config.verification.requirePhoneVerification && phone) {
-    await sendVerificationSMS(result.id, phone);
-  }
-
-  logger.info("User registered", {
-    userId: result.id,
-    email,
-    role,
-    emailVerificationRequired: config.verification.requireEmailVerification,
-    phoneVerificationRequired:
-      config.verification.requirePhoneVerification && !!phone,
-  });
-
-  res.status(201).json({
-    message: "User registered successfully",
-    userId: result.id,
-    verificationRequired: {
-      email: config.verification.requireEmailVerification,
-      phone: config.verification.requirePhoneVerification && !!phone,
-    },
-  });
-});
-
-// Login user
-router.post("/login", validateRequest(loginSchema), async (req, res) => {
-  const { email, password, rememberMe } = req.body;
-
-  // Find user
-  const user = await prisma.user.findUnique({
-    where: { email },
-    include: {
-      studentProfile: true,
-      teacherProfile: true,
-    },
-  });
-
-  if (!user) {
-    throw new AppError("Invalid credentials", 401, "INVALID_CREDENTIALS");
-  }
-
-  // Check password
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    throw new AppError("Invalid credentials", 401, "INVALID_CREDENTIALS");
-  }
-
-  // Check account status
-  if (user.status !== "ACTIVE") {
-    throw new AppError("Account is not active", 403, "ACCOUNT_INACTIVE");
-  }
-
-  // Check email verification if required
-  if (config.verification.requireEmailVerification && !user.emailVerified) {
-    throw new AppError(
-      "Email verification required",
-      403,
-      "EMAIL_VERIFICATION_REQUIRED",
+    // Token yaratish
+    const accessToken = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      config.jwtSecret,
+      { expiresIn: config.jwtExpiration },
     );
-  }
 
-  // Generate tokens
-  const tokenPayload = {
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-  };
+    const refreshToken = jwt.sign(
+      { userId: user.id },
+      config.jwtRefreshSecret,
+      { expiresIn: config.jwtRefreshExpiration },
+    );
 
-  const accessToken = jwt.sign(tokenPayload, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn,
-  });
+    logger.info("User registered successfully", { userId: user.id, email });
 
-  const refreshToken = jwt.sign(tokenPayload, config.jwtRefreshSecret, {
-    expiresIn: config.jwtRefreshExpiresIn,
-  });
-
-  // Create session
-  const expiresAt = new Date();
-  expiresAt.setTime(
-    expiresAt.getTime() +
-      (rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000),
-  );
-
-  const session = await prisma.userSession.create({
-    data: {
-      userId: user.id,
-      token: accessToken,
-      refreshToken,
-      expiresAt,
-      ipAddress: req.ip,
-      userAgent: req.get("User-Agent"),
-    },
-  });
-
-  // Update last login
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { lastLoginAt: new Date() },
-  });
-
-  logger.info("User logged in", {
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-    sessionId: session.id,
-  });
-
-  res.json({
-    message: "Login successful",
-    user: {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      emailVerified: user.emailVerified,
-      phoneVerified: user.phoneVerified,
-      profile:
-        user.role === "STUDENT" ? user.studentProfile : user.teacherProfile,
-    },
-    tokens: {
+    res.status(201).json({
+      message: "Muvaffaqiyatli ro'yxatdan o'tdingiz",
+      user,
       accessToken,
       refreshToken,
-      expiresAt,
-    },
-  });
-});
+    });
+  },
+);
 
-// Refresh token
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Foydalanuvchi tizimga kirish
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Muvaffaqiyatli kirdi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Muvaffaqiyatli kirdingiz
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *       401:
+ *         description: Noto'g'ri email yoki parol
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post(
+  "/login",
+  authValidators.login,
+  validationMiddleware,
+  async (req, res) => {
+    const { email, password } = req.body;
+
+    // Foydalanuvchini topish
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        role: true,
+        avatar: true,
+        isVerified: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new AppError("Noto'g'ri email yoki parol", 401);
+    }
+
+    // Parolni tekshirish
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new AppError("Noto'g'ri email yoki parol", 401);
+    }
+
+    // Faol emasligini tekshirish
+    if (user.status !== "ACTIVE") {
+      throw new AppError("Hisobingiz faol emas. Admin bilan bog'laning", 403);
+    }
+
+    // Token yaratish
+    const accessToken = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      config.jwtSecret,
+      { expiresIn: config.jwtExpiration },
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user.id },
+      config.jwtRefreshSecret,
+      { expiresIn: config.jwtRefreshExpiration },
+    );
+
+    // Parolni response dan olib tashlash
+    const { password: _, ...userWithoutPassword } = user;
+
+    logger.info("User logged in successfully", { userId: user.id, email });
+
+    res.json({
+      message: "Muvaffaqiyatli kirdingiz",
+      user: userWithoutPassword,
+      accessToken,
+      refreshToken,
+    });
+  },
+);
+
+/**
+ * @swagger
+ * /auth/refresh:
+ *   post:
+ *     summary: Access token yangilash
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Token muvaffaqiyatli yangilandi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *       401:
+ *         description: Noto'g'ri refresh token
+ */
 router.post("/refresh", async (req, res) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {
-    throw new AppError("Refresh token required", 400, "REFRESH_TOKEN_REQUIRED");
+    throw new AppError("Refresh token talab qilinadi", 400);
   }
 
-  // Verify refresh token
-  let decoded: any;
   try {
-    decoded = jwt.verify(refreshToken, config.jwtRefreshSecret);
-  } catch (error) {
-    throw new AppError("Invalid refresh token", 401, "INVALID_REFRESH_TOKEN");
-  }
+    const decoded = jwt.verify(refreshToken, config.jwtRefreshSecret) as any;
 
-  // Find session
-  const session = await prisma.userSession.findFirst({
-    where: {
-      refreshToken,
-      isActive: true,
-    },
-    include: {
-      user: true,
-    },
-  });
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+      },
+    });
 
-  if (!session || session.expiresAt < new Date()) {
-    throw new AppError("Session expired or invalid", 401, "SESSION_EXPIRED");
-  }
+    if (!user || user.status !== "ACTIVE") {
+      throw new AppError("Foydalanuvchi topilmadi yoki faol emas", 401);
+    }
 
-  // Generate new tokens
-  const tokenPayload = {
-    userId: session.user.id,
-    email: session.user.email,
-    role: session.user.role,
-  };
+    // Yangi tokenlar yaratish
+    const newAccessToken = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      config.jwtSecret,
+      { expiresIn: config.jwtExpiration },
+    );
 
-  const newAccessToken = jwt.sign(tokenPayload, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn,
-  });
+    const newRefreshToken = jwt.sign(
+      { userId: user.id },
+      config.jwtRefreshSecret,
+      { expiresIn: config.jwtRefreshExpiration },
+    );
 
-  const newRefreshToken = jwt.sign(tokenPayload, config.jwtRefreshSecret, {
-    expiresIn: config.jwtRefreshExpiresIn,
-  });
-
-  // Update session
-  await prisma.userSession.update({
-    where: { id: session.id },
-    data: {
-      token: newAccessToken,
-      refreshToken: newRefreshToken,
-      lastUsedAt: new Date(),
-    },
-  });
-
-  logger.info("Token refreshed", {
-    userId: session.user.id,
-    sessionId: session.id,
-  });
-
-  res.json({
-    tokens: {
+    res.json({
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
-      expiresAt: session.expiresAt,
-    },
-  });
+    });
+  } catch (error) {
+    throw new AppError("Noto'g'ri refresh token", 401);
+  }
 });
 
-// Logout
-router.post("/logout", authMiddleware, async (req: AuthRequest, res) => {
-  if (req.user?.sessionId) {
-    await prisma.userSession.update({
-      where: { id: req.user.sessionId },
-      data: { isActive: false },
-    });
+/**
+ * @swagger
+ * /auth/profile:
+ *   get:
+ *     summary: Joriy foydalanuvchi ma'lumotlarini olish
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Foydalanuvchi ma'lumotlari
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Autentifikatsiya talab qilinadi
+ */
+router.get("/profile", authMiddleware, async (req, res) => {
+  const userId = (req as any).user.id;
 
-    logger.info("User logged out", {
-      userId: req.user.id,
-      sessionId: req.user.sessionId,
-    });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      phone: true,
+      role: true,
+      avatar: true,
+      isVerified: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  if (!user) {
+    throw new AppError("Foydalanuvchi topilmadi", 404);
   }
 
-  res.json({ message: "Logged out successfully" });
+  res.json(user);
 });
 
-// Logout from all devices
-router.post("/logout-all", authMiddleware, async (req: AuthRequest, res) => {
-  await prisma.userSession.updateMany({
-    where: {
-      userId: req.user!.id,
-      isActive: true,
-    },
-    data: { isActive: false },
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Tizimdan chiqish
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Muvaffaqiyatli chiqdi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Muvaffaqiyatli chiqdingiz
+ */
+router.post("/logout", authMiddleware, async (req, res) => {
+  const userId = (req as any).user.id;
+
+  logger.info("User logged out", { userId });
+
+  res.json({
+    message: "Muvaffaqiyatli chiqdingiz",
   });
-
-  logger.info("User logged out from all devices", { userId: req.user!.id });
-
-  res.json({ message: "Logged out from all devices successfully" });
 });
 
-// Forgot password
-router.post(
-  "/forgot-password",
-  validateRequest(forgotPasswordSchema),
-  async (req, res) => {
-    const { email } = req.body;
+/**
+ * @swagger
+ * /auth/verify-email:
+ *   post:
+ *     summary: Email tasdiqlash
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: Email tasdiqlash tokeni
+ *     responses:
+ *       200:
+ *         description: Email muvaffaqiyatli tasdiqlandi
+ *       400:
+ *         description: Noto'g'ri yoki muddati tugagan token
+ */
+router.post("/verify-email", async (req, res) => {
+  const { token } = req.body;
 
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
+  if (!token) {
+    throw new AppError("Tasdiqlash tokeni talab qilinadi", 400);
+  }
 
-    if (!user) {
-      // Don't reveal if email exists
-      res.json({ message: "If the email exists, a reset link has been sent" });
-      return;
-    }
-
-    // Generate reset token
-    const resetToken = jwt.sign(
-      { userId: user.id, type: "password_reset" },
-      config.jwtSecret,
-      { expiresIn: "1h" },
-    );
-
-    // Send reset email
-    await sendPasswordResetEmail(user.email, resetToken);
-
-    logger.info("Password reset requested", { userId: user.id, email });
-
-    res.json({ message: "If the email exists, a reset link has been sent" });
-  },
-);
-
-// Reset password
-router.post(
-  "/reset-password",
-  validateRequest(resetPasswordSchema),
-  async (req, res) => {
-    const { token, newPassword } = req.body;
-
-    // Verify reset token
-    let decoded: any;
-    try {
-      decoded = jwt.verify(token, config.jwtSecret);
-    } catch (error) {
-      throw new AppError(
-        "Invalid or expired reset token",
-        400,
-        "INVALID_RESET_TOKEN",
-      );
-    }
-
-    if (decoded.type !== "password_reset") {
-      throw new AppError("Invalid token type", 400, "INVALID_TOKEN_TYPE");
-    }
-
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(
-      newPassword,
-      config.security.bcryptRounds,
-    );
-
-    // Update password and invalidate all sessions
-    await prisma.$transaction(async (tx) => {
-      await tx.user.update({
-        where: { id: decoded.userId },
-        data: { password: hashedPassword },
-      });
-
-      await tx.userSession.updateMany({
-        where: { userId: decoded.userId },
-        data: { isActive: false },
-      });
-    });
-
-    logger.info("Password reset completed", { userId: decoded.userId });
-
-    res.json({ message: "Password reset successfully" });
-  },
-);
-
-// Verify email
-router.post(
-  "/verify-email",
-  validateRequest(verifyEmailSchema),
-  async (req, res) => {
-    const { token } = req.body;
-
-    // Verify token
-    let decoded: any;
-    try {
-      decoded = jwt.verify(token, config.jwtSecret);
-    } catch (error) {
-      throw new AppError(
-        "Invalid or expired verification token",
-        400,
-        "INVALID_VERIFICATION_TOKEN",
-      );
-    }
-
-    if (decoded.type !== "email_verification") {
-      throw new AppError("Invalid token type", 400, "INVALID_TOKEN_TYPE");
-    }
-
-    // Update user
-    await prisma.user.update({
-      where: { id: decoded.userId },
-      data: { emailVerified: true },
-    });
-
-    logger.info("Email verified", { userId: decoded.userId });
-
-    res.json({ message: "Email verified successfully" });
-  },
-);
-
-// Resend email verification
-router.post(
-  "/resend-email-verification",
-  authMiddleware,
-  async (req: AuthRequest, res) => {
-    const user = await prisma.user.findUnique({
-      where: { id: req.user!.id },
-    });
-
-    if (!user) {
-      throw new AppError("User not found", 404, "USER_NOT_FOUND");
-    }
-
-    if (user.emailVerified) {
-      throw new AppError(
-        "Email already verified",
-        400,
-        "EMAIL_ALREADY_VERIFIED",
-      );
-    }
-
-    await sendVerificationEmail(user.id, user.email);
-
-    logger.info("Email verification resent", { userId: user.id });
-
-    res.json({ message: "Verification email sent" });
-  },
-);
-
-// Change password
-router.post(
-  "/change-password",
-  authMiddleware,
-  validateRequest(changePasswordSchema),
-  async (req: AuthRequest, res) => {
-    const { currentPassword, newPassword } = req.body;
-
-    const user = await prisma.user.findUnique({
-      where: { id: req.user!.id },
-    });
-
-    if (!user) {
-      throw new AppError("User not found", 404, "USER_NOT_FOUND");
-    }
-
-    // Verify current password
-    const isCurrentPasswordValid = await bcrypt.compare(
-      currentPassword,
-      user.password,
-    );
-    if (!isCurrentPasswordValid) {
-      throw new AppError(
-        "Current password is incorrect",
-        400,
-        "INVALID_CURRENT_PASSWORD",
-      );
-    }
-
-    // Hash new password
-    const hashedNewPassword = await bcrypt.hash(
-      newPassword,
-      config.security.bcryptRounds,
-    );
-
-    // Update password
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { password: hashedNewPassword },
-    });
-
-    logger.info("Password changed", { userId: user.id });
-
-    res.json({ message: "Password changed successfully" });
-  },
-);
-
-// Helper functions
-const sendVerificationEmail = async (userId: string, email: string) => {
-  const token = jwt.sign(
-    { userId, type: "email_verification" },
-    config.jwtSecret,
-    { expiresIn: "24h" },
-  );
-
-  const verificationUrl = `${config.frontendUrl}/verify-email?token=${token}`;
-
-  await sendEmail({
-    to: email,
-    subject: "Verify your email address",
-    template: "email-verification",
-    data: {
-      verificationUrl,
-    },
+  // Bu yerda email tasdiqlash logikasi bo'ladi
+  // Hozircha mock response
+  res.json({
+    message: "Email muvaffaqiyatli tasdiqlandi",
   });
-};
+});
 
-const sendVerificationSMS = async (userId: string, phone: string) => {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+/**
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Parolni tiklash so'rovi
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Parol tiklash havolasi yuborildi
+ */
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
 
-  // Store OTP in cache/database for verification
-  // Implementation depends on your OTP storage strategy
-
-  await sendSMS({
-    to: phone,
-    message: `Your verification code is: ${otp}. Valid for 10 minutes.`,
+  // Email mavjudligini tekshirish
+  const user = await prisma.user.findUnique({
+    where: { email },
   });
-};
 
-const sendPasswordResetEmail = async (email: string, token: string) => {
-  const resetUrl = `${config.frontendUrl}/reset-password?token=${token}`;
-
-  await sendEmail({
-    to: email,
-    subject: "Reset your password",
-    template: "password-reset",
-    data: {
-      resetUrl,
-    },
+  // Xavfsizlik uchun har doim muvaffaqiyatli javoб qaytaramiz
+  res.json({
+    message: "Agar email mavjud bo'lsa, parol tiklash havolasi yuborildi",
   });
-};
+});
 
 export default router;

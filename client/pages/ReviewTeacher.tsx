@@ -1,6 +1,17 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Star, Send, Loader2, CheckCircle, BookOpen, Clock, User, Calendar as CalendarIcon } from "lucide-react";
+import { toast } from "sonner";
+import {
+  ArrowLeft,
+  Star,
+  Send,
+  Loader2,
+  CheckCircle,
+  BookOpen,
+  Clock,
+  User,
+  Calendar as CalendarIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,7 +30,7 @@ export default function ReviewTeacher() {
     teaching: 0,
     communication: 0,
     preparation: 0,
-    punctuality: 0
+    punctuality: 0,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -32,61 +43,65 @@ export default function ReviewTeacher() {
       name: "Aziza Karimova",
       title: "English Language Expert",
       image: "/placeholder.svg",
-      subjects: ["English", "IELTS"]
+      subjects: ["English", "IELTS"],
     },
     date: "2024-01-15",
     time: "14:00",
     duration: 60,
     type: "Business English",
-    student: "John Doe"
+    student: "John Doe",
   };
 
   const ratingLabels = {
     1: "Poor",
-    2: "Fair", 
+    2: "Fair",
     3: "Good",
     4: "Very Good",
-    5: "Excellent"
+    5: "Excellent",
   };
 
   const categoryLabels = {
     teaching: "Teaching Quality",
     communication: "Communication",
     preparation: "Lesson Preparation",
-    punctuality: "Punctuality"
+    punctuality: "Punctuality",
   };
 
   const handleRatingClick = (value: number) => {
     setRating(value);
   };
 
-  const handleCategoryRating = (category: keyof typeof categories, value: number) => {
-    setCategories(prev => ({
+  const handleCategoryRating = (
+    category: keyof typeof categories,
+    value: number,
+  ) => {
+    setCategories((prev) => ({
       ...prev,
-      [category]: value
+      [category]: value,
     }));
   };
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      alert("Please provide an overall rating");
+      toast.error("Iltimos, umumiy baho bering");
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setIsSubmitted(true);
     } catch (error) {
-      alert("Failed to submit review. Please try again.");
+      toast.error("Sharh yuborishda xato. Qayta urinib ko'ring.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const averageCategoryRating = Object.values(categories).reduce((sum, rating) => sum + rating, 0) / 4;
+  const averageCategoryRating =
+    Object.values(categories).reduce((sum, rating) => sum + rating, 0) / 4;
 
   if (isSubmitted) {
     return (
@@ -102,18 +117,17 @@ export default function ReviewTeacher() {
                   Thank You for Your Review!
                 </h1>
                 <p className="text-gray-600 mb-8">
-                  Your feedback helps us maintain high quality education and helps other students choose the best teachers.
+                  Your feedback helps us maintain high quality education and
+                  helps other students choose the best teachers.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link to="/student-dashboard">
-                    <Button>
-                      Back to Dashboard
-                    </Button>
+                    <Button>Back to Dashboard</Button>
                   </Link>
-                  <Link to={`/book-lesson/${lesson.teacher.name.replace(' ', '-').toLowerCase()}`}>
-                    <Button variant="outline">
-                      Book Another Lesson
-                    </Button>
+                  <Link
+                    to={`/book-lesson/${lesson.teacher.name.replace(" ", "-").toLowerCase()}`}
+                  >
+                    <Button variant="outline">Book Another Lesson</Button>
                   </Link>
                 </div>
               </CardContent>
@@ -130,12 +144,19 @@ export default function ReviewTeacher() {
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
-            <Link to="/student-dashboard" className="text-primary hover:text-primary/80">
+            <Link
+              to="/student-dashboard"
+              className="text-primary hover:text-primary/80"
+            >
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Rate Your Lesson</h1>
-              <p className="text-gray-600">Share your experience to help other students</p>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Rate Your Lesson
+              </h1>
+              <p className="text-gray-600">
+                Share your experience to help other students
+              </p>
             </div>
           </div>
 
@@ -151,17 +172,29 @@ export default function ReviewTeacher() {
               <CardContent>
                 <div className="flex items-center gap-4">
                   <Avatar className="w-16 h-16">
-                    <AvatarImage src={lesson.teacher.image} alt={lesson.teacher.name} />
+                    <AvatarImage
+                      src={lesson.teacher.image}
+                      alt={lesson.teacher.name}
+                    />
                     <AvatarFallback className="text-lg">
-                      {lesson.teacher.name.split(' ').map(n => n[0]).join('')}
+                      {lesson.teacher.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-gray-900">{lesson.teacher.name}</h3>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {lesson.teacher.name}
+                    </h3>
                     <p className="text-gray-600">{lesson.teacher.title}</p>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {lesson.teacher.subjects.map((subject) => (
-                        <Badge key={subject} variant="secondary" className="text-xs">
+                        <Badge
+                          key={subject}
+                          variant="secondary"
+                          className="text-xs"
+                        >
                           {subject}
                         </Badge>
                       ))}
@@ -174,7 +207,9 @@ export default function ReviewTeacher() {
                     </div>
                     <div className="flex items-center gap-1 mb-1">
                       <Clock className="h-4 w-4" />
-                      <span>{lesson.time} ({lesson.duration} min)</span>
+                      <span>
+                        {lesson.time} ({lesson.duration} min)
+                      </span>
                     </div>
                     <div className="font-medium">{lesson.type}</div>
                   </div>
@@ -201,8 +236,8 @@ export default function ReviewTeacher() {
                         <Star
                           className={`h-12 w-12 ${
                             value <= (hoverRating || rating)
-                              ? 'fill-yellow-400 text-yellow-400'
-                              : 'text-gray-300 hover:text-yellow-200'
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-300 hover:text-yellow-200"
                           }`}
                         />
                       </button>
@@ -210,7 +245,11 @@ export default function ReviewTeacher() {
                   </div>
                   {(hoverRating || rating) > 0 && (
                     <p className="text-lg font-medium text-gray-700">
-                      {ratingLabels[(hoverRating || rating) as keyof typeof ratingLabels]}
+                      {
+                        ratingLabels[
+                          (hoverRating || rating) as keyof typeof ratingLabels
+                        ]
+                      }
                     </p>
                   )}
                 </div>
@@ -231,23 +270,32 @@ export default function ReviewTeacher() {
                         {[1, 2, 3, 4, 5].map((value) => (
                           <button
                             key={value}
-                            onClick={() => handleCategoryRating(key as keyof typeof categories, value)}
+                            onClick={() =>
+                              handleCategoryRating(
+                                key as keyof typeof categories,
+                                value,
+                              )
+                            }
                             className="transition-transform hover:scale-110"
                           >
                             <Star
                               className={`h-6 w-6 ${
-                                value <= categories[key as keyof typeof categories]
-                                  ? 'fill-yellow-400 text-yellow-400'
-                                  : 'text-gray-300 hover:text-yellow-200'
+                                value <=
+                                categories[key as keyof typeof categories]
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-gray-300 hover:text-yellow-200"
                               }`}
                             />
                           </button>
                         ))}
                       </div>
                       <span className="text-sm text-gray-600 ml-2">
-                        {categories[key as keyof typeof categories] > 0 && 
-                          ratingLabels[categories[key as keyof typeof categories] as keyof typeof ratingLabels]
-                        }
+                        {categories[key as keyof typeof categories] > 0 &&
+                          ratingLabels[
+                            categories[
+                              key as keyof typeof categories
+                            ] as keyof typeof ratingLabels
+                          ]}
                       </span>
                     </div>
                   </div>
@@ -306,7 +354,9 @@ export default function ReviewTeacher() {
                           <Star
                             key={i}
                             className={`h-4 w-4 ${
-                              i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                              i < rating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-300"
                             }`}
                           />
                         ))}
@@ -314,22 +364,28 @@ export default function ReviewTeacher() {
                       <span className="font-medium">{rating}/5</span>
                     </div>
                   </div>
-                  
+
                   {averageCategoryRating > 0 && (
                     <div className="flex justify-between items-center">
                       <span>Category Average:</span>
-                      <span className="font-medium">{averageCategoryRating.toFixed(1)}/5</span>
+                      <span className="font-medium">
+                        {averageCategoryRating.toFixed(1)}/5
+                      </span>
                     </div>
                   )}
-                  
+
                   <div className="flex justify-between items-center">
                     <span>Review Length:</span>
-                    <span className="font-medium">{review.length} characters</span>
+                    <span className="font-medium">
+                      {review.length} characters
+                    </span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span>Visibility:</span>
-                    <span className="font-medium">{isAnonymous ? 'Anonymous' : 'Public'}</span>
+                    <span className="font-medium">
+                      {isAnonymous ? "Anonymous" : "Public"}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -355,7 +411,7 @@ export default function ReviewTeacher() {
                   </>
                 )}
               </Button>
-              
+
               <Link to="/student-dashboard">
                 <Button variant="outline" size="lg">
                   Skip for Now

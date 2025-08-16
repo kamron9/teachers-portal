@@ -12,6 +12,7 @@ import { logger } from "./utils/logger";
 import { errorHandler } from "./middleware/errorHandler";
 import { authMiddleware } from "./middleware/auth";
 import { auditMiddleware } from "./middleware/audit";
+import { setupSwagger } from "./swagger";
 
 // Route imports
 import authRoutes from "./routes/auth";
@@ -80,6 +81,9 @@ app.get("/health", (req, res) => {
     version: process.env.npm_package_version || "1.0.0",
   });
 });
+
+// Setup Swagger documentation
+setupSwagger(app);
 
 // API routes
 const apiVersion = `/api/${config.apiVersion}`;
