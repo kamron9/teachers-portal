@@ -1,9 +1,9 @@
-import express from 'express';
-import { body } from 'express-validator';
-import { prisma } from '../lib/prisma';
-import { validationMiddleware } from '../middleware/validation';
-import { AppError } from '../utils/errors';
-import { logger } from '../utils/logger';
+import express from "express";
+import { body } from "express-validator";
+import { prisma } from "../lib/prisma";
+import { validationMiddleware } from "../middleware/validation";
+import { AppError } from "../utils/errors";
+import { logger } from "../utils/logger";
 
 const router = express.Router();
 
@@ -23,7 +23,7 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/User'
  */
-router.get('/profile', async (req, res) => {
+router.get("/profile", async (req, res) => {
   const userId = (req as any).user.id;
 
   const user = await prisma.user.findUnique({
@@ -39,12 +39,12 @@ router.get('/profile', async (req, res) => {
       isVerified: true,
       status: true,
       createdAt: true,
-      updatedAt: true
-    }
+      updatedAt: true,
+    },
   });
 
   if (!user) {
-    throw new AppError('Foydalanuvchi topilmadi', 404);
+    throw new AppError("Foydalanuvchi topilmadi", 404);
   }
 
   res.json(user);
@@ -78,12 +78,13 @@ router.get('/profile', async (req, res) => {
  *       200:
  *         description: Profil muvaffaqiyatli yangilandi
  */
-router.put('/profile', 
+router.put(
+  "/profile",
   [
-    body('firstName').optional().isLength({ min: 2, max: 50 }),
-    body('lastName').optional().isLength({ min: 2, max: 50 }),
-    body('phone').optional().isMobilePhone('uz-UZ'),
-    body('avatar').optional().isURL()
+    body("firstName").optional().isLength({ min: 2, max: 50 }),
+    body("lastName").optional().isLength({ min: 2, max: 50 }),
+    body("phone").optional().isMobilePhone("uz-UZ"),
+    body("avatar").optional().isURL(),
   ],
   validationMiddleware,
   async (req, res) => {
@@ -96,7 +97,7 @@ router.put('/profile',
         ...(firstName && { firstName }),
         ...(lastName && { lastName }),
         ...(phone && { phone }),
-        ...(avatar && { avatar })
+        ...(avatar && { avatar }),
       },
       select: {
         id: true,
@@ -108,17 +109,17 @@ router.put('/profile',
         avatar: true,
         isVerified: true,
         status: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     });
 
-    logger.info('User profile updated', { userId });
+    logger.info("User profile updated", { userId });
 
     res.json({
-      message: 'Profil muvaffaqiyatli yangilandi',
-      user: updatedUser
+      message: "Profil muvaffaqiyatli yangilandi",
+      user: updatedUser,
     });
-  }
+  },
 );
 
 /**
@@ -148,18 +149,23 @@ router.put('/profile',
  *       200:
  *         description: Parol muvaffaqiyatli o'zgartirildi
  */
-router.put('/change-password',
+router.put(
+  "/change-password",
   [
-    body('currentPassword').notEmpty().withMessage('Joriy parol talab qilinadi'),
-    body('newPassword').isLength({ min: 8 }).withMessage('Yangi parol kamida 8 ta belgidan iborat bo\'lishi kerak')
+    body("currentPassword")
+      .notEmpty()
+      .withMessage("Joriy parol talab qilinadi"),
+    body("newPassword")
+      .isLength({ min: 8 })
+      .withMessage("Yangi parol kamida 8 ta belgidan iborat bo'lishi kerak"),
   ],
   validationMiddleware,
   async (req, res) => {
     // Bu yerda parol o'zgartirish logikasi bo'ladi
     res.json({
-      message: 'Parol muvaffaqiyatli o\'zgartirildi'
+      message: "Parol muvaffaqiyatli o'zgartirildi",
     });
-  }
+  },
 );
 
 /**
@@ -174,19 +180,19 @@ router.put('/change-password',
  *       200:
  *         description: Hisob muvaffaqiyatli o'chirildi
  */
-router.delete('/delete-account', async (req, res) => {
+router.delete("/delete-account", async (req, res) => {
   const userId = (req as any).user.id;
 
   // Hisobni o'chirish o'rniga status ni o'zgartirish
   await prisma.user.update({
     where: { id: userId },
-    data: { status: 'INACTIVE' }
+    data: { status: "INACTIVE" },
   });
 
-  logger.info('User account deactivated', { userId });
+  logger.info("User account deactivated", { userId });
 
   res.json({
-    message: 'Hisob muvaffaqiyatli o\'chirildi'
+    message: "Hisob muvaffaqiyatli o'chirildi",
   });
 });
 

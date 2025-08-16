@@ -9,15 +9,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const languages = [
-  { code: 'uz', name: "O'zbek", flag: '🇺🇿' },
-  { code: 'ru', name: 'Русский', flag: '🇷🇺' }
+  { code: "uz", name: "O'zbek", flag: "🇺🇿" },
+  { code: "ru", name: "Русский", flag: "🇷🇺" },
 ];
 
 export default function LanguageSwitcher() {
-  const [currentLanguage, setCurrentLanguage] = useState('uz');
+  const [currentLanguage, setCurrentLanguage] = useState("uz");
 
   const getCurrentLanguage = () => {
-    return languages.find(lang => lang.code === currentLanguage) || languages[0];
+    return (
+      languages.find((lang) => lang.code === currentLanguage) || languages[0]
+    );
   };
 
   const handleLanguageChange = (langCode: string) => {
@@ -41,7 +43,7 @@ export default function LanguageSwitcher() {
             key={language.code}
             onClick={() => handleLanguageChange(language.code)}
             className={`cursor-pointer ${
-              currentLanguage === language.code ? 'bg-gray-100' : ''
+              currentLanguage === language.code ? "bg-gray-100" : ""
             }`}
           >
             <span className="mr-2">{language.flag}</span>

@@ -1,14 +1,14 @@
-import express from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { body } from 'express-validator';
-import { prisma } from '../lib/prisma';
-import { config } from '../config';
-import { authValidators } from '../validators/authValidators';
-import { validationMiddleware } from '../middleware/validation';
-import { authMiddleware } from '../middleware/auth';
-import { logger } from '../utils/logger';
-import { AppError } from '../utils/errors';
+import express from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { body } from "express-validator";
+import { prisma } from "../lib/prisma";
+import { config } from "../config";
+import { authValidators } from "../validators/authValidators";
+import { validationMiddleware } from "../middleware/validation";
+import { authMiddleware } from "../middleware/auth";
+import { logger } from "../utils/logger";
+import { AppError } from "../utils/errors";
 
 const router = express.Router();
 
@@ -78,7 +78,8 @@ const router = express.Router();
  *       409:
  *         description: Email allaqachon mavjud
  */
-router.post('/register', 
+router.post(
+  "/register",
   authValidators.register,
   validationMiddleware,
   async (req, res) => {
@@ -86,11 +87,11 @@ router.post('/register',
 
     // Email tekshirish
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { email },
     });
 
     if (existingUser) {
-      throw new AppError('Bu email allaqachon ro\'yxatdan o\'tgan', 409);
+      throw new AppError("Bu email allaqachon ro'yxatdan o'tgan", 409);
     }
 
     // Parolni hash qilish
@@ -104,7 +105,7 @@ router.post('/register',
         firstName,
         lastName,
         phone,
-        role: role as 'STUDENT' | 'TEACHER'
+        role: role as "STUDENT" | "TEACHER",
       },
       select: {
         id: true,
@@ -116,32 +117,32 @@ router.post('/register',
         avatar: true,
         isVerified: true,
         status: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
     // Token yaratish
     const accessToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       config.jwtSecret,
-      { expiresIn: config.jwtExpiration }
+      { expiresIn: config.jwtExpiration },
     );
 
     const refreshToken = jwt.sign(
       { userId: user.id },
       config.jwtRefreshSecret,
-      { expiresIn: config.jwtRefreshExpiration }
+      { expiresIn: config.jwtRefreshExpiration },
     );
 
-    logger.info('User registered successfully', { userId: user.id, email });
+    logger.info("User registered successfully", { userId: user.id, email });
 
     res.status(201).json({
-      message: 'Muvaffaqiyatli ro\'yxatdan o\'tdingiz',
+      message: "Muvaffaqiyatli ro'yxatdan o'tdingiz",
       user,
       accessToken,
-      refreshToken
+      refreshToken,
     });
-  }
+  },
 );
 
 /**
@@ -191,7 +192,8 @@ router.post('/register',
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/login',
+router.post(
+  "/login",
   authValidators.login,
   validationMiddleware,
   async (req, res) => {
@@ -211,50 +213,50 @@ router.post('/login',
         avatar: true,
         isVerified: true,
         status: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
     if (!user) {
-      throw new AppError('Noto\'g\'ri email yoki parol', 401);
+      throw new AppError("Noto'g'ri email yoki parol", 401);
     }
 
     // Parolni tekshirish
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new AppError('Noto\'g\'ri email yoki parol', 401);
+      throw new AppError("Noto'g'ri email yoki parol", 401);
     }
 
     // Faol emasligini tekshirish
-    if (user.status !== 'ACTIVE') {
-      throw new AppError('Hisobingiz faol emas. Admin bilan bog\'laning', 403);
+    if (user.status !== "ACTIVE") {
+      throw new AppError("Hisobingiz faol emas. Admin bilan bog'laning", 403);
     }
 
     // Token yaratish
     const accessToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       config.jwtSecret,
-      { expiresIn: config.jwtExpiration }
+      { expiresIn: config.jwtExpiration },
     );
 
     const refreshToken = jwt.sign(
       { userId: user.id },
       config.jwtRefreshSecret,
-      { expiresIn: config.jwtRefreshExpiration }
+      { expiresIn: config.jwtRefreshExpiration },
     );
 
     // Parolni response dan olib tashlash
     const { password: _, ...userWithoutPassword } = user;
 
-    logger.info('User logged in successfully', { userId: user.id, email });
+    logger.info("User logged in successfully", { userId: user.id, email });
 
     res.json({
-      message: 'Muvaffaqiyatli kirdingiz',
+      message: "Muvaffaqiyatli kirdingiz",
       user: userWithoutPassword,
       accessToken,
-      refreshToken
+      refreshToken,
     });
-  }
+  },
 );
 
 /**
@@ -289,49 +291,49 @@ router.post('/login',
  *       401:
  *         description: Noto'g'ri refresh token
  */
-router.post('/refresh', async (req, res) => {
+router.post("/refresh", async (req, res) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {
-    throw new AppError('Refresh token talab qilinadi', 400);
+    throw new AppError("Refresh token talab qilinadi", 400);
   }
 
   try {
     const decoded = jwt.verify(refreshToken, config.jwtRefreshSecret) as any;
-    
+
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: {
         id: true,
         email: true,
         role: true,
-        status: true
-      }
+        status: true,
+      },
     });
 
-    if (!user || user.status !== 'ACTIVE') {
-      throw new AppError('Foydalanuvchi topilmadi yoki faol emas', 401);
+    if (!user || user.status !== "ACTIVE") {
+      throw new AppError("Foydalanuvchi topilmadi yoki faol emas", 401);
     }
 
     // Yangi tokenlar yaratish
     const newAccessToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       config.jwtSecret,
-      { expiresIn: config.jwtExpiration }
+      { expiresIn: config.jwtExpiration },
     );
 
     const newRefreshToken = jwt.sign(
       { userId: user.id },
       config.jwtRefreshSecret,
-      { expiresIn: config.jwtRefreshExpiration }
+      { expiresIn: config.jwtRefreshExpiration },
     );
 
     res.json({
       accessToken: newAccessToken,
-      refreshToken: newRefreshToken
+      refreshToken: newRefreshToken,
     });
   } catch (error) {
-    throw new AppError('Noto\'g\'ri refresh token', 401);
+    throw new AppError("Noto'g'ri refresh token", 401);
   }
 });
 
@@ -353,7 +355,7 @@ router.post('/refresh', async (req, res) => {
  *       401:
  *         description: Autentifikatsiya talab qilinadi
  */
-router.get('/profile', authMiddleware, async (req, res) => {
+router.get("/profile", authMiddleware, async (req, res) => {
   const userId = (req as any).user.id;
 
   const user = await prisma.user.findUnique({
@@ -369,12 +371,12 @@ router.get('/profile', authMiddleware, async (req, res) => {
       isVerified: true,
       status: true,
       createdAt: true,
-      updatedAt: true
-    }
+      updatedAt: true,
+    },
   });
 
   if (!user) {
-    throw new AppError('Foydalanuvchi topilmadi', 404);
+    throw new AppError("Foydalanuvchi topilmadi", 404);
   }
 
   res.json(user);
@@ -400,13 +402,13 @@ router.get('/profile', authMiddleware, async (req, res) => {
  *                   type: string
  *                   example: Muvaffaqiyatli chiqdingiz
  */
-router.post('/logout', authMiddleware, async (req, res) => {
+router.post("/logout", authMiddleware, async (req, res) => {
   const userId = (req as any).user.id;
-  
-  logger.info('User logged out', { userId });
-  
+
+  logger.info("User logged out", { userId });
+
   res.json({
-    message: 'Muvaffaqiyatli chiqdingiz'
+    message: "Muvaffaqiyatli chiqdingiz",
   });
 });
 
@@ -434,17 +436,17 @@ router.post('/logout', authMiddleware, async (req, res) => {
  *       400:
  *         description: Noto'g'ri yoki muddati tugagan token
  */
-router.post('/verify-email', async (req, res) => {
+router.post("/verify-email", async (req, res) => {
   const { token } = req.body;
 
   if (!token) {
-    throw new AppError('Tasdiqlash tokeni talab qilinadi', 400);
+    throw new AppError("Tasdiqlash tokeni talab qilinadi", 400);
   }
 
   // Bu yerda email tasdiqlash logikasi bo'ladi
   // Hozircha mock response
   res.json({
-    message: 'Email muvaffaqiyatli tasdiqlandi'
+    message: "Email muvaffaqiyatli tasdiqlandi",
   });
 });
 
@@ -470,17 +472,17 @@ router.post('/verify-email', async (req, res) => {
  *       200:
  *         description: Parol tiklash havolasi yuborildi
  */
-router.post('/forgot-password', async (req, res) => {
+router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
   // Email mavjudligini tekshirish
   const user = await prisma.user.findUnique({
-    where: { email }
+    where: { email },
   });
 
   // Xavfsizlik uchun har doim muvaffaqiyatli javoб qaytaramiz
   res.json({
-    message: 'Agar email mavjud bo\'lsa, parol tiklash havolasi yuborildi'
+    message: "Agar email mavjud bo'lsa, parol tiklash havolasi yuborildi",
   });
 });
 

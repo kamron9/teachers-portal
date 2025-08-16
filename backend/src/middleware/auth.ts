@@ -209,7 +209,9 @@ export const optionalAuth = async (
       }
     } catch (error) {
       // Ignore authentication errors for optional auth
-      logger.debug("Optional auth failed", { error: error instanceof Error ? error.message : String(error) });
+      logger.debug("Optional auth failed", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
 
     next();

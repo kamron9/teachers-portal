@@ -1,9 +1,9 @@
-import express from 'express';
-import { body, query } from 'express-validator';
-import { prisma } from '../lib/prisma';
-import { validationMiddleware } from '../middleware/validation';
-import { AppError } from '../utils/errors';
-import { logger } from '../utils/logger';
+import express from "express";
+import { body, query } from "express-validator";
+import { prisma } from "../lib/prisma";
+import { validationMiddleware } from "../middleware/validation";
+import { AppError } from "../utils/errors";
+import { logger } from "../utils/logger";
 
 const router = express.Router();
 
@@ -68,12 +68,13 @@ const router = express.Router();
  *                     totalPages:
  *                       type: integer
  */
-router.get('/', 
+router.get(
+  "/",
   [
-    query('page').optional().isInt({ min: 1 }),
-    query('limit').optional().isInt({ min: 1, max: 50 }),
-    query('minRating').optional().isFloat({ min: 0, max: 5 }),
-    query('maxPrice').optional().isFloat({ min: 0 })
+    query("page").optional().isInt({ min: 1 }),
+    query("limit").optional().isInt({ min: 1, max: 50 }),
+    query("minRating").optional().isFloat({ min: 0, max: 5 }),
+    query("maxPrice").optional().isFloat({ min: 0 }),
   ],
   validationMiddleware,
   async (req, res) => {
@@ -86,8 +87,8 @@ router.get('/',
     const skip = (page - 1) * limit;
 
     const where: any = {
-      user: { status: 'ACTIVE' },
-      isVerified: true
+      user: { status: "ACTIVE" },
+      isVerified: true,
     };
 
     if (subject) {
@@ -113,13 +114,13 @@ router.get('/',
               id: true,
               firstName: true,
               lastName: true,
-              avatar: true
-            }
-          }
+              avatar: true,
+            },
+          },
         },
-        orderBy: { rating: 'desc' }
+        orderBy: { rating: "desc" },
       }),
-      prisma.teacher.count({ where })
+      prisma.teacher.count({ where }),
     ]);
 
     res.json({
@@ -128,10 +129,10 @@ router.get('/',
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     });
-  }
+  },
 );
 
 /**
@@ -157,7 +158,7 @@ router.get('/',
  *       404:
  *         description: O'qituvchi topilmadi
  */
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
   const teacher = await prisma.teacher.findUnique({
@@ -169,12 +170,12 @@ router.get('/:id', async (req, res) => {
           firstName: true,
           lastName: true,
           avatar: true,
-          isVerified: true
-        }
+          isVerified: true,
+        },
       },
       reviews: {
         take: 10,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         include: {
           student: {
             include: {
@@ -182,18 +183,18 @@ router.get('/:id', async (req, res) => {
                 select: {
                   firstName: true,
                   lastName: true,
-                  avatar: true
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+                  avatar: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!teacher) {
-    throw new AppError('O\'qituvchi topilmadi', 404);
+    throw new AppError("O'qituvchi topilmadi", 404);
   }
 
   res.json(teacher);
@@ -232,13 +233,14 @@ router.get('/:id', async (req, res) => {
  *       200:
  *         description: Profil muvaffaqiyatli yangilandi
  */
-router.put('/profile', 
+router.put(
+  "/profile",
   [
-    body('subjects').optional().isArray(),
-    body('experience').optional().isInt({ min: 0 }),
-    body('hourlyRate').optional().isFloat({ min: 0 }),
-    body('bio').optional().isLength({ max: 1000 }),
-    body('education').optional().isLength({ max: 500 })
+    body("subjects").optional().isArray(),
+    body("experience").optional().isInt({ min: 0 }),
+    body("hourlyRate").optional().isFloat({ min: 0 }),
+    body("bio").optional().isLength({ max: 1000 }),
+    body("education").optional().isLength({ max: 500 }),
   ],
   validationMiddleware,
   async (req, res) => {
@@ -247,11 +249,11 @@ router.put('/profile',
 
     // Foydalanuvchi o'qituvchi ekanligini tekshirish
     const user = await prisma.user.findUnique({
-      where: { id: userId }
+      where: { id: userId },
     });
 
-    if (!user || user.role !== 'TEACHER') {
-      throw new AppError('Faqat o\'qituvchilar bu amalni bajara oladi', 403);
+    if (!user || user.role !== "TEACHER") {
+      throw new AppError("Faqat o'qituvchilar bu amalni bajara oladi", 403);
     }
 
     const teacher = await prisma.teacher.upsert({
@@ -259,26 +261,26 @@ router.put('/profile',
       update: updateData,
       create: {
         userId,
-        ...updateData
+        ...updateData,
       },
       include: {
         user: {
           select: {
             firstName: true,
             lastName: true,
-            avatar: true
-          }
-        }
-      }
+            avatar: true,
+          },
+        },
+      },
     });
 
-    logger.info('Teacher profile updated', { userId, teacherId: teacher.id });
+    logger.info("Teacher profile updated", { userId, teacherId: teacher.id });
 
     res.json({
-      message: 'O\'qituvchi profili muvaffaqiyatli yangilandi',
-      teacher
+      message: "O'qituvchi profili muvaffaqiyatli yangilandi",
+      teacher,
     });
-  }
+  },
 );
 
 /**
@@ -293,16 +295,16 @@ router.put('/profile',
  *       200:
  *         description: Mavjudlik jadvali
  */
-router.get('/availability', async (req, res) => {
+router.get("/availability", async (req, res) => {
   const userId = (req as any).user.id;
 
   const teacher = await prisma.teacher.findUnique({
     where: { userId },
-    select: { availability: true }
+    select: { availability: true },
   });
 
   if (!teacher) {
-    throw new AppError('O\'qituvchi profili topilmadi', 404);
+    throw new AppError("O'qituvchi profili topilmadi", 404);
   }
 
   res.json(teacher.availability);
@@ -335,20 +337,20 @@ router.get('/availability', async (req, res) => {
  *       200:
  *         description: Mavjudlik muvaffaqiyatli yangilandi
  */
-router.put('/availability', async (req, res) => {
+router.put("/availability", async (req, res) => {
   const userId = (req as any).user.id;
   const availability = req.body;
 
   await prisma.teacher.update({
     where: { userId },
-    data: { availability }
+    data: { availability },
   });
 
-  logger.info('Teacher availability updated', { userId });
+  logger.info("Teacher availability updated", { userId });
 
   res.json({
-    message: 'Mavjudlik muvaffaqiyatli yangilandi',
-    availability
+    message: "Mavjudlik muvaffaqiyatli yangilandi",
+    availability,
   });
 });
 

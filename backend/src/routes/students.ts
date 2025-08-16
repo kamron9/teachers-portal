@@ -1,9 +1,9 @@
-import express from 'express';
-import { body, query } from 'express-validator';
-import { prisma } from '../lib/prisma';
-import { validationMiddleware } from '../middleware/validation';
-import { AppError } from '../utils/errors';
-import { logger } from '../utils/logger';
+import express from "express";
+import { body, query } from "express-validator";
+import { prisma } from "../lib/prisma";
+import { validationMiddleware } from "../middleware/validation";
+import { AppError } from "../utils/errors";
+import { logger } from "../utils/logger";
 
 const router = express.Router();
 
@@ -40,16 +40,16 @@ const router = express.Router();
  *                 user:
  *                   $ref: '#/components/schemas/User'
  */
-router.get('/profile', async (req, res) => {
+router.get("/profile", async (req, res) => {
   const userId = (req as any).user.id;
 
   // Foydalanuvchi o'quvchi ekanligini tekshirish
   const user = await prisma.user.findUnique({
-    where: { id: userId }
+    where: { id: userId },
   });
 
-  if (!user || user.role !== 'STUDENT') {
-    throw new AppError('Faqat o\'quvchilar bu amalni bajara oladi', 403);
+  if (!user || user.role !== "STUDENT") {
+    throw new AppError("Faqat o'quvchilar bu amalni bajara oladi", 403);
   }
 
   const student = await prisma.student.findUnique({
@@ -63,10 +63,10 @@ router.get('/profile', async (req, res) => {
           email: true,
           phone: true,
           avatar: true,
-          isVerified: true
-        }
-      }
-    }
+          isVerified: true,
+        },
+      },
+    },
   });
 
   if (!student) {
@@ -75,9 +75,9 @@ router.get('/profile', async (req, res) => {
       data: {
         userId,
         interests: [],
-        learningGoals: '',
-        preferredLanguage: 'uz',
-        timezone: 'Asia/Tashkent'
+        learningGoals: "",
+        preferredLanguage: "uz",
+        timezone: "Asia/Tashkent",
       },
       include: {
         user: {
@@ -88,10 +88,10 @@ router.get('/profile', async (req, res) => {
             email: true,
             phone: true,
             avatar: true,
-            isVerified: true
-          }
-        }
-      }
+            isVerified: true,
+          },
+        },
+      },
     });
 
     return res.json(newStudent);
@@ -130,12 +130,13 @@ router.get('/profile', async (req, res) => {
  *       200:
  *         description: Profil muvaffaqiyatli yangilandi
  */
-router.put('/profile', 
+router.put(
+  "/profile",
   [
-    body('interests').optional().isArray(),
-    body('learningGoals').optional().isLength({ max: 1000 }),
-    body('preferredLanguage').optional().isIn(['uz', 'ru', 'en']),
-    body('timezone').optional().isString()
+    body("interests").optional().isArray(),
+    body("learningGoals").optional().isLength({ max: 1000 }),
+    body("preferredLanguage").optional().isIn(["uz", "ru", "en"]),
+    body("timezone").optional().isString(),
   ],
   validationMiddleware,
   async (req, res) => {
@@ -144,11 +145,11 @@ router.put('/profile',
 
     // Foydalanuvchi o'quvchi ekanligini tekshirish
     const user = await prisma.user.findUnique({
-      where: { id: userId }
+      where: { id: userId },
     });
 
-    if (!user || user.role !== 'STUDENT') {
-      throw new AppError('Faqat o\'quvchilar bu amalni bajara oladi', 403);
+    if (!user || user.role !== "STUDENT") {
+      throw new AppError("Faqat o'quvchilar bu amalni bajara oladi", 403);
     }
 
     const student = await prisma.student.upsert({
@@ -157,28 +158,28 @@ router.put('/profile',
       create: {
         userId,
         interests: updateData.interests || [],
-        learningGoals: updateData.learningGoals || '',
-        preferredLanguage: updateData.preferredLanguage || 'uz',
-        timezone: updateData.timezone || 'Asia/Tashkent'
+        learningGoals: updateData.learningGoals || "",
+        preferredLanguage: updateData.preferredLanguage || "uz",
+        timezone: updateData.timezone || "Asia/Tashkent",
       },
       include: {
         user: {
           select: {
             firstName: true,
             lastName: true,
-            avatar: true
-          }
-        }
-      }
+            avatar: true,
+          },
+        },
+      },
     });
 
-    logger.info('Student profile updated', { userId, studentId: student.id });
+    logger.info("Student profile updated", { userId, studentId: student.id });
 
     res.json({
-      message: 'O\'quvchi profili muvaffaqiyatli yangilandi',
-      student
+      message: "O'quvchi profili muvaffaqiyatli yangilandi",
+      student,
     });
-  }
+  },
 );
 
 /**
@@ -213,11 +214,14 @@ router.put('/profile',
  *       200:
  *         description: O'quvchi darslari ro'yxati
  */
-router.get('/bookings', 
+router.get(
+  "/bookings",
   [
-    query('page').optional().isInt({ min: 1 }),
-    query('limit').optional().isInt({ min: 1, max: 50 }),
-    query('status').optional().isIn(['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'RESCHEDULED'])
+    query("page").optional().isInt({ min: 1 }),
+    query("limit").optional().isInt({ min: 1, max: 50 }),
+    query("status")
+      .optional()
+      .isIn(["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "RESCHEDULED"]),
   ],
   validationMiddleware,
   async (req, res) => {
@@ -231,11 +235,11 @@ router.get('/bookings',
     // Student ID ni olish
     const student = await prisma.student.findUnique({
       where: { userId },
-      select: { id: true }
+      select: { id: true },
     });
 
     if (!student) {
-      throw new AppError('O\'quvchi profili topilmadi', 404);
+      throw new AppError("O'quvchi profili topilmadi", 404);
     }
 
     const where: any = { studentId: student.id };
@@ -255,15 +259,15 @@ router.get('/bookings',
                 select: {
                   firstName: true,
                   lastName: true,
-                  avatar: true
-                }
-              }
-            }
-          }
+                  avatar: true,
+                },
+              },
+            },
+          },
         },
-        orderBy: { scheduledAt: 'desc' }
+        orderBy: { scheduledAt: "desc" },
       }),
-      prisma.booking.count({ where })
+      prisma.booking.count({ where }),
     ]);
 
     res.json({
@@ -272,10 +276,10 @@ router.get('/bookings',
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     });
-  }
+  },
 );
 
 /**
@@ -290,17 +294,17 @@ router.get('/bookings',
  *       200:
  *         description: Yozgan sharhlar ro'yxati
  */
-router.get('/reviews', async (req, res) => {
+router.get("/reviews", async (req, res) => {
   const userId = (req as any).user.id;
 
   // Student ID ni olish
   const student = await prisma.student.findUnique({
     where: { userId },
-    select: { id: true }
+    select: { id: true },
   });
 
   if (!student) {
-    throw new AppError('O\'quvchi profili topilmadi', 404);
+    throw new AppError("O'quvchi profili topilmadi", 404);
   }
 
   const reviews = await prisma.review.findMany({
@@ -312,19 +316,19 @@ router.get('/reviews', async (req, res) => {
             select: {
               firstName: true,
               lastName: true,
-              avatar: true
-            }
-          }
-        }
+              avatar: true,
+            },
+          },
+        },
       },
       booking: {
         select: {
           subject: true,
-          scheduledAt: true
-        }
-      }
+          scheduledAt: true,
+        },
+      },
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: "desc" },
   });
 
   res.json(reviews);
@@ -342,7 +346,7 @@ router.get('/reviews', async (req, res) => {
  *       200:
  *         description: Sevimli o'qituvchilar ro'yxati
  */
-router.get('/favorites', async (req, res) => {
+router.get("/favorites", async (req, res) => {
   // Bu yerda sevimli o'qituvchilar logikasi bo'ladi
   // Hozircha bo'sh array qaytarish
   res.json([]);
@@ -366,12 +370,12 @@ router.get('/favorites', async (req, res) => {
  *       200:
  *         description: Sevimlilarga qo'shildi
  */
-router.post('/favorites/:teacherId', async (req, res) => {
+router.post("/favorites/:teacherId", async (req, res) => {
   const { teacherId } = req.params;
-  
+
   // Bu yerda sevimlilar logikasi bo'ladi
   res.json({
-    message: 'O\'qituvchi sevimlilarga qo\'shildi'
+    message: "O'qituvchi sevimlilarga qo'shildi",
   });
 });
 
@@ -393,12 +397,12 @@ router.post('/favorites/:teacherId', async (req, res) => {
  *       200:
  *         description: Sevimlilardan olib tashlandi
  */
-router.delete('/favorites/:teacherId', async (req, res) => {
+router.delete("/favorites/:teacherId", async (req, res) => {
   const { teacherId } = req.params;
-  
+
   // Bu yerda sevimlilar logikasi bo'ladi
   res.json({
-    message: 'O\'qituvchi sevimlilardan olib tashlandi'
+    message: "O'qituvchi sevimlilardan olib tashlandi",
   });
 });
 
