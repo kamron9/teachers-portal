@@ -178,5 +178,61 @@ export function createServer() {
     });
   });
 
+  // Subject offerings
+  app.get("/api/v1/subjects/offerings", (_req, res) => {
+    res.json({
+      offerings: [{
+        id: "offering-1",
+        teacherId: "teacher-1",
+        subjectName: "English",
+        level: "INTERMEDIATE",
+        price: 50000,
+        duration: 60,
+        deliveryType: "ONLINE",
+        description: "Conversational English for intermediate students"
+      }]
+    });
+  });
+
+  // Reviews
+  app.get("/api/v1/reviews", (_req, res) => {
+    res.json({
+      reviews: [{
+        id: "review-1",
+        studentId: "student-1",
+        teacherId: "teacher-1",
+        rating: 5,
+        comment: "Excellent teacher! Very patient and knowledgeable.",
+        createdAt: new Date().toISOString()
+      }],
+      total: 1
+    });
+  });
+
+  app.post("/api/v1/reviews", (req, res) => {
+    res.status(201).json({
+      id: `review-${Date.now()}`,
+      ...req.body,
+      createdAt: new Date().toISOString()
+    });
+  });
+
+  // Messages
+  app.get("/api/v1/messages", (_req, res) => {
+    res.json({
+      messages: [],
+      total: 0
+    });
+  });
+
+  // Notifications
+  app.get("/api/v1/notifications", (_req, res) => {
+    res.json({
+      notifications: [],
+      total: 0,
+      unreadCount: 0
+    });
+  });
+
   return app;
 }
