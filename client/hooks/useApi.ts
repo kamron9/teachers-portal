@@ -264,8 +264,8 @@ export function useReorderSubjectOfferings() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (offerings: { id: string; orderIndex: number }[]) =>
-      apiClient.reorderSubjectOfferings(offerings),
+    mutationFn: (offeringIds: string[]) =>
+      apiClient.reorderSubjectOfferings(offeringIds),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.subjectOfferings });
       queryClient.invalidateQueries({ queryKey: ["teacher"] });
