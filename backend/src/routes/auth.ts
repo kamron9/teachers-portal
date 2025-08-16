@@ -228,15 +228,15 @@ router.post(
             firstName: true,
             lastName: true,
             avatar: true,
-          }
+          },
         },
         teacherProfile: {
           select: {
             firstName: true,
             lastName: true,
             avatar: true,
-          }
-        }
+          },
+        },
       },
     });
 
@@ -397,15 +397,15 @@ router.get("/profile", authMiddleware, async (req, res) => {
           firstName: true,
           lastName: true,
           avatar: true,
-        }
+        },
       },
       teacherProfile: {
         select: {
           firstName: true,
           lastName: true,
           avatar: true,
-        }
-      }
+        },
+      },
     },
   });
 
