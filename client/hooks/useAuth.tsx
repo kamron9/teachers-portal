@@ -129,7 +129,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       toast.success("Chiqish muvaffaqiyatli");
       navigate("/");
     } catch (error) {
-      console.error("Logout failed:", error);
       // Force logout even if API call fails
       setUser(null);
       navigate("/");
