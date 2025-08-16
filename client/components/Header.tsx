@@ -171,7 +171,7 @@ export default function Header() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link to={getDashboardLink()}>
-                        <User className="mr-2 h-4 w-4" />
+                        <UserIcon className="mr-2 h-4 w-4" />
                         <span>Bosh sahifa</span>
                       </Link>
                     </DropdownMenuItem>
