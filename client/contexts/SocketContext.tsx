@@ -42,7 +42,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
 
       newSocket.on('connect', () => {
-        console.log('Socket connected:', newSocket.id);
+        // Socket connected successfully
         setIsConnected(true);
       });
 
