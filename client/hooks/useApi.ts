@@ -190,8 +190,13 @@ export function useSubjects(
     queryFn: () => apiClient.getSubjects(params),
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: (failureCount, error: any) => {
-      if (error?.status === 400) return false;
+      if (error?.status === 400 || error?.status === 501) return false;
       return failureCount < 3;
+    },
+    onError: (error: any) => {
+      if (error?.status !== 501) {
+        console.error("Subjects fetch failed:", error);
+      }
     },
     ...options,
   });
