@@ -22,7 +22,6 @@ import {
   PaginatedResponse,
   ApiError,
 } from "@/lib/api";
-import { toast } from "sonner";
 
 // Query Keys
 export const queryKeys = {
