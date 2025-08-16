@@ -308,7 +308,7 @@ export default function Header() {
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <Button variant="ghost" className="w-full justify-start">
-                        <User className="mr-2 h-4 w-4" />
+                        <UserIcon className="mr-2 h-4 w-4" />
                         Profil
                       </Button>
                     </Link>
