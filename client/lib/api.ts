@@ -334,7 +334,7 @@ class ApiClient {
     };
 
     if (this.tokens?.accessToken) {
-      headers.Authorization = `Bearer ${this.tokens.accessToken}`;
+      headers["Authorization"] = `Bearer ${this.tokens.accessToken}`;
     }
 
     try {

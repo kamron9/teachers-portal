@@ -5,7 +5,6 @@ import {
   UseQueryOptions,
   UseMutationOptions,
 } from "@tanstack/react-query";
-import { toast } from "sonner";
 import {
   apiClient,
   TeacherProfile,
@@ -22,6 +21,7 @@ import {
   PaginatedResponse,
   ApiError,
 } from "@/lib/api";
+import { toast } from "sonner";
 
 // Query Keys
 export const queryKeys = {
@@ -158,20 +158,9 @@ export function useTeacherSearch(
     enabled: true,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: (failureCount, error: any) => {
-      // Don't retry on 400 errors (bad request) or 501 (not implemented)
-      if (error?.status === 400 || error?.status === 501) return false;
+      // Don't retry on 400 errors (bad request)
+      if (error?.status === 400) return false;
       return failureCount < 3;
-    },
-    onError: (error: any) => {
-      if (error?.status !== 501 && import.meta.env.DEV) {
-        console.error("Teacher search failed:", error);
-      }
-      // Show user-friendly error message
-      if (error?.status === 500) {
-        toast.error("Server bilan bog'lanishda xato. Keyinroq urinib ko'ring.");
-      } else if (error?.status === 404) {
-        toast.error("O'qituvchilar topilmadi.");
-      }
     },
     ...options,
   });
@@ -196,17 +185,8 @@ export function useSubjects(
     queryFn: () => apiClient.getSubjects(params),
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: (failureCount, error: any) => {
-      if (error?.status === 400 || error?.status === 501) return false;
+      if (error?.status === 400) return false;
       return failureCount < 3;
-    },
-    onError: (error: any) => {
-      if (error?.status !== 501 && import.meta.env.DEV) {
-        console.error("Subjects fetch failed:", error);
-      }
-      // Show user-friendly error message
-      if (error?.status === 500) {
-        toast.error("Fanlar ro'yxatini yuklashda xato.");
-      }
     },
     ...options,
   });
