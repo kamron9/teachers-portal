@@ -2,27 +2,6 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import {
-  handleAuthMe,
-  handleLogin,
-  handleRegister,
-  handleGetTeacherProfile,
-  handleUpdateTeacherProfile,
-  handleSearchTeachers,
-  handleGetBookings,
-  handleCreateBooking,
-  handleGetAvailability,
-  handleCreateAvailabilityRule,
-  handleUpdateAvailabilityRule,
-  handleDeleteAvailabilityRule,
-  handleGetAvailableSlots,
-  handleGetSubjectOfferings,
-  handleGetReviews,
-  handleCreateReview,
-  handleGetMessages,
-  handleGetNotifications,
-  handleHealthCheck
-} from "./routes/tutoring";
 
 export function createServer() {
   const app = express();
@@ -32,7 +11,7 @@ export function createServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // Basic API routes
+  // Example API routes
   app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "ping";
     res.json({ message: ping });
@@ -40,37 +19,64 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
-  // Health check
-  app.get("/health", handleHealthCheck);
-  app.get("/api/v1/health", handleHealthCheck);
+  // Basic tutoring API routes with mock data
+  app.get("/api/v1/health", (_req, res) => {
+    res.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      version: "1.0.0"
+    });
+  });
 
-  // Auth routes
-  app.get("/api/v1/auth/me", handleAuthMe);
-  app.post("/api/v1/auth/login", handleLogin);
-  app.post("/api/v1/auth/register", handleRegister);
+  app.get("/api/v1/auth/me", (_req, res) => {
+    res.json({
+      user: {
+        id: "user-1",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john.doe@example.com",
+        role: "TEACHER",
+        isVerified: true
+      }
+    });
+  });
 
-  // Teacher routes
-  app.get("/api/v1/teachers", handleSearchTeachers);
+  app.post("/api/v1/auth/login", (_req, res) => {
+    res.json({
+      user: {
+        id: "user-1",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john.doe@example.com",
+        role: "TEACHER",
+        isVerified: true
+      },
+      accessToken: "mock-jwt-token"
+    });
+  });
 
-  // Booking routes
-  app.get("/api/v1/bookings", handleGetBookings);
-  app.post("/api/v1/bookings", handleCreateBooking);
+  app.get("/api/v1/teachers", (_req, res) => {
+    res.json({
+      teachers: [{
+        id: "teacher-1",
+        firstName: "John",
+        lastName: "Doe",
+        bio: "Experienced English teacher",
+        subjects: ["English"],
+        hourlyRate: 50000,
+        rating: 4.8,
+        totalReviews: 156
+      }],
+      total: 1
+    });
+  });
 
-  // Basic availability routes
-  app.post("/api/v1/availability", handleCreateAvailabilityRule);
-
-  // Subject offerings routes
-  app.get("/api/v1/subjects/offerings", handleGetSubjectOfferings);
-
-  // Review routes
-  app.get("/api/v1/reviews", handleGetReviews);
-  app.post("/api/v1/reviews", handleCreateReview);
-
-  // Message routes
-  app.get("/api/v1/messages", handleGetMessages);
-
-  // Notification routes
-  app.get("/api/v1/notifications", handleGetNotifications);
+  app.get("/api/v1/bookings", (_req, res) => {
+    res.json({
+      bookings: [],
+      total: 0
+    });
+  });
 
   // Generic 404 handler for API routes
   app.use("/api/v1/*", (req, res) => {
