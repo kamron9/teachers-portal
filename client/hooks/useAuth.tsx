@@ -46,8 +46,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(currentUser);
       }
     } catch (error) {
-      console.error("Failed to fetch current user:", error);
-      // Clear invalid tokens
+      // Clear invalid tokens on auth error
       await apiClient.logout();
       setUser(null);
     } finally {
