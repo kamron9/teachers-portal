@@ -56,7 +56,7 @@ export const auditMiddleware = (
         }
       } catch (error) {
         logger.error("Failed to create audit log", {
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
           userId: req.user.id,
           path: req.path,
         });
@@ -137,7 +137,7 @@ const createAuditLog = async (
     });
   } catch (error) {
     logger.error("Failed to create audit log entry", {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       auditData,
       userId: req.user!.id,
     });
@@ -244,7 +244,7 @@ export const logAuditEvent = async (
     });
   } catch (error) {
     logger.error("Failed to create manual audit log", {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       userId,
       action,
       resource,
