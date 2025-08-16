@@ -255,7 +255,7 @@ export default function TeacherRegister() {
                       <Input
                         id="contact"
                         type={verificationMethod === 'sms' ? 'tel' : 'email'}
-                        placeholder={verificationMethod === 'sms' ? '+998901234567' : 'your.email@example.com'}
+                        placeholder={verificationMethod === 'sms' ? '+998901234567' : 'sizning.email@example.com'}
                         value={contact}
                         onChange={(e) => setContact(e.target.value)}
                         className="pl-10"
