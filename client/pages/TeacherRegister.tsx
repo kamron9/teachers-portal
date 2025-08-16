@@ -208,7 +208,7 @@ export default function TeacherRegister() {
               {step === 'method' && (
                 <div className="space-y-6">
                   <div className="text-center text-sm text-gray-600 mb-6">
-                    Choose how you'd like to verify your account
+                    Hisobingizni tasdiqlash usulini tanlang
                   </div>
                   
                   <RadioGroup value={verificationMethod} onValueChange={(value: VerificationMethod) => setVerificationMethod(value)}>
