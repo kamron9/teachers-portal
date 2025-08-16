@@ -35,15 +35,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { 
+import {
   useCurrentUser,
   useBookings,
   useStudentProfile,
   useUpdateBookingStatus,
   useCancelBooking,
 } from "@/hooks/useApi";
-import { 
-  formatPrice, 
+import {
+  formatPrice,
   formatTimezone,
   Booking,
   StudentProfile as StudentProfileType,
@@ -57,8 +57,9 @@ export default function StudentDashboard() {
 
   // Fetch current user and profile
   const { data: currentUser, isLoading: userLoading } = useCurrentUser();
-  const { data: studentProfile, isLoading: profileLoading } = useStudentProfile();
-  
+  const { data: studentProfile, isLoading: profileLoading } =
+    useStudentProfile();
+
   // Fetch bookings
   const { data: bookingsData, isLoading: bookingsLoading } = useBookings({
     limit: 10,
@@ -91,7 +92,9 @@ export default function StudentDashboard() {
 
   // Get profile info
   const student = {
-    name: studentProfile ? `${studentProfile.firstName} ${studentProfile.lastName}` : "Student",
+    name: studentProfile
+      ? `${studentProfile.firstName} ${studentProfile.lastName}`
+      : "Student",
     avatar: studentProfile?.avatar || "/placeholder.svg",
     timezone: studentProfile?.timezone || "Asia/Tashkent",
     preferredLanguages: studentProfile?.preferredLanguages || ["uz"],
@@ -101,7 +104,10 @@ export default function StudentDashboard() {
   const stats = {
     totalLessons: completedBookings.length,
     upcomingLessons: upcomingBookings.length,
-    totalSpent: completedBookings.reduce((sum, booking) => sum + (booking.priceAtBooking || 0), 0),
+    totalSpent: completedBookings.reduce(
+      (sum, booking) => sum + (booking.priceAtBooking || 0),
+      0,
+    ),
     averageRating: 4.8, // This would come from your reviews
   };
 
@@ -132,7 +138,7 @@ export default function StudentDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {student.name.split(' ')[0]}!
+            Welcome back, {student.name.split(" ")[0]}!
           </h1>
           <p className="text-gray-600">Continue your learning journey</p>
         </div>
@@ -141,7 +147,10 @@ export default function StudentDashboard() {
             <Search className="h-4 w-4 mr-2" />
             Find Teachers
           </Button>
-          <Button variant="outline" onClick={() => navigate("/student-profile")}>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/student-profile")}
+          >
             <Edit3 className="h-4 w-4 mr-2" />
             Edit Profile
           </Button>
@@ -155,8 +164,12 @@ export default function StudentDashboard() {
             <div className="flex items-center">
               <BookOpen className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Lessons</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalLessons}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Lessons
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.totalLessons}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -168,7 +181,9 @@ export default function StudentDashboard() {
               <Calendar className="h-8 w-8 text-green-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Upcoming</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.upcomingLessons}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.upcomingLessons}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -194,7 +209,9 @@ export default function StudentDashboard() {
               <Star className="h-8 w-8 text-yellow-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Avg. Rating</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.averageRating}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.averageRating}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -206,7 +223,11 @@ export default function StudentDashboard() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Upcoming Lessons</CardTitle>
-            <Button variant="outline" size="sm" onClick={() => setActiveSection("bookings")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setActiveSection("bookings")}
+            >
               View All
             </Button>
           </div>
@@ -243,7 +264,8 @@ export default function StudentDashboard() {
                         alt={`${booking.teacher?.firstName} ${booking.teacher?.lastName}`}
                       />
                       <AvatarFallback>
-                        {booking.teacher?.firstName?.[0]}{booking.teacher?.lastName?.[0]}
+                        {booking.teacher?.firstName?.[0]}
+                        {booking.teacher?.lastName?.[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div>
@@ -260,12 +282,17 @@ export default function StudentDashboard() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge
-                      variant={booking.status === "CONFIRMED" ? "default" : "secondary"}
+                      variant={
+                        booking.status === "CONFIRMED" ? "default" : "secondary"
+                      }
                     >
                       {booking.status.toLowerCase()}
                     </Badge>
                     {booking.status === "CONFIRMED" && (
-                      <Button size="sm" onClick={() => handleJoinLesson(booking)}>
+                      <Button
+                        size="sm"
+                        onClick={() => handleJoinLesson(booking)}
+                      >
                         <Video className="h-4 w-4 mr-1" />
                         Join
                       </Button>
@@ -291,7 +318,11 @@ export default function StudentDashboard() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Recent Lessons</CardTitle>
-            <Button variant="outline" size="sm" onClick={() => setActiveSection("history")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setActiveSection("history")}
+            >
               View All
             </Button>
           </div>
@@ -321,7 +352,8 @@ export default function StudentDashboard() {
                         alt={`${booking.teacher?.firstName} ${booking.teacher?.lastName}`}
                       />
                       <AvatarFallback>
-                        {booking.teacher?.firstName?.[0]}{booking.teacher?.lastName?.[0]}
+                        {booking.teacher?.firstName?.[0]}
+                        {booking.teacher?.lastName?.[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div>
@@ -341,7 +373,9 @@ export default function StudentDashboard() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/review-teacher?bookingId=${booking.id}`)}
+                      onClick={() =>
+                        navigate(`/review-teacher?bookingId=${booking.id}`)
+                      }
                     >
                       Review
                     </Button>
@@ -398,7 +432,8 @@ export default function StudentDashboard() {
                         alt={`${booking.teacher?.firstName} ${booking.teacher?.lastName}`}
                       />
                       <AvatarFallback>
-                        {booking.teacher?.firstName?.[0]}{booking.teacher?.lastName?.[0]}
+                        {booking.teacher?.firstName?.[0]}
+                        {booking.teacher?.lastName?.[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div>
@@ -420,26 +455,31 @@ export default function StudentDashboard() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3">
                     <Badge
                       variant={
-                        booking.status === "CONFIRMED" ? "default" :
-                        booking.status === "PENDING" ? "secondary" :
-                        booking.status === "COMPLETED" ? "outline" : "destructive"
+                        booking.status === "CONFIRMED"
+                          ? "default"
+                          : booking.status === "PENDING"
+                            ? "secondary"
+                            : booking.status === "COMPLETED"
+                              ? "outline"
+                              : "destructive"
                       }
                     >
                       {booking.status.toLowerCase()}
                     </Badge>
-                    
+
                     {booking.status === "CONFIRMED" && (
                       <Button onClick={() => handleJoinLesson(booking)}>
                         <Video className="h-4 w-4 mr-2" />
                         Join Lesson
                       </Button>
                     )}
-                    
-                    {(booking.status === "PENDING" || booking.status === "CONFIRMED") && (
+
+                    {(booking.status === "PENDING" ||
+                      booking.status === "CONFIRMED") && (
                       <Button
                         variant="outline"
                         onClick={() => handleCancelBooking(booking.id)}
@@ -448,11 +488,13 @@ export default function StudentDashboard() {
                         Cancel
                       </Button>
                     )}
-                    
+
                     {booking.status === "COMPLETED" && (
                       <Button
                         variant="outline"
-                        onClick={() => navigate(`/review-teacher?bookingId=${booking.id}`)}
+                        onClick={() =>
+                          navigate(`/review-teacher?bookingId=${booking.id}`)
+                        }
                       >
                         Review
                       </Button>

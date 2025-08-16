@@ -24,7 +24,7 @@ export function createServer() {
     res.json({
       status: "ok",
       timestamp: new Date().toISOString(),
-      version: "1.0.0"
+      version: "1.0.0",
     });
   });
 
@@ -39,8 +39,8 @@ export function createServer() {
         role: "TEACHER",
         isVerified: true,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
+        updatedAt: new Date().toISOString(),
+      },
     });
   });
 
@@ -52,54 +52,58 @@ export function createServer() {
         lastName: "Doe",
         email: "john.doe@example.com",
         role: "TEACHER",
-        isVerified: true
+        isVerified: true,
       },
       accessToken: "mock-jwt-token",
-      refreshToken: "mock-refresh-token"
+      refreshToken: "mock-refresh-token",
     });
   });
 
   // Teacher endpoints
   app.get("/api/v1/teachers", (_req, res) => {
     res.json({
-      teachers: [{
-        id: "teacher-1",
-        userId: "user-1",
-        firstName: "John",
-        lastName: "Doe",
-        bio: "Experienced English teacher with 10+ years of experience",
-        subjects: ["English", "IELTS"],
-        hourlyRate: 50000,
-        timezone: "Asia/Tashkent",
-        rating: 4.8,
-        totalReviews: 156,
-        totalLessons: 890,
-        responseTime: "Usually responds within 1 hour",
-        profileCompletion: 85,
-        verificationStatus: "APPROVED"
-      }],
+      teachers: [
+        {
+          id: "teacher-1",
+          userId: "user-1",
+          firstName: "John",
+          lastName: "Doe",
+          bio: "Experienced English teacher with 10+ years of experience",
+          subjects: ["English", "IELTS"],
+          hourlyRate: 50000,
+          timezone: "Asia/Tashkent",
+          rating: 4.8,
+          totalReviews: 156,
+          totalLessons: 890,
+          responseTime: "Usually responds within 1 hour",
+          profileCompletion: 85,
+          verificationStatus: "APPROVED",
+        },
+      ],
       total: 1,
       page: 1,
       limit: 10,
-      pages: 1
+      pages: 1,
     });
   });
 
   // Booking endpoints
   app.get("/api/v1/bookings", (_req, res) => {
     res.json({
-      bookings: [{
-        id: "booking-1",
-        studentId: "student-1",
-        teacherId: "teacher-1",
-        status: "CONFIRMED",
-        startAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        endAt: new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString(),
-        subject: "English Conversation",
-        price: 50000,
-        createdAt: new Date().toISOString()
-      }],
-      total: 1
+      bookings: [
+        {
+          id: "booking-1",
+          studentId: "student-1",
+          teacherId: "teacher-1",
+          status: "CONFIRMED",
+          startAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          endAt: new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString(),
+          subject: "English Conversation",
+          price: 50000,
+          createdAt: new Date().toISOString(),
+        },
+      ],
+      total: 1,
     });
   });
 
@@ -108,7 +112,7 @@ export function createServer() {
       id: `booking-${Date.now()}`,
       status: "PENDING",
       createdAt: new Date().toISOString(),
-      message: "Booking created successfully"
+      message: "Booking created successfully",
     });
   });
 
@@ -117,34 +121,39 @@ export function createServer() {
     res.status(201).json({
       id: `rule-${Date.now()}`,
       ...req.body,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     });
   });
 
   // Mock availability data for specific teacher
   app.get("/api/v1/availability/user-1", (_req, res) => {
     res.json({
-      rules: [{
-        id: "rule-1",
-        type: "recurring",
-        weekday: 1,
-        startTime: "09:00",
-        endTime: "17:00",
-        isOpen: true
-      }, {
-        id: "rule-2",
-        type: "recurring",
-        weekday: 2,
-        startTime: "09:00",
-        endTime: "17:00",
-        isOpen: true
-      }],
-      bookings: [{
-        startAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        endAt: new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString(),
-        status: "CONFIRMED"
-      }],
-      timezone: "Asia/Tashkent"
+      rules: [
+        {
+          id: "rule-1",
+          type: "recurring",
+          weekday: 1,
+          startTime: "09:00",
+          endTime: "17:00",
+          isOpen: true,
+        },
+        {
+          id: "rule-2",
+          type: "recurring",
+          weekday: 2,
+          startTime: "09:00",
+          endTime: "17:00",
+          isOpen: true,
+        },
+      ],
+      bookings: [
+        {
+          startAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          endAt: new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString(),
+          status: "CONFIRMED",
+        },
+      ],
+      timezone: "Asia/Tashkent",
     });
   });
 
@@ -165,7 +174,7 @@ export function createServer() {
           startAt: startAt.toISOString(),
           endAt: endAt.toISOString(),
           duration: 60,
-          available: true
+          available: true,
         });
       }
     }
@@ -174,38 +183,42 @@ export function createServer() {
       slots: slots.slice(0, 20),
       timezone: "Asia/Tashkent",
       duration: 60,
-      teacher: { id: "user-1" }
+      teacher: { id: "user-1" },
     });
   });
 
   // Subject offerings
   app.get("/api/v1/subjects/offerings", (_req, res) => {
     res.json({
-      offerings: [{
-        id: "offering-1",
-        teacherId: "teacher-1",
-        subjectName: "English",
-        level: "INTERMEDIATE",
-        price: 50000,
-        duration: 60,
-        deliveryType: "ONLINE",
-        description: "Conversational English for intermediate students"
-      }]
+      offerings: [
+        {
+          id: "offering-1",
+          teacherId: "teacher-1",
+          subjectName: "English",
+          level: "INTERMEDIATE",
+          price: 50000,
+          duration: 60,
+          deliveryType: "ONLINE",
+          description: "Conversational English for intermediate students",
+        },
+      ],
     });
   });
 
   // Reviews
   app.get("/api/v1/reviews", (_req, res) => {
     res.json({
-      reviews: [{
-        id: "review-1",
-        studentId: "student-1",
-        teacherId: "teacher-1",
-        rating: 5,
-        comment: "Excellent teacher! Very patient and knowledgeable.",
-        createdAt: new Date().toISOString()
-      }],
-      total: 1
+      reviews: [
+        {
+          id: "review-1",
+          studentId: "student-1",
+          teacherId: "teacher-1",
+          rating: 5,
+          comment: "Excellent teacher! Very patient and knowledgeable.",
+          createdAt: new Date().toISOString(),
+        },
+      ],
+      total: 1,
     });
   });
 
@@ -213,7 +226,7 @@ export function createServer() {
     res.status(201).json({
       id: `review-${Date.now()}`,
       ...req.body,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     });
   });
 
@@ -221,7 +234,7 @@ export function createServer() {
   app.get("/api/v1/messages", (_req, res) => {
     res.json({
       messages: [],
-      total: 0
+      total: 0,
     });
   });
 
@@ -230,7 +243,7 @@ export function createServer() {
     res.json({
       notifications: [],
       total: 0,
-      unreadCount: 0
+      unreadCount: 0,
     });
   });
 

@@ -2,7 +2,7 @@ import React from "react";
 
 export default function App() {
   console.log("App component rendering");
-  
+
   return (
     <div style={{ padding: "20px", backgroundColor: "#f0f8ff" }}>
       <h1 style={{ color: "#333" }}>🎓 Tutoring Marketplace</h1>
