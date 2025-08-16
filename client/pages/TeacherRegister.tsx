@@ -219,11 +219,11 @@ export default function TeacherRegister() {
                           <div className="flex items-center gap-3">
                             <Phone className="h-5 w-5 text-primary" />
                             <div>
-                              <div className="font-medium">SMS Verification</div>
-                              <div className="text-sm text-gray-600">Verify using your phone number</div>
+                              <div className="font-medium">SMS tasdiqlash</div>
+                              <div className="text-sm text-gray-600">Telefon raqamingiz orqali tasdiqlang</div>
                             </div>
                           </div>
-                          <Badge variant="secondary">Recommended</Badge>
+                          <Badge variant="secondary">Tavsiya etiladi</Badge>
                         </label>
                       </div>
                       
@@ -233,8 +233,8 @@ export default function TeacherRegister() {
                           <div className="flex items-center gap-3">
                             <Mail className="h-5 w-5 text-primary" />
                             <div>
-                              <div className="font-medium">Email Verification</div>
-                              <div className="text-sm text-gray-600">Verify using your email address</div>
+                              <div className="font-medium">Email tasdiqlash</div>
+                              <div className="text-sm text-gray-600">Email manzilingiz orqali tasdiqlang</div>
                             </div>
                           </div>
                         </label>
@@ -244,7 +244,7 @@ export default function TeacherRegister() {
 
                   <div className="space-y-2">
                     <Label htmlFor="contact">
-                      {verificationMethod === 'sms' ? 'Phone Number' : 'Email Address'}
+                      {verificationMethod === 'sms' ? 'Telefon raqami' : 'Email manzili'}
                     </Label>
                     <div className="relative">
                       {verificationMethod === 'sms' ? (
@@ -285,7 +285,7 @@ export default function TeacherRegister() {
               {step === 'verify' && (
                 <div className="space-y-4">
                   <div className="text-center text-sm text-gray-600 mb-4">
-                    Enter the 6-digit code sent to<br />
+                    Quyidagi manzilga yuborilgan 6 xonali kodni kiriting:<br />
                     <span className="font-medium">{contact}</span>
                   </div>
 
@@ -314,7 +314,7 @@ export default function TeacherRegister() {
                         </p>
                       ) : (
                         <Button variant="link" onClick={handleSendVerification} disabled={isLoading}>
-                          Resend verification code
+                          Tasdiqlash kodini qayta yuborish
                         </Button>
                       )}
                     </div>
