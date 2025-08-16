@@ -364,7 +364,7 @@ export default function Login() {
                 <div className="flex gap-2">
                   <Link to="/student-register" className="flex-1">
                     <Button variant="outline" size="sm" className="w-full">
-                      <User className="h-4 w-4 mr-2" />
+                      <UserIcon className="h-4 w-4 mr-2" />
                       Sign up as Student
                     </Button>
                   </Link>
