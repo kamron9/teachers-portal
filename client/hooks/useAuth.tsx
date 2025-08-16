@@ -81,7 +81,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
           navigate("/");
       }
     } catch (error: any) {
-      console.error("Login failed:", error);
       toast.error(error.message || "Kirish xatosi");
       throw error;
     } finally {
