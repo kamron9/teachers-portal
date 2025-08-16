@@ -82,6 +82,9 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Setup Swagger documentation
+setupSwagger(app);
+
 // API routes
 const apiVersion = `/api/${config.apiVersion}`;
 
