@@ -137,6 +137,28 @@ export default function TeacherDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Fetch real data
+  const { data: teacherProfile, isLoading: profileLoading } = useTeacherProfile();
+  const { data: bookingsData, isLoading: bookingsLoading } = useBookings({
+    limit: 10,
+    sortBy: "startAt",
+    sortOrder: "asc",
+  });
+  const { data: upcomingBookingsData } = useBookings({
+    status: ["PENDING", "CONFIRMED"],
+    limit: 5,
+    sortBy: "startAt",
+    sortOrder: "asc",
+  });
+
+  // Booking mutations
+  const updateBookingMutation = useUpdateBookingStatus();
+  const cancelBookingMutation = useCancelBooking();
+
+  // Extract data
+  const bookings = bookingsData?.data || [];
+  const upcomingBookings = upcomingBookingsData?.data || [];
+
   // Profile management state - moved to top level to follow Rules of Hooks
   const [isEditing, setIsEditing] = useState(false);
 
