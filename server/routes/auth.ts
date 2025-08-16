@@ -19,11 +19,11 @@ const mockUsers = [
       lastName: "Karimov",
       avatar: null,
       timezone: "Asia/Tashkent",
-      preferredLanguages: ["uz", "ru"]
-    }
+      preferredLanguages: ["uz", "ru"],
+    },
   },
   {
-    id: "2", 
+    id: "2",
     email: "teacher@test.com",
     password: "password123",
     role: "TEACHER",
@@ -34,7 +34,7 @@ const mockUsers = [
     updatedAt: new Date().toISOString(),
     profile: {
       id: "2",
-      userId: "2", 
+      userId: "2",
       firstName: "Madina",
       lastName: "Abdullayeva",
       avatar: null,
@@ -50,12 +50,12 @@ const mockUsers = [
       rating: 4.9,
       totalReviews: 45,
       totalLessons: 289,
-      totalEarnings: 12000000
-    }
+      totalEarnings: 12000000,
+    },
   },
   {
     id: "3",
-    email: "admin@test.com", 
+    email: "admin@test.com",
     password: "admin123",
     role: "ADMIN",
     emailVerified: true,
@@ -70,9 +70,9 @@ const mockUsers = [
       lastName: "User",
       avatar: null,
       timezone: "Asia/Tashkent",
-      preferredLanguages: ["uz", "ru", "en"]
-    }
-  }
+      preferredLanguages: ["uz", "ru", "en"],
+    },
+  },
 ];
 
 // Generate mock JWT token
@@ -91,26 +91,28 @@ export const handleLogin: RequestHandler = (req, res) => {
         message: "Email va parol majburiy",
         fields: {
           email: !email ? ["Email majburiy"] : [],
-          password: !password ? ["Parol majburiy"] : []
-        }
+          password: !password ? ["Parol majburiy"] : [],
+        },
       });
     }
 
     // Find user
-    const user = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
+    const user = mockUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase(),
+    );
+
     if (!user) {
       return res.status(401).json({
         error: "InvalidCredentials",
-        message: "Email yoki parol noto'g'ri"
+        message: "Email yoki parol noto'g'ri",
       });
     }
 
     // Check password (in real app, compare hashed passwords)
     if (user.password !== password) {
       return res.status(401).json({
-        error: "InvalidCredentials", 
-        message: "Email yoki parol noto'g'ri"
+        error: "InvalidCredentials",
+        message: "Email yoki parol noto'g'ri",
       });
     }
 
@@ -118,7 +120,7 @@ export const handleLogin: RequestHandler = (req, res) => {
     if (user.status !== "ACTIVE") {
       return res.status(401).json({
         error: "AccountInactive",
-        message: "Hisob faol emas"
+        message: "Hisob faol emas",
       });
     }
 
@@ -135,14 +137,13 @@ export const handleLogin: RequestHandler = (req, res) => {
       accessToken,
       refreshToken,
       expiresIn,
-      message: "Muvaffaqiyatli kirildi"
+      message: "Muvaffaqiyatli kirildi",
     });
-
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({
       error: "InternalServerError",
-      message: "Server xatosi yuz berdi"
+      message: "Server xatosi yuz berdi",
     });
   }
 };
@@ -161,17 +162,19 @@ export const handleRegister: RequestHandler = (req, res) => {
           password: !password ? ["Parol majburiy"] : [],
           role: !role ? ["Rol majburiy"] : [],
           firstName: !firstName ? ["Ism majburiy"] : [],
-          lastName: !lastName ? ["Familiya majburiy"] : []
-        }
+          lastName: !lastName ? ["Familiya majburiy"] : [],
+        },
       });
     }
 
     // Check if user already exists
-    const existingUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const existingUser = mockUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase(),
+    );
     if (existingUser) {
       return res.status(409).json({
         error: "UserExists",
-        message: "Bu email bilan foydalanuvchi mavjud"
+        message: "Bu email bilan foydalanuvchi mavjud",
       });
     }
 
@@ -193,8 +196,8 @@ export const handleRegister: RequestHandler = (req, res) => {
         lastName,
         avatar: null,
         timezone: "Asia/Tashkent",
-        preferredLanguages: ["uz"]
-      }
+        preferredLanguages: ["uz"],
+      },
     };
 
     // Add to mock database
@@ -213,14 +216,13 @@ export const handleRegister: RequestHandler = (req, res) => {
       accessToken,
       refreshToken,
       expiresIn,
-      message: "Ro'yxatdan o'tish muvaffaqiyatli"
+      message: "Ro'yxatdan o'tish muvaffaqiyatli",
     });
-
   } catch (error) {
     console.error("Register error:", error);
     res.status(500).json({
       error: "InternalServerError",
-      message: "Server xatosi yuz berdi"
+      message: "Server xatosi yuz berdi",
     });
   }
 };
@@ -228,45 +230,45 @@ export const handleRegister: RequestHandler = (req, res) => {
 export const handleGetCurrentUser: RequestHandler = (req, res) => {
   // In real app, decode JWT token from Authorization header
   const authHeader = req.headers.authorization;
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
       error: "Unauthorized",
-      message: "Autentifikatsiya talab qilinadi"
+      message: "Autentifikatsiya talab qilinadi",
     });
   }
 
   // Mock: extract user ID from token (in real app, verify JWT)
-  const token = authHeader.split(' ')[1];
+  const token = authHeader.split(" ")[1];
   const userIdMatch = token.match(/mock_jwt_token_(\d+)_/);
-  
+
   if (!userIdMatch) {
     return res.status(401).json({
-      error: "InvalidToken", 
-      message: "Yaroqsiz token"
+      error: "InvalidToken",
+      message: "Yaroqsiz token",
     });
   }
 
   const userId = userIdMatch[1];
-  const user = mockUsers.find(u => u.id === userId);
+  const user = mockUsers.find((u) => u.id === userId);
 
   if (!user) {
     return res.status(401).json({
       error: "UserNotFound",
-      message: "Foydalanuvchi topilmadi"
+      message: "Foydalanuvchi topilmadi",
     });
   }
 
   // Remove password from response
   const { password: _, ...userWithoutPassword } = user;
-  
+
   res.json(userWithoutPassword);
 };
 
 export const handleLogout: RequestHandler = (req, res) => {
   // In real app, blacklist the token or remove from session
   res.json({
-    message: "Muvaffaqiyatli chiqildi"
+    message: "Muvaffaqiyatli chiqildi",
   });
 };
 
@@ -276,27 +278,27 @@ export const handleRefreshToken: RequestHandler = (req, res) => {
   if (!refreshToken) {
     return res.status(400).json({
       error: "ValidationError",
-      message: "Refresh token majburiy"
+      message: "Refresh token majburiy",
     });
   }
 
   // Mock: extract user ID from refresh token
   const userIdMatch = refreshToken.match(/refresh_mock_jwt_token_(\d+)_/);
-  
+
   if (!userIdMatch) {
     return res.status(401).json({
       error: "InvalidToken",
-      message: "Yaroqsiz refresh token"
+      message: "Yaroqsiz refresh token",
     });
   }
 
   const userId = userIdMatch[1];
-  const user = mockUsers.find(u => u.id === userId);
+  const user = mockUsers.find((u) => u.id === userId);
 
   if (!user) {
     return res.status(401).json({
-      error: "UserNotFound", 
-      message: "Foydalanuvchi topilmadi"
+      error: "UserNotFound",
+      message: "Foydalanuvchi topilmadi",
     });
   }
 
@@ -308,6 +310,6 @@ export const handleRefreshToken: RequestHandler = (req, res) => {
   res.json({
     accessToken,
     refreshToken: newRefreshToken,
-    expiresIn
+    expiresIn,
   });
 };

@@ -1,8 +1,17 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  User, Phone, Mail, MapPin, Calendar, ArrowLeft,
-  CheckCircle, AlertCircle, Eye, EyeOff, Smartphone
+  User,
+  Phone,
+  Mail,
+  MapPin,
+  Calendar,
+  ArrowLeft,
+  CheckCircle,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Smartphone,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -36,53 +45,65 @@ export default function StudentRegister() {
     learningGoals: "",
     preferredSubjects: [] as string[],
     experience: "beginner",
-    agreeToTerms: false
+    agreeToTerms: false,
   });
 
   const registrationSteps: RegistrationStep[] = [
     {
       id: 1,
       title: "Basic Information",
-      description: "Tell us about yourself"
+      description: "Tell us about yourself",
     },
     {
       id: 2,
       title: "Contact Details",
-      description: "How can we reach you?"
+      description: "How can we reach you?",
     },
     {
       id: 3,
       title: "SMS Verification",
-      description: "Verify your phone number"
+      description: "Verify your phone number",
     },
     {
       id: 4,
       title: "Learning Profile",
-      description: "What do you want to learn?"
+      description: "What do you want to learn?",
     },
     {
       id: 5,
       title: "Complete",
-      description: "Welcome to TutorUZ!"
-    }
+      description: "Welcome to TutorUZ!",
+    },
   ];
 
   const subjects = [
-    "English", "Mathematics", "Physics", "Chemistry", "Biology",
-    "IELTS", "TOEFL", "Business English", "Programming", "History",
-    "Geography", "Literature", "Music", "Art", "Economics"
+    "English",
+    "Mathematics",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "IELTS",
+    "TOEFL",
+    "Business English",
+    "Programming",
+    "History",
+    "Geography",
+    "Literature",
+    "Music",
+    "Art",
+    "Economics",
   ];
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubjectToggle = (subject: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       preferredSubjects: prev.preferredSubjects.includes(subject)
-        ? prev.preferredSubjects.filter(s => s !== subject)
-        : [...prev.preferredSubjects, subject]
+        ? prev.preferredSubjects.filter((s) => s !== subject)
+        : [...prev.preferredSubjects, subject],
     }));
   };
 
@@ -94,7 +115,7 @@ export default function StudentRegister() {
       setIsVerifying(false);
       // Start countdown timer
       const timer = setInterval(() => {
-        setResendTimer(prev => {
+        setResendTimer((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
             return 60;
@@ -106,7 +127,8 @@ export default function StudentRegister() {
   };
 
   const verifyOTP = async () => {
-    if (otpCode === "123456") { // Demo OTP
+    if (otpCode === "123456") {
+      // Demo OTP
       setCurrentStep(4);
     } else {
       toast.error("Noto'g'ri kod. Demo uchun 123456 ishlatilng.");
@@ -115,11 +137,14 @@ export default function StudentRegister() {
 
   const completeRegistration = () => {
     // Save user data to localStorage for demo
-    localStorage.setItem("userAuth", JSON.stringify({
-      type: "student",
-      user: formData,
-      token: "demo-token"
-    }));
+    localStorage.setItem(
+      "userAuth",
+      JSON.stringify({
+        type: "student",
+        user: formData,
+        token: "demo-token",
+      }),
+    );
     setCurrentStep(5);
     setTimeout(() => {
       navigate("/student-dashboard");
@@ -129,14 +154,18 @@ export default function StudentRegister() {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Basic Information</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Basic Information
+        </h2>
         <p className="text-gray-600">Let's start with your basic details</p>
       </div>
 
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">First Name *</label>
+            <label className="text-sm font-medium text-gray-700">
+              First Name *
+            </label>
             <input
               type="text"
               value={formData.firstName}
@@ -147,7 +176,9 @@ export default function StudentRegister() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Last Name *</label>
+            <label className="text-sm font-medium text-gray-700">
+              Last Name *
+            </label>
             <input
               type="text"
               value={formData.lastName}
@@ -160,7 +191,9 @@ export default function StudentRegister() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Date of Birth *</label>
+          <label className="text-sm font-medium text-gray-700">
+            Date of Birth *
+          </label>
           <input
             type="date"
             value={formData.dateOfBirth}
@@ -171,7 +204,9 @@ export default function StudentRegister() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Location *</label>
+          <label className="text-sm font-medium text-gray-700">
+            Location *
+          </label>
           <div className="relative">
             <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <select
@@ -194,10 +229,15 @@ export default function StudentRegister() {
         </div>
       </div>
 
-      <Button 
+      <Button
         onClick={() => setCurrentStep(2)}
         className="w-full"
-        disabled={!formData.firstName || !formData.lastName || !formData.dateOfBirth || !formData.location}
+        disabled={
+          !formData.firstName ||
+          !formData.lastName ||
+          !formData.dateOfBirth ||
+          !formData.location
+        }
       >
         Continue
       </Button>
@@ -207,13 +247,17 @@ export default function StudentRegister() {
   const renderStep2 = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Contact Details</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Contact Details
+        </h2>
         <p className="text-gray-600">How can teachers and support reach you?</p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Email Address *</label>
+          <label className="text-sm font-medium text-gray-700">
+            Email Address *
+          </label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
@@ -228,7 +272,9 @@ export default function StudentRegister() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Phone Number *</label>
+          <label className="text-sm font-medium text-gray-700">
+            Phone Number *
+          </label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
@@ -240,11 +286,15 @@ export default function StudentRegister() {
               required
             />
           </div>
-          <p className="text-xs text-gray-500">We'll send an SMS verification code to this number</p>
+          <p className="text-xs text-gray-500">
+            We'll send an SMS verification code to this number
+          </p>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Password *</label>
+          <label className="text-sm font-medium text-gray-700">
+            Password *
+          </label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -259,24 +309,33 @@ export default function StudentRegister() {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2"
             >
-              {showPassword ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
+              {showPassword ? (
+                <EyeOff className="h-4 w-4 text-gray-400" />
+              ) : (
+                <Eye className="h-4 w-4 text-gray-400" />
+              )}
             </button>
           </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Confirm Password *</label>
+          <label className="text-sm font-medium text-gray-700">
+            Confirm Password *
+          </label>
           <input
             type="password"
             value={formData.confirmPassword}
-            onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("confirmPassword", e.target.value)
+            }
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
             placeholder="Confirm your password"
             required
           />
-          {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-            <p className="text-xs text-red-500">Passwords do not match</p>
-          )}
+          {formData.confirmPassword &&
+            formData.password !== formData.confirmPassword && (
+              <p className="text-xs text-red-500">Passwords do not match</p>
+            )}
         </div>
 
         <div className="flex items-start space-x-2">
@@ -284,25 +343,43 @@ export default function StudentRegister() {
             type="checkbox"
             id="terms"
             checked={formData.agreeToTerms}
-            onChange={(e) => handleInputChange("agreeToTerms", e.target.checked)}
+            onChange={(e) =>
+              handleInputChange("agreeToTerms", e.target.checked)
+            }
             className="mt-1"
           />
           <label htmlFor="terms" className="text-sm text-gray-600">
-            I agree to the <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link> and{" "}
-            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+            I agree to the{" "}
+            <Link to="/terms" className="text-primary hover:underline">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link to="/privacy" className="text-primary hover:underline">
+              Privacy Policy
+            </Link>
           </label>
         </div>
       </div>
 
       <div className="flex gap-3">
-        <Button variant="outline" onClick={() => setCurrentStep(1)} className="flex-1">
+        <Button
+          variant="outline"
+          onClick={() => setCurrentStep(1)}
+          className="flex-1"
+        >
           Back
         </Button>
-        <Button 
+        <Button
           onClick={sendOTP}
           className="flex-1"
-          disabled={isVerifying || !formData.email || !formData.phone || !formData.password || 
-                   formData.password !== formData.confirmPassword || !formData.agreeToTerms}
+          disabled={
+            isVerifying ||
+            !formData.email ||
+            !formData.phone ||
+            !formData.password ||
+            formData.password !== formData.confirmPassword ||
+            !formData.agreeToTerms
+          }
         >
           {isVerifying ? "Sending OTP..." : "Send Verification Code"}
         </Button>
@@ -316,16 +393,21 @@ export default function StudentRegister() {
         <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
           <Smartphone className="h-8 w-8 text-primary" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">SMS Verification</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          SMS Verification
+        </h2>
         <p className="text-gray-600">
-          We've sent a 6-digit verification code to<br />
+          We've sent a 6-digit verification code to
+          <br />
           <span className="font-medium">{formData.phone}</span>
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Enter Verification Code</label>
+          <label className="text-sm font-medium text-gray-700">
+            Enter Verification Code
+          </label>
           <input
             type="text"
             value={otpCode}
@@ -335,7 +417,10 @@ export default function StudentRegister() {
             maxLength={6}
           />
           <p className="text-xs text-gray-500 text-center">
-            For demo purposes, use code: <span className="font-mono bg-gray-100 px-2 py-1 rounded">123456</span>
+            For demo purposes, use code:{" "}
+            <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+              123456
+            </span>
           </p>
         </div>
 
@@ -345,7 +430,7 @@ export default function StudentRegister() {
             {resendTimer > 0 ? (
               <span className="text-gray-500">Resend in {resendTimer}s</span>
             ) : (
-              <button 
+              <button
                 onClick={sendOTP}
                 className="text-primary hover:underline"
               >
@@ -357,10 +442,14 @@ export default function StudentRegister() {
       </div>
 
       <div className="flex gap-3">
-        <Button variant="outline" onClick={() => setCurrentStep(2)} className="flex-1">
+        <Button
+          variant="outline"
+          onClick={() => setCurrentStep(2)}
+          className="flex-1"
+        >
           Back
         </Button>
-        <Button 
+        <Button
           onClick={verifyOTP}
           className="flex-1"
           disabled={otpCode.length !== 6}
@@ -374,13 +463,19 @@ export default function StudentRegister() {
   const renderStep4 = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Learning Profile</h2>
-        <p className="text-gray-600">Help us personalize your learning experience</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Learning Profile
+        </h2>
+        <p className="text-gray-600">
+          Help us personalize your learning experience
+        </p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Learning Goals</label>
+          <label className="text-sm font-medium text-gray-700">
+            Learning Goals
+          </label>
           <textarea
             value={formData.learningGoals}
             onChange={(e) => handleInputChange("learningGoals", e.target.value)}
@@ -391,7 +486,9 @@ export default function StudentRegister() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Current Experience Level</label>
+          <label className="text-sm font-medium text-gray-700">
+            Current Experience Level
+          </label>
           <select
             value={formData.experience}
             onChange={(e) => handleInputChange("experience", e.target.value)}
@@ -406,12 +503,18 @@ export default function StudentRegister() {
         </div>
 
         <div className="space-y-3">
-          <label className="text-sm font-medium text-gray-700">Subjects You're Interested In</label>
+          <label className="text-sm font-medium text-gray-700">
+            Subjects You're Interested In
+          </label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {subjects.map((subject) => (
               <Badge
                 key={subject}
-                variant={formData.preferredSubjects.includes(subject) ? "default" : "outline"}
+                variant={
+                  formData.preferredSubjects.includes(subject)
+                    ? "default"
+                    : "outline"
+                }
                 className="cursor-pointer py-2 px-3 justify-center"
                 onClick={() => handleSubjectToggle(subject)}
               >
@@ -419,18 +522,21 @@ export default function StudentRegister() {
               </Badge>
             ))}
           </div>
-          <p className="text-xs text-gray-500">Select all subjects that interest you</p>
+          <p className="text-xs text-gray-500">
+            Select all subjects that interest you
+          </p>
         </div>
       </div>
 
       <div className="flex gap-3">
-        <Button variant="outline" onClick={() => setCurrentStep(3)} className="flex-1">
-          Back
-        </Button>
-        <Button 
-          onClick={completeRegistration}
+        <Button
+          variant="outline"
+          onClick={() => setCurrentStep(3)}
           className="flex-1"
         >
+          Back
+        </Button>
+        <Button onClick={completeRegistration} className="flex-1">
           Complete Registration
         </Button>
       </div>
@@ -442,11 +548,14 @@ export default function StudentRegister() {
       <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
         <CheckCircle className="h-12 w-12 text-green-600" />
       </div>
-      
+
       <div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to TutorUZ!</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          Welcome to TutorUZ!
+        </h2>
         <p className="text-gray-600 text-lg">
-          Your account has been created successfully.<br />
+          Your account has been created successfully.
+          <br />
           You'll be redirected to your dashboard shortly.
         </p>
       </div>
@@ -472,14 +581,21 @@ export default function StudentRegister() {
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center text-primary hover:text-primary/80 mb-6">
+          <Link
+            to="/"
+            className="inline-flex items-center text-primary hover:text-primary/80 mb-6"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
           </Link>
-          
+
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Student Account</h1>
-            <p className="text-gray-600">Join thousands of students learning with expert teachers</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Create Student Account
+            </h1>
+            <p className="text-gray-600">
+              Join thousands of students learning with expert teachers
+            </p>
           </div>
 
           {/* Progress Bar */}
@@ -490,8 +606,8 @@ export default function StudentRegister() {
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                       currentStep >= step.id
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-200 text-gray-500'
+                        ? "bg-primary text-white"
+                        : "bg-gray-200 text-gray-500"
                     }`}
                   >
                     {currentStep > step.id ? (
@@ -526,7 +642,10 @@ export default function StudentRegister() {
         <div className="text-center mt-6">
           <p className="text-gray-600">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary hover:underline font-medium">
+            <Link
+              to="/login"
+              className="text-primary hover:underline font-medium"
+            >
               Sign in here
             </Link>
           </p>

@@ -357,13 +357,21 @@ class ApiClient {
 
       // Only log errors in development
       if (import.meta.env.DEV) {
-        console.error(`[API] Error for ${url}:`, JSON.stringify(errorData, null, 2));
+        console.error(
+          `[API] Error for ${url}:`,
+          JSON.stringify(errorData, null, 2),
+        );
       }
       throw errorData;
     } catch (error) {
       // Only log errors in development
       if (import.meta.env.DEV) {
-        console.error(`[API] Fetch error for ${url}:`, error instanceof Error ? error.message : JSON.stringify(error, null, 2));
+        console.error(
+          `[API] Fetch error for ${url}:`,
+          error instanceof Error
+            ? error.message
+            : JSON.stringify(error, null, 2),
+        );
       }
       throw error;
     }
@@ -1029,8 +1037,16 @@ class ApiClient {
   }
 
   // Wallet methods
-  async getWalletBalance(): Promise<{ availableBalance: number; pendingBalance: number; totalEarnings: number }> {
-    return this.request<{ availableBalance: number; pendingBalance: number; totalEarnings: number }>("/wallet/balance");
+  async getWalletBalance(): Promise<{
+    availableBalance: number;
+    pendingBalance: number;
+    totalEarnings: number;
+  }> {
+    return this.request<{
+      availableBalance: number;
+      pendingBalance: number;
+      totalEarnings: number;
+    }>("/wallet/balance");
   }
 
   async getWalletEntries(params?: {
@@ -1048,7 +1064,9 @@ class ApiClient {
         }
       });
     }
-    return this.request<PaginatedResponse<any>>(`/wallet/entries?${searchParams}`);
+    return this.request<PaginatedResponse<any>>(
+      `/wallet/entries?${searchParams}`,
+    );
   }
 
   async requestPayout(data: {
@@ -1057,10 +1075,13 @@ class ApiClient {
     accountRef: string;
     note?: string;
   }): Promise<{ message: string; payoutId: string }> {
-    return this.request<{ message: string; payoutId: string }>("/wallet/payout", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    return this.request<{ message: string; payoutId: string }>(
+      "/wallet/payout",
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+    );
   }
 
   // Get auth state

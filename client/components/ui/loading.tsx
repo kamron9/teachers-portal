@@ -8,22 +8,22 @@ interface LoadingProps {
   text?: string;
 }
 
-export function Loading({ 
-  size = "md", 
-  variant = "spinner", 
+export function Loading({
+  size = "md",
+  variant = "spinner",
   className,
-  text 
+  text,
 }: LoadingProps) {
   const sizeClasses = {
     sm: "h-4 w-4",
-    md: "h-8 w-8", 
-    lg: "h-12 w-12"
+    md: "h-8 w-8",
+    lg: "h-12 w-12",
   };
 
   const textSizeClasses = {
     sm: "text-sm",
     md: "text-base",
-    lg: "text-lg"
+    lg: "text-lg",
   };
 
   if (variant === "spinner") {
@@ -33,7 +33,7 @@ export function Loading({
           <div
             className={cn(
               "animate-spin rounded-full border-2 border-muted border-t-primary",
-              sizeClasses[size]
+              sizeClasses[size],
             )}
           />
           {text && (
@@ -56,11 +56,15 @@ export function Loading({
                 key={i}
                 className={cn(
                   "bg-primary rounded-full animate-pulse",
-                  size === "sm" ? "h-2 w-2" : size === "md" ? "h-3 w-3" : "h-4 w-4"
+                  size === "sm"
+                    ? "h-2 w-2"
+                    : size === "md"
+                      ? "h-3 w-3"
+                      : "h-4 w-4",
                 )}
                 style={{
                   animationDelay: `${i * 0.2}s`,
-                  animationDuration: "1s"
+                  animationDuration: "1s",
                 }}
               />
             ))}
@@ -82,7 +86,7 @@ export function Loading({
           <div
             className={cn(
               "bg-primary rounded-full animate-pulse",
-              sizeClasses[size]
+              sizeClasses[size],
             )}
           />
           {text && (

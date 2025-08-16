@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { MessageThreadList } from '@/components/messaging/MessageThreadList';
-import { ChatWindow } from '@/components/messaging/ChatWindow';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { MessageThreadList } from "@/components/messaging/MessageThreadList";
+import { ChatWindow } from "@/components/messaging/ChatWindow";
 import { Button } from "@/components/ui/button";
-import { 
-  ArrowLeft, 
-  MessageCircle, 
+import {
+  ArrowLeft,
+  MessageCircle,
   Users,
   Phone,
   Video,
   UserPlus,
-  Search
+  Search,
 } from "lucide-react";
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 interface ChatUser {
@@ -22,16 +22,16 @@ interface ChatUser {
   avatar?: string;
   isOnline?: boolean;
   lastSeen?: string;
-  role: 'student' | 'teacher';
+  role: "student" | "teacher";
 }
 
 export default function Messages() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
-  
+
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(
-    searchParams.get('thread') || null
+    searchParams.get("thread") || null,
   );
   const [isMobileView, setIsMobileView] = useState(false);
   const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null);
@@ -43,8 +43,8 @@ export default function Messages() {
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    return () => window.removeEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   // Update URL when thread selection changes
@@ -62,12 +62,12 @@ export default function Messages() {
     if (selectedThreadId) {
       // Mock user data - in real app, get from thread data
       setSelectedUser({
-        id: '2',
-        firstName: 'Aziza',
-        lastName: 'Karimova',
-        avatar: '/placeholder.svg',
+        id: "2",
+        firstName: "Aziza",
+        lastName: "Karimova",
+        avatar: "/placeholder.svg",
         isOnline: true,
-        role: 'teacher',
+        role: "teacher",
       });
     }
   }, [selectedThreadId]);
@@ -83,17 +83,17 @@ export default function Messages() {
 
   const handleNewMessage = () => {
     // Navigate to teacher/student search for new conversation
-    navigate('/teachers');
+    navigate("/teachers");
   };
 
-  const handleCallStart = (type: 'audio' | 'video') => {
+  const handleCallStart = (type: "audio" | "video") => {
     // TODO: Implement call functionality
   };
 
   const handleUserInfo = () => {
     if (selectedUser) {
       // Navigate to user profile
-      if (selectedUser.role === 'teacher') {
+      if (selectedUser.role === "teacher") {
         navigate(`/teacher/${selectedUser.id}`);
       } else {
         navigate(`/student/${selectedUser.id}`);
@@ -111,9 +111,7 @@ export default function Messages() {
           <p className="text-gray-600 mb-6">
             Xabarlarni ko'rish uchun tizimga kirishingiz kerak.
           </p>
-          <Button onClick={() => navigate('/login')}>
-            Tizimga kirish
-          </Button>
+          <Button onClick={() => navigate("/login")}>Tizimga kirish</Button>
         </div>
       </div>
     );
@@ -137,18 +135,18 @@ export default function Messages() {
           <div className="h-screen">
             {/* Mobile Header */}
             <div className="bg-white border-b p-4 flex items-center justify-between">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => navigate(-1)}
                 className="p-2"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <h1 className="text-lg font-semibold">Xabarlar</h1>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleNewMessage}
                 className="p-2"
               >
@@ -177,11 +175,7 @@ export default function Messages() {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate(-1)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Orqaga
               </Button>
@@ -237,7 +231,10 @@ export default function Messages() {
                         <UserPlus className="h-4 w-4 mr-2" />
                         Yangi xabar
                       </Button>
-                      <Button variant="outline" onClick={() => navigate('/teachers')}>
+                      <Button
+                        variant="outline"
+                        onClick={() => navigate("/teachers")}
+                      >
                         <Search className="h-4 w-4 mr-2" />
                         O'qituvchi topish
                       </Button>

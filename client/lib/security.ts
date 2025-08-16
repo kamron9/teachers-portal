@@ -2,18 +2,18 @@
 
 // Environment variables validation
 export function validateEnvVars() {
-  const requiredVars = ['VITE_API_BASE_URL'];
-  const missing = requiredVars.filter(v => !import.meta.env[v]);
-  
+  const requiredVars = ["VITE_API_BASE_URL"];
+  const missing = requiredVars.filter((v) => !import.meta.env[v]);
+
   if (missing.length > 0 && import.meta.env.DEV) {
-    console.error('Missing required environment variables:', missing);
+    console.error("Missing required environment variables:", missing);
   }
 }
 
 // Input sanitization
 export function sanitizeInput(input: string): string {
   return input
-    .replace(/[<>'"]/g, '') // Remove potential XSS characters
+    .replace(/[<>'"]/g, "") // Remove potential XSS characters
     .trim()
     .substring(0, 1000); // Limit length
 }
@@ -59,7 +59,11 @@ export function checkPasswordStrength(password: string): {
 // Rate limiting check (client-side basic)
 const requestCounts = new Map<string, { count: number; resetTime: number }>();
 
-export function checkRateLimit(key: string, maxRequests = 10, windowMs = 60000): boolean {
+export function checkRateLimit(
+  key: string,
+  maxRequests = 10,
+  windowMs = 60000,
+): boolean {
   const now = Date.now();
   const record = requestCounts.get(key);
 
@@ -92,14 +96,22 @@ export function validateFileUpload(file: File): {
   error?: string;
 } {
   const maxSize = 10 * 1024 * 1024; // 10MB
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "application/pdf",
+  ];
 
   if (file.size > maxSize) {
     return { valid: false, error: "Fayl hajmi 10MB dan oshmasligi kerak" };
   }
 
   if (!allowedTypes.includes(file.type)) {
-    return { valid: false, error: "Faqat JPG, PNG, WebP va PDF fayllar ruxsat etilgan" };
+    return {
+      valid: false,
+      error: "Faqat JPG, PNG, WebP va PDF fayllar ruxsat etilgan",
+    };
   }
 
   return { valid: true };
@@ -118,7 +130,7 @@ export function isValidUrl(url: string): boolean {
 // Initialize security measures
 export function initializeSecurity(): void {
   validateEnvVars();
-  
+
   // Remove sensitive data from console in production
   if (import.meta.env.PROD) {
     console.log = () => {};

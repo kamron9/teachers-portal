@@ -152,7 +152,9 @@ export default function Payment() {
         navigate(`/payment-success?payment=${result.id}`);
       }
     } catch (error: any) {
-      toast.error(error?.message || "To'lov amalga oshmadi. Qayta urinib ko'ring.");
+      toast.error(
+        error?.message || "To'lov amalga oshmadi. Qayta urinib ko'ring.",
+      );
     } finally {
       setIsProcessing(false);
     }

@@ -8,37 +8,39 @@ interface ResponsiveContainerProps {
   center?: boolean;
 }
 
-export function ResponsiveContainer({ 
-  children, 
+export function ResponsiveContainer({
+  children,
   className,
   size = "lg",
-  center = true
+  center = true,
 }: ResponsiveContainerProps) {
   const sizeClasses = {
     sm: "max-w-sm",
-    md: "max-w-2xl", 
+    md: "max-w-2xl",
     lg: "max-w-4xl",
     xl: "max-w-6xl",
-    full: "max-w-full"
+    full: "max-w-full",
   };
 
   return (
-    <div className={cn(
-      "w-full px-4 sm:px-6 lg:px-8",
-      sizeClasses[size],
-      center && "mx-auto",
-      className
-    )}>
+    <div
+      className={cn(
+        "w-full px-4 sm:px-6 lg:px-8",
+        sizeClasses[size],
+        center && "mx-auto",
+        className,
+      )}
+    >
       {children}
     </div>
   );
 }
 
-export function PageContainer({ 
-  children, 
+export function PageContainer({
+  children,
   className,
   title,
-  description
+  description,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -53,9 +55,7 @@ export function PageContainer({
             {title}
           </h1>
           {description && (
-            <p className="mt-4 text-lg text-gray-600">
-              {description}
-            </p>
+            <p className="mt-4 text-lg text-gray-600">{description}</p>
           )}
         </div>
       )}
@@ -64,12 +64,12 @@ export function PageContainer({
   );
 }
 
-export function Section({ 
-  children, 
+export function Section({
+  children,
   className,
   title,
   description,
-  id
+  id,
 }: {
   children: React.ReactNode;
   className?: string;

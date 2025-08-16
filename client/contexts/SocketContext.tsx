@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { useAuth } from '@/hooks/useAuth';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SocketContextType {
   socket: Socket | null;
@@ -15,7 +15,7 @@ const SocketContext = createContext<SocketContextType>({
 export const useSocket = () => {
   const context = useContext(SocketContext);
   if (!context) {
-    throw new Error('useSocket must be used within a SocketProvider');
+    throw new Error("useSocket must be used within a SocketProvider");
   }
   return context;
 };
@@ -32,28 +32,31 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   useEffect(() => {
     if (user && token) {
       // Create socket connection with authentication
-      const newSocket = io(process.env.NODE_ENV === 'production' 
-        ? 'https://your-production-url.com' 
-        : 'http://localhost:3001', {
-        auth: {
-          token: token,
+      const newSocket = io(
+        process.env.NODE_ENV === "production"
+          ? "https://your-production-url.com"
+          : "http://localhost:3001",
+        {
+          auth: {
+            token: token,
+          },
+          transports: ["websocket"],
         },
-        transports: ['websocket'],
-      });
+      );
 
-      newSocket.on('connect', () => {
+      newSocket.on("connect", () => {
         // Socket connected successfully
         setIsConnected(true);
       });
 
-      newSocket.on('disconnect', () => {
+      newSocket.on("disconnect", () => {
         // Socket disconnected
         setIsConnected(false);
       });
 
-      newSocket.on('connect_error', (error) => {
+      newSocket.on("connect_error", (error) => {
         if (import.meta.env.DEV) {
-          console.error('Socket connection error:', error);
+          console.error("Socket connection error:", error);
         }
         setIsConnected(false);
       });

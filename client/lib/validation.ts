@@ -25,7 +25,10 @@ export const nameSchema = z
   .string()
   .min(2, "Ism kamida 2 ta harfdan iborat bo'lishi kerak")
   .max(50, "Ism 50 ta harfdan oshmasligi kerak")
-  .regex(/^[a-zA-Zа-яёА-ЯЁ\s]+$/, "Ismda faqat harflar va bo'sh joy bo'lishi mumkin");
+  .regex(
+    /^[a-zA-Zа-яёА-ЯЁ\s]+$/,
+    "Ismda faqat harflar va bo'sh joy bo'lishi mumkin",
+  );
 
 // Price validation (UZS)
 export const priceSchema = z
@@ -84,17 +87,29 @@ export const studentProfileSchema = z.object({
 
 // Review validation
 export const reviewSchema = z.object({
-  rating: z.number().min(1, "Kamida 1 yulduz bering").max(5, "Maksimal 5 yulduz"),
-  comment: z.string().max(500, "Sharh 500 ta belgidan oshmasligi kerak").optional(),
+  rating: z
+    .number()
+    .min(1, "Kamida 1 yulduz bering")
+    .max(5, "Maksimal 5 yulduz"),
+  comment: z
+    .string()
+    .max(500, "Sharh 500 ta belgidan oshmasligi kerak")
+    .optional(),
 });
 
 // Message validation
 export const messageSchema = z.object({
-  content: z.string().min(1, "Xabar mazmuni bo'sh bo'lishi mumkin emas").max(1000, "Xabar 1000 ta belgidan oshmasligi kerak"),
+  content: z
+    .string()
+    .min(1, "Xabar mazmuni bo'sh bo'lishi mumkin emas")
+    .max(1000, "Xabar 1000 ta belgidan oshmasligi kerak"),
 });
 
 // Utility functions
-export function validateField<T>(schema: z.ZodSchema<T>, value: unknown): {
+export function validateField<T>(
+  schema: z.ZodSchema<T>,
+  value: unknown,
+): {
   success: boolean;
   error?: string;
   data?: T;
@@ -110,7 +125,10 @@ export function validateField<T>(schema: z.ZodSchema<T>, value: unknown): {
   }
 }
 
-export function validateForm<T>(schema: z.ZodSchema<T>, data: unknown): {
+export function validateForm<T>(
+  schema: z.ZodSchema<T>,
+  data: unknown,
+): {
   success: boolean;
   errors?: Record<string, string>;
   data?: T;
