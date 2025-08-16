@@ -411,11 +411,11 @@ export default function TeacherRegister() {
                         <SelectValue placeholder="Tajriba darajangizni tanlang" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="0-1">Less than 1 year</SelectItem>
-                        <SelectItem value="1-2">1-2 years</SelectItem>
-                        <SelectItem value="3-5">3-5 years</SelectItem>
-                        <SelectItem value="6-10">6-10 years</SelectItem>
-                        <SelectItem value="10+">10+ years</SelectItem>
+                        <SelectItem value="0-1">1 yildan kam</SelectItem>
+                        <SelectItem value="1-2">1-2 yil</SelectItem>
+                        <SelectItem value="3-5">3-5 yil</SelectItem>
+                        <SelectItem value="6-10">6-10 yil</SelectItem>
+                        <SelectItem value="10+">10+ yil</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
