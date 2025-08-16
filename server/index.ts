@@ -49,21 +49,15 @@ export function createServer() {
   app.post("/api/v1/auth/login", handleLogin);
   app.post("/api/v1/auth/register", handleRegister);
 
-  // Teacher routes (most specific routes first)
+  // Teacher routes
   app.get("/api/v1/teachers", handleSearchTeachers);
-  app.get("/api/v1/teachers/:id", handleGetTeacherProfile);
-  app.put("/api/v1/teachers/:id", handleUpdateTeacherProfile);
 
   // Booking routes
   app.get("/api/v1/bookings", handleGetBookings);
   app.post("/api/v1/bookings", handleCreateBooking);
 
-  // Availability routes (most specific routes first)
-  app.get("/api/v1/availability/:teacherId/slots", handleGetAvailableSlots);
-  app.get("/api/v1/availability/:teacherId", handleGetAvailability);
+  // Basic availability routes
   app.post("/api/v1/availability", handleCreateAvailabilityRule);
-  app.put("/api/v1/availability/:ruleId", handleUpdateAvailabilityRule);
-  app.delete("/api/v1/availability/:ruleId", handleDeleteAvailabilityRule);
 
   // Subject offerings routes
   app.get("/api/v1/subjects/offerings", handleGetSubjectOfferings);
