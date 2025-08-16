@@ -183,7 +183,7 @@ const Booking: React.FC = () => {
       const redirectUrl = mockPaymentUrls[bookingState.selectedProvider as keyof typeof mockPaymentUrls];
 
       // Show success message instead of redirecting (for demo)
-      alert(`To'lov sahifasiga yo'naltirilmoqda: ${bookingState.selectedProvider.toUpperCase()}\n\nDemo maqsadida redirect o'rniga alert ko'rsatildi.`);
+      toast.success(`To'lov sahifasiga yo'naltirilmoqda: ${bookingState.selectedProvider.toUpperCase()}`);
 
       // In real app, you would redirect:
       // window.location.href = redirectUrl;
