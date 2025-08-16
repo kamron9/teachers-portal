@@ -165,7 +165,7 @@ export default function Login() {
                       htmlFor="student"
                       className="flex-1 flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                     >
-                      <User className="h-5 w-5 text-blue-600" />
+                      <UserIcon className="h-5 w-5 text-blue-600" />
                       <div>
                         <div className="font-medium">Student</div>
                         <div className="text-sm text-gray-600">
