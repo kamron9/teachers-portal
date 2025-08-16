@@ -7,34 +7,43 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, ProtectedRoute } from "./hooks/useAuth";
 import Header from "./components/Header";
-import Index from "./pages/Index";
-import Teachers from "./pages/Teachers";
-import TeacherProfile from "./pages/TeacherProfile";
-import TeacherDetails from "./pages/TeacherDetails";
-import TeacherRegister from "./pages/TeacherRegister";
-import TeacherDashboard from "./pages/TeacherDashboard";
-import TeacherSchedule from "./pages/TeacherSchedule";
-import StudentRegister from "./pages/StudentRegister";
-import StudentProfile from "./pages/StudentProfile";
-import StudentDashboard from "./pages/StudentDashboard";
-import StudentReviews from "./pages/StudentReviews";
-import StudentPayments from "./pages/StudentPayments";
-import BookLesson from "./pages/BookLesson";
-import Pricing from "./pages/Pricing";
-import Payment from "./pages/Payment";
-import ReviewTeacher from "./pages/ReviewTeacher";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminUsers from "./pages/AdminUsers";
-import Login from "./pages/Login";
-import Subjects from "./pages/Subjects";
-import FindTeachers from "./pages/FindTeachers";
-import Search from "./pages/Search";
-import Booking from "./pages/Booking";
-import PlaceholderPage from "./pages/PlaceholderPage";
-import NotFound from "./pages/NotFound";
-import Messages from "./pages/Messages";
 import { SocketProvider } from "./contexts/SocketContext";
+
+// Loading component
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
+
+// Lazy loaded components
+const Index = lazy(() => import("./pages/Index"));
+const Teachers = lazy(() => import("./pages/Teachers"));
+const TeacherProfile = lazy(() => import("./pages/TeacherProfile"));
+const TeacherDetails = lazy(() => import("./pages/TeacherDetails"));
+const TeacherRegister = lazy(() => import("./pages/TeacherRegister"));
+const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
+const TeacherSchedule = lazy(() => import("./pages/TeacherSchedule"));
+const StudentRegister = lazy(() => import("./pages/StudentRegister"));
+const StudentProfile = lazy(() => import("./pages/StudentProfile"));
+const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
+const StudentReviews = lazy(() => import("./pages/StudentReviews"));
+const StudentPayments = lazy(() => import("./pages/StudentPayments"));
+const BookLesson = lazy(() => import("./pages/BookLesson"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const Payment = lazy(() => import("./pages/Payment"));
+const ReviewTeacher = lazy(() => import("./pages/ReviewTeacher"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminUsers = lazy(() => import("./pages/AdminUsers"));
+const Login = lazy(() => import("./pages/Login"));
+const Subjects = lazy(() => import("./pages/Subjects"));
+const FindTeachers = lazy(() => import("./pages/FindTeachers"));
+const Search = lazy(() => import("./pages/Search"));
+const Booking = lazy(() => import("./pages/Booking"));
+const PlaceholderPage = lazy(() => import("./pages/PlaceholderPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Messages = lazy(() => import("./pages/Messages"));
 
 // Configure React Query client with proper defaults
 const queryClient = new QueryClient({
