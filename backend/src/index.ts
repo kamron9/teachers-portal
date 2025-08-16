@@ -12,6 +12,7 @@ import { logger } from "./utils/logger";
 import { errorHandler } from "./middleware/errorHandler";
 import { authMiddleware } from "./middleware/auth";
 import { auditMiddleware } from "./middleware/audit";
+import { setupSwagger } from "./swagger";
 
 // Route imports
 import authRoutes from "./routes/auth";
