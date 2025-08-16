@@ -71,7 +71,7 @@ const App = () => {
         <AuthProvider>
           <SocketProvider>
             {!isAdminRoute && <Header />}
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<PageLoading />}>
               <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
