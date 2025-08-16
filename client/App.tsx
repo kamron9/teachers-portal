@@ -1,12 +1,17 @@
 import "./global.css";
 
 import React from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider, ProtectedRoute } from "./hooks/useAuth";
-import Header from "./components/Header";
+
+export default function App() {
+  console.log("App component rendering");
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>Tutoring Marketplace</h1>
+      <p>App is loading successfully!</p>
+    </div>
+  );
+}
 import Index from "./pages/Index";
 import Teachers from "./pages/Teachers";
 import TeacherProfile from "./pages/TeacherProfile";
