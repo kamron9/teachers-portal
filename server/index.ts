@@ -28,5 +28,36 @@ export function createServer() {
     });
   });
 
+  // Auth endpoints
+  app.get("/api/v1/auth/me", (_req, res) => {
+    res.json({
+      user: {
+        id: "user-1",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john.doe@example.com",
+        role: "TEACHER",
+        isVerified: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    });
+  });
+
+  app.post("/api/v1/auth/login", (_req, res) => {
+    res.json({
+      user: {
+        id: "user-1",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john.doe@example.com",
+        role: "TEACHER",
+        isVerified: true
+      },
+      accessToken: "mock-jwt-token",
+      refreshToken: "mock-refresh-token"
+    });
+  });
+
   return app;
 }
