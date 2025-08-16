@@ -247,5 +247,107 @@ export function createServer() {
     });
   });
 
+  // Teacher search endpoint
+  app.get("/api/v1/search/teachers", (_req, res) => {
+    res.json({
+      data: [
+        {
+          id: "teacher-1",
+          userId: "user-1",
+          firstName: "John",
+          lastName: "Doe",
+          bioUz: "Experienced English teacher with 10+ years of experience",
+          bioEn: "Experienced English teacher with 10+ years of experience",
+          experienceYears: 10,
+          languagesTaught: ["English"],
+          languagesSpoken: ["English", "Russian", "Uzbek"],
+          verificationStatus: "APPROVED",
+          timezone: "Asia/Tashkent",
+          isActive: true,
+          rating: 4.8,
+          totalReviews: 156,
+          totalLessons: 890,
+          totalEarnings: 5000000,
+          subjectOfferings: [
+            {
+              id: "offering-1",
+              teacherId: "teacher-1",
+              subjectName: "English",
+              level: "INTERMEDIATE",
+              pricePerHour: 5000000, // 50,000 UZS in kopeks
+              delivery: "ONLINE",
+              icon: "BOOK",
+              status: "PUBLISHED",
+              orderIndex: 1,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            },
+          ],
+        },
+      ],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 1,
+        pages: 1,
+      },
+      appliedFilters: {},
+    });
+  });
+
+  // Subjects endpoint
+  app.get("/api/v1/subjects", (_req, res) => {
+    res.json({
+      data: [
+        {
+          id: "subject-1",
+          name: "English",
+          nameUz: "Ingliz tili",
+          nameRu: "Английский язык",
+          nameEn: "English",
+          description: "English language learning",
+          category: "Languages",
+          isActive: true,
+          teacherCount: 150,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: "subject-2",
+          name: "Mathematics",
+          nameUz: "Matematika",
+          nameRu: "Математика",
+          nameEn: "Mathematics",
+          description: "Mathematics and problem solving",
+          category: "Science",
+          isActive: true,
+          teacherCount: 89,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: "subject-3",
+          name: "Russian",
+          nameUz: "Rus tili",
+          nameRu: "Русский язык",
+          nameEn: "Russian",
+          description: "Russian language learning",
+          category: "Languages",
+          isActive: true,
+          teacherCount: 67,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 3,
+        pages: 1,
+      },
+      categories: ["Languages", "Science"],
+    });
+  });
+
   return app;
 }
