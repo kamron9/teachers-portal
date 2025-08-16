@@ -41,7 +41,7 @@ export default function AdminUsers() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   // Mock users data
-  const users: User[] = [
+  const users: AdminUser[] = [
     {
       id: "1",
       name: "John Doe",
