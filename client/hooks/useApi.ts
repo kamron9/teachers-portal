@@ -503,12 +503,13 @@ export function useCreatePayment() {
 
   return useMutation({
     mutationFn: (data: {
+      amount: number;
+      provider: 'CLICK' | 'PAYME' | 'UZUM_BANK' | 'STRIPE';
       bookingId?: string;
       packageId?: string;
-      provider: string;
       returnUrl: string;
       cancelUrl: string;
-      paymentMethodId?: string;
+      savePaymentMethod?: boolean;
     }) => apiClient.createPayment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
@@ -516,6 +517,60 @@ export function useCreatePayment() {
     },
     onError: (error: ApiError) => {
       toast.error(error.message || "To'lov yaratilmadi");
+    },
+  });
+}
+
+export function usePaymentStatus(paymentId: string, options?: Partial<UseQueryOptions>) {
+  return useQuery({
+    queryKey: ['payment', 'status', paymentId],
+    queryFn: () => apiClient.getPaymentStatus(paymentId),
+    enabled: !!paymentId,
+    refetchInterval: 2000, // Poll every 2 seconds
+    staleTime: 0, // Always fetch fresh data
+    ...options,
+  });
+}
+
+// Wallet Hooks
+export function useWalletBalance() {
+  return useQuery({
+    queryKey: ['wallet', 'balance'],
+    queryFn: () => apiClient.getWalletBalance(),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+export function useWalletEntries(params?: {
+  status?: 'PENDING' | 'AVAILABLE' | 'PAID';
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}) {
+  return useQuery({
+    queryKey: ['wallet', 'entries', params],
+    queryFn: () => apiClient.getWalletEntries(params),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+export function useRequestPayout() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      amount: number;
+      method: 'bank_transfer' | 'card';
+      accountRef: string;
+      note?: string;
+    }) => apiClient.requestPayout(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wallet'] });
+      toast.success("To'lov so'rovi yuborildi");
+    },
+    onError: (error: ApiError) => {
+      toast.error(error.message || "To'lov so'rovi yuborilmadi");
     },
   });
 }
