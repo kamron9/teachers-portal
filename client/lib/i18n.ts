@@ -81,6 +81,12 @@ const resources = {
       "selectDate": "Sanani tanlang",
       "available": "Mavjud",
       "unavailable": "Mavjud emas",
+
+      // Additional UI elements
+      "notifications": "Bildirishnomalar",
+      "noNewNotifications": "Yangi bildirishnomalar yo'q",
+      "viewAllNotifications": "Barcha bildirishnomalarni ko'rish",
+      "becomeTeacher": "O'qituvchi bo'ling",
     }
   },
   ru: {
