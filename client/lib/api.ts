@@ -361,10 +361,10 @@ class ApiClient {
         error: "RequestFailed",
         message: `Request failed with status ${response.status}`,
       }));
-      console.error(`[API] Error for ${url}:`, errorData);
+      console.error(`[API] Error for ${url}:`, JSON.stringify(errorData, null, 2));
       throw errorData;
     } catch (error) {
-      console.error(`[API] Fetch error for ${url}:`, error);
+      console.error(`[API] Fetch error for ${url}:`, error instanceof Error ? error.message : JSON.stringify(error, null, 2));
       throw error;
     }
   }
