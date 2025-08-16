@@ -32,6 +32,8 @@ import Search from "./pages/Search";
 import Booking from "./pages/Booking";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
+import Messages from "./pages/Messages";
+import { SocketProvider } from "./contexts/SocketContext";
 
 // Configure React Query client with proper defaults
 const queryClient = new QueryClient({
@@ -62,7 +64,8 @@ const App = () => {
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          {!isAdminRoute && <Header />}
+          <SocketProvider>
+            {!isAdminRoute && <Header />}
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
@@ -200,10 +203,19 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/messages"
+              element={
+                <ProtectedRoute>
+                  <Messages />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </SocketProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
