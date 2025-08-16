@@ -2437,10 +2437,10 @@ export default function TeacherDashboard() {
           <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={() => setShowAvailabilityModal(true)}
+              onClick={() => navigate("/teacher-availability")}
             >
               <Settings className="h-4 w-4 mr-2" />
-              Set Availability
+              Manage Availability
             </Button>
             <Button variant="outline">
               <Plus className="h-4 w-4 mr-2" />
