@@ -8,7 +8,12 @@
 
   <body>
     <div id="root"></div>
+    <div id="test">Loading...</div>
 
+    <script>
+      console.log("Inline script loaded");
+      document.getElementById('test').innerHTML = 'Inline script working!';
+    </script>
     <script type="module" src="/client/main.tsx"></script>
   </body>
 </html>
