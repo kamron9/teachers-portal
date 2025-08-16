@@ -24,20 +24,23 @@ import { Badge } from "@/components/ui/badge";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useAuth, useRole } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useApi";
+import { useTranslation } from "react-i18next";
 
-const navigation = [
-  { name: "Bosh sahifa", href: "/" },
-  { name: "O'qituvchilar", href: "/teachers" },
-  { name: "Fanlar", href: "/subjects" },
-  { name: "Qanday ishlaydi", href: "/how-it-works" },
-  { name: "Narxlar", href: "/pricing" },
-];
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const { isStudent, isTeacher, isAdmin } = useRole();
+  const { t } = useTranslation();
+
+  const navigation = [
+    { name: t('home'), href: "/" },
+    { name: t('teachers'), href: "/teachers" },
+    { name: "Fanlar", href: "/subjects" },
+    { name: "Qanday ishlaydi", href: "/how-it-works" },
+    { name: "Narxlar", href: "/pricing" },
+  ];
 
   // Get unread notifications count
   const { data: notificationsData } = useNotifications(
@@ -120,12 +123,12 @@ export default function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-80" align="end">
-                    <DropdownMenuLabel>Bildirishnomalar</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('notifications')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <div className="p-2">
                       {unreadCount === 0 ? (
                         <p className="text-sm text-muted-foreground text-center py-4">
-                          Yangi bildirishnomalar yo'q
+                          {t('noNewNotifications')}
                         </p>
                       ) : (
                         <Link to="/notifications" className="block">
@@ -133,7 +136,7 @@ export default function Header() {
                             variant="ghost"
                             className="w-full justify-start"
                           >
-                            Barcha bildirishnomalarni ko'rish ({unreadCount})
+                            {t('viewAllNotifications')} ({unreadCount})
                           </Button>
                         </Link>
                       )}
@@ -172,13 +175,13 @@ export default function Header() {
                     <DropdownMenuItem asChild>
                       <Link to={getDashboardLink()}>
                         <User className="mr-2 h-4 w-4" />
-                        <span>Bosh sahifa</span>
+                        <span>{t('dashboard')}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/profile">
                         <User className="mr-2 h-4 w-4" />
-                        <span>Profil</span>
+                        <span>{t('profile')}</span>
                       </Link>
                     </DropdownMenuItem>
                     {(isTeacher || isStudent) && (
@@ -189,26 +192,26 @@ export default function Header() {
                           }
                         >
                           <BookOpen className="mr-2 h-4 w-4" />
-                          <span>Darslarim</span>
+                          <span>{t('myLessons')}</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
                       <Link to="/messages">
                         <MessageCircle className="mr-2 h-4 w-4" />
-                        <span>Xabarlar</span>
+                        <span>{t('messages')}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/settings">
                         <Settings className="mr-2 h-4 w-4" />
-                        <span>Sozlamalar</span>
+                        <span>{t('settings')}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Chiqish</span>
+                      <span>{t('logout')}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -216,13 +219,13 @@ export default function Header() {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost">Kirish</Button>
+                  <Button variant="ghost">{t('login')}</Button>
                 </Link>
                 <Link to="/register">
-                  <Button>Ro'yxatdan o'tish</Button>
+                  <Button>{t('register')}</Button>
                 </Link>
                 <Link to="/teacher-signup">
-                  <Button variant="outline">O'qituvchi bo'ling</Button>
+                  <Button variant="outline">{t('becomeTeacher')}</Button>
                 </Link>
               </>
             )}
@@ -300,7 +303,7 @@ export default function Header() {
                     >
                       <Button variant="ghost" className="w-full justify-start">
                         <User className="mr-2 h-4 w-4" />
-                        Bosh sahifa
+                        {t('dashboard')}
                       </Button>
                     </Link>
                     <Link
@@ -309,7 +312,7 @@ export default function Header() {
                     >
                       <Button variant="ghost" className="w-full justify-start">
                         <User className="mr-2 h-4 w-4" />
-                        Profil
+                        {t('profile')}
                       </Button>
                     </Link>
                     {(isTeacher || isStudent) && (
@@ -322,7 +325,7 @@ export default function Header() {
                           className="w-full justify-start"
                         >
                           <BookOpen className="mr-2 h-4 w-4" />
-                          Darslarim
+                          {t('myLessons')}
                         </Button>
                       </Link>
                     )}
@@ -332,7 +335,7 @@ export default function Header() {
                     >
                       <Button variant="ghost" className="w-full justify-start">
                         <MessageCircle className="mr-2 h-4 w-4" />
-                        Xabarlar
+                        {t('messages')}
                       </Button>
                     </Link>
                     <Link
@@ -341,7 +344,7 @@ export default function Header() {
                     >
                       <Button variant="ghost" className="w-full justify-start">
                         <Bell className="mr-2 h-4 w-4" />
-                        Bildirishnomalar
+                        {t('notifications')}
                         {unreadCount > 0 && (
                           <Badge
                             variant="destructive"
@@ -358,7 +361,7 @@ export default function Header() {
                     >
                       <Button variant="ghost" className="w-full justify-start">
                         <Settings className="mr-2 h-4 w-4" />
-                        Sozlamalar
+                        {t('settings')}
                       </Button>
                     </Link>
                     <Button
@@ -367,28 +370,28 @@ export default function Header() {
                       onClick={handleLogout}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      Chiqish
+                      {t('logout')}
                     </Button>
                   </div>
                 ) : (
                   <div className="flex flex-col space-y-2">
                     <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="ghost" className="w-full justify-start">
-                        Kirish
+                        {t('login')}
                       </Button>
                     </Link>
                     <Link
                       to="/register"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Button className="w-full">Ro'yxatdan o'tish</Button>
+                      <Button className="w-full">{t('register')}</Button>
                     </Link>
                     <Link
                       to="/teacher-signup"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <Button variant="outline" className="w-full">
-                        O'qituvchi bo'ling
+                        {t('becomeTeacher')}
                       </Button>
                     </Link>
                   </div>
