@@ -19,5 +19,14 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Health check
+  app.get("/api/v1/health", (_req, res) => {
+    res.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      version: "1.0.0"
+    });
+  });
+
   return app;
 }
