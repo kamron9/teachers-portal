@@ -76,7 +76,8 @@ const App = () => {
         <AuthProvider>
           <SocketProvider>
             {!isAdminRoute && <Header />}
-          <Routes>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/teachers" element={<Teachers />} />
@@ -224,7 +225,8 @@ const App = () => {
 
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
-          </Routes>
+              </Routes>
+            </Suspense>
           </SocketProvider>
         </AuthProvider>
       </BrowserRouter>
