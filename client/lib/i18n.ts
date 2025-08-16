@@ -166,6 +166,12 @@ const resources = {
       "selectDate": "Выберите дату",
       "available": "Доступно",
       "unavailable": "Недоступно",
+
+      // Additional UI elements
+      "notifications": "Уведомления",
+      "noNewNotifications": "Нет новых уведомлений",
+      "viewAllNotifications": "Просмотреть все уведомления",
+      "becomeTeacher": "Стать преподавателем",
     }
   },
   en: {
