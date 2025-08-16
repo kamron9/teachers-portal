@@ -163,8 +163,14 @@ export function useTeacherSearch(
       return failureCount < 3;
     },
     onError: (error: any) => {
-      if (error?.status !== 501) {
+      if (error?.status !== 501 && import.meta.env.DEV) {
         console.error("Teacher search failed:", error);
+      }
+      // Show user-friendly error message
+      if (error?.status === 500) {
+        toast.error("Server bilan bog'lanishda xato. Keyinroq urinib ko'ring.");
+      } else if (error?.status === 404) {
+        toast.error("O'qituvchilar topilmadi.");
       }
     },
     ...options,
