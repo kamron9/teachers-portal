@@ -8,7 +8,7 @@ import {
   Video,
   MessageCircle,
   Settings,
-  User,
+  User as UserIcon,
   CreditCard,
   Search,
   Filter,
