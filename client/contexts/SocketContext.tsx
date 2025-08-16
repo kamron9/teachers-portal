@@ -52,7 +52,9 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
 
       newSocket.on('connect_error', (error) => {
-        console.error('Socket connection error:', error);
+        if (import.meta.env.DEV) {
+          console.error('Socket connection error:', error);
+        }
         setIsConnected(false);
       });
 
