@@ -112,5 +112,71 @@ export function createServer() {
     });
   });
 
+  // Availability endpoints (without parameterized routes for now)
+  app.post("/api/v1/availability", (_req, res) => {
+    res.status(201).json({
+      id: `rule-${Date.now()}`,
+      ...req.body,
+      createdAt: new Date().toISOString()
+    });
+  });
+
+  // Mock availability data for specific teacher
+  app.get("/api/v1/availability/user-1", (_req, res) => {
+    res.json({
+      rules: [{
+        id: "rule-1",
+        type: "recurring",
+        weekday: 1,
+        startTime: "09:00",
+        endTime: "17:00",
+        isOpen: true
+      }, {
+        id: "rule-2",
+        type: "recurring",
+        weekday: 2,
+        startTime: "09:00",
+        endTime: "17:00",
+        isOpen: true
+      }],
+      bookings: [{
+        startAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        endAt: new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString(),
+        status: "CONFIRMED"
+      }],
+      timezone: "Asia/Tashkent"
+    });
+  });
+
+  // Available slots
+  app.get("/api/v1/availability/user-1/slots", (_req, res) => {
+    const now = new Date();
+    const slots = [];
+
+    // Generate some mock available slots for the next 7 days
+    for (let i = 1; i <= 7; i++) {
+      const date = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
+      for (let hour = 9; hour < 17; hour += 2) {
+        const startAt = new Date(date);
+        startAt.setHours(hour, 0, 0, 0);
+        const endAt = new Date(startAt.getTime() + 60 * 60 * 1000);
+
+        slots.push({
+          startAt: startAt.toISOString(),
+          endAt: endAt.toISOString(),
+          duration: 60,
+          available: true
+        });
+      }
+    }
+
+    res.json({
+      slots: slots.slice(0, 20),
+      timezone: "Asia/Tashkent",
+      duration: 60,
+      teacher: { id: "user-1" }
+    });
+  });
+
   return app;
 }
