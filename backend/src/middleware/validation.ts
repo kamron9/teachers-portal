@@ -87,4 +87,11 @@ export const commonSchemas = {
   }),
 };
 
+export const validationMiddleware = {
+  validateRequest,
+  validateQuery,
+  validateParams,
+  commonSchemas,
+};
+
 export default validateRequest;

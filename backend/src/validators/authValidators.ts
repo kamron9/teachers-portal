@@ -156,7 +156,7 @@ export const twoFactorSetupSchema = Joi.object({
     }),
 });
 
-export default {
+export const authValidators = {
   registerSchema,
   loginSchema,
   forgotPasswordSchema,
@@ -166,3 +166,5 @@ export default {
   verifyPhoneSchema,
   twoFactorSetupSchema,
 };
+
+export default authValidators;
