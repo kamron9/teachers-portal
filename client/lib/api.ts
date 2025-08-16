@@ -57,7 +57,6 @@ export interface TeacherProfile {
   user?: User;
   subjectOfferings?: SubjectOffering[];
   teacherChips?: TeacherChips;
-  profileCompletion?: number;
 }
 
 export interface Subject {
@@ -94,9 +93,6 @@ export interface SubjectOffering {
   icon: "BOOK" | "BAR_CHART" | "BRIEFCASE" | "SPEECH_BUBBLE";
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   orderIndex: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt?: string;
   teacher?: TeacherProfile;
 }
 
@@ -304,9 +300,9 @@ class ApiClient {
       if (response.ok) {
         const data = await response.json();
         this.saveTokens({
-          accessToken: data.tokens.accessToken,
-          refreshToken: data.tokens.refreshToken,
-          expiresAt: new Date(data.tokens.expiresAt).getTime(),
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          expiresAt: Date.now() + data.expiresIn * 1000,
         });
         return true;
       }
@@ -386,23 +382,21 @@ class ApiClient {
   async login(
     email: string,
     password: string,
-  ): Promise<{ user: User & { profile: TeacherProfile | StudentProfile }; tokens: AuthTokens }> {
+  ): Promise<{ user: User; tokens: AuthTokens }> {
     const response = await this.request<{
-      user: User & { profile: TeacherProfile | StudentProfile };
-      tokens: {
-        accessToken: string;
-        refreshToken: string;
-        expiresAt: string;
-      };
+      user: User;
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
     }>("/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
 
     const tokens = {
-      accessToken: response.tokens.accessToken,
-      refreshToken: response.tokens.refreshToken,
-      expiresAt: new Date(response.tokens.expiresAt).getTime(),
+      accessToken: response.accessToken,
+      refreshToken: response.refreshToken,
+      expiresAt: Date.now() + response.expiresIn * 1000,
     };
 
     this.saveTokens(tokens);
@@ -420,11 +414,29 @@ class ApiClient {
     firstName: string;
     lastName: string;
     phone?: string;
-  }): Promise<{ message: string; userId: string; verificationRequired: any }> {
-    return this.request<{ message: string; userId: string; verificationRequired: any }>("/auth/register", {
+  }): Promise<{ user: User; tokens: AuthTokens }> {
+    const response = await this.request<{
+      user: User;
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    }>("/auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     });
+
+    const tokens = {
+      accessToken: response.accessToken,
+      refreshToken: response.refreshToken,
+      expiresAt: Date.now() + response.expiresIn * 1000,
+    };
+
+    this.saveTokens(tokens);
+
+    return {
+      user: response.user,
+      tokens,
+    };
   }
 
   async logout(): Promise<void> {
@@ -432,6 +444,7 @@ class ApiClient {
       if (this.tokens?.refreshToken) {
         await this.request("/auth/logout", {
           method: "POST",
+          body: JSON.stringify({ refreshToken: this.tokens.refreshToken }),
         });
       }
     } finally {
@@ -439,8 +452,8 @@ class ApiClient {
     }
   }
 
-  async getCurrentUser(): Promise<User & { studentProfile?: StudentProfile; teacherProfile?: TeacherProfile }> {
-    return this.request<User & { studentProfile?: StudentProfile; teacherProfile?: TeacherProfile }>("/users/me");
+  async getCurrentUser(): Promise<User> {
+    return this.request<User>("/auth/me");
   }
 
   // Teacher methods
@@ -520,18 +533,13 @@ class ApiClient {
 
   // Subject offerings methods
   async getSubjectOfferings(): Promise<SubjectOffering[]> {
-    return this.request<SubjectOffering[]>("/subjects");
-  }
-
-  async getTeacherSubjectOfferings(teacherId?: string): Promise<{ offerings: SubjectOffering[]; chips: TeacherChips }> {
-    const endpoint = teacherId ? `/subjects/teacher/${teacherId}` : "/subjects";
-    return this.request<{ offerings: SubjectOffering[]; chips: TeacherChips }>(endpoint);
+    return this.request<SubjectOffering[]>("/teachers/subject-offerings");
   }
 
   async createSubjectOffering(
-    data: Omit<SubjectOffering, "id" | "teacherId" | "createdAt" | "updatedAt" | "orderIndex">,
+    data: Omit<SubjectOffering, "id" | "teacherId" | "createdAt" | "updatedAt">,
   ): Promise<SubjectOffering> {
-    return this.request<SubjectOffering>("/subjects", {
+    return this.request<SubjectOffering>("/teachers/subject-offerings", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -541,39 +549,25 @@ class ApiClient {
     id: string,
     data: Partial<SubjectOffering>,
   ): Promise<SubjectOffering> {
-    return this.request<SubjectOffering>(`/subjects/${id}`, {
+    return this.request<SubjectOffering>(`/teachers/subject-offerings/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
 
-  async deleteSubjectOffering(id: string): Promise<{ message: string }> {
-    return this.request<{ message: string }>(`/subjects/${id}`, {
+  async deleteSubjectOffering(id: string): Promise<void> {
+    await this.request(`/teachers/subject-offerings/${id}`, {
       method: "DELETE",
     });
   }
 
   async reorderSubjectOfferings(
-    offeringIds: string[],
-  ): Promise<{ message: string }> {
-    return this.request<{ message: string }>("/subjects/reorder", {
+    offerings: { id: string; orderIndex: number }[],
+  ): Promise<void> {
+    await this.request("/teachers/subject-offerings/reorder", {
       method: "POST",
-      body: JSON.stringify({ offeringIds }),
+      body: JSON.stringify({ offerings }),
     });
-  }
-
-  async updateTeacherChips(data: {
-    teachingLevels: string[];
-    examPreparation: string[];
-  }): Promise<TeacherChips> {
-    return this.request<TeacherChips>("/subjects/chips", {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
-  }
-
-  async getPopularSubjects(): Promise<{ name: string; teacherCount: number }[]> {
-    return this.request<{ name: string; teacherCount: number }[]>("/subjects/popular");
   }
 
   // Availability methods
@@ -620,41 +614,6 @@ class ApiClient {
     await this.request(`/availability/${id}`, {
       method: "DELETE",
     });
-  }
-
-  async bulkUpdateAvailability(
-    rules: Array<Omit<AvailabilityRule, "id">>,
-    replaceExisting: boolean = false
-  ): Promise<{ message: string; rulesCreated: number }> {
-    return this.request<{ message: string; rulesCreated: number }>("/availability/bulk", {
-      method: "POST",
-      body: JSON.stringify({ rules, replaceExisting }),
-    });
-  }
-
-  async getTeacherSchedule(
-    teacherId: string,
-    startDate: string,
-    endDate: string,
-    timezone: string = "Asia/Tashkent"
-  ): Promise<{
-    schedule: any[];
-    availabilityRules: AvailabilityRule[];
-    bookings: number;
-    timezone: string;
-  }> {
-    const params = new URLSearchParams({
-      startDate,
-      endDate,
-      timezone,
-    });
-
-    return this.request<{
-      schedule: any[];
-      availabilityRules: AvailabilityRule[];
-      bookings: number;
-      timezone: string;
-    }>(`/availability/${teacherId}/schedule?${params}`);
   }
 
   async getAvailableSlots(
@@ -1143,37 +1102,4 @@ export const getBioText = (
     default:
       return teacher.bioUz || teacher.bioRu || teacher.bioEn || "";
   }
-};
-
-export const getLevelDisplayName = (level: string): string => {
-  const levelMap: Record<string, string> = {
-    "ALL_LEVELS": "All Levels",
-    "BEGINNER": "Beginner",
-    "ELEMENTARY": "Elementary",
-    "INTERMEDIATE": "Intermediate",
-    "UPPER_INTERMEDIATE": "Upper Intermediate",
-    "ADVANCED": "Advanced",
-    "INTERMEDIATE_PLUS": "Intermediate Plus",
-  };
-  return levelMap[level] || level;
-};
-
-export const getDeliveryDisplayName = (delivery: string): string => {
-  const deliveryMap: Record<string, string> = {
-    "ONLINE": "Online",
-    "OFFLINE": "In Person",
-    "HYBRID": "Online & In Person",
-  };
-  return deliveryMap[delivery] || delivery;
-};
-
-export const getIconComponent = (icon: string) => {
-  // This would normally import from lucide-react or similar
-  const iconMap: Record<string, string> = {
-    "BOOK": "📚",
-    "BAR_CHART": "📊",
-    "BRIEFCASE": "💼",
-    "SPEECH_BUBBLE": "💬",
-  };
-  return iconMap[icon] || "📚";
 };

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Camera, Save, Edit3, Upload, Video, Star, Award, BookOpen, Globe, DollarSign, Loader2, CheckCircle, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,18 +11,49 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
-import { apiClient, TeacherProfile as TeacherProfileType } from "@/lib/api";
 
 export default function TeacherProfile() {
-  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [profileData, setProfileData] = useState<TeacherProfileType | null>(null);
-  const [unsavedChanges, setUnsavedChanges] = useState<Partial<TeacherProfileType>>({});
+  const [profileImage, setProfileImage] = useState("/placeholder.svg");
+  const [videoIntro, setVideoIntro] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  
+  const [profileData, setProfileData] = useState({
+    firstName: "Aziza",
+    lastName: "Karimova",
+    title: "English Language Expert & IELTS Specialist",
+    bio: "Certified English teacher with extensive experience in IELTS preparation and business communication. I help students achieve their language goals through personalized lessons and proven methodologies.",
+    education: "Masters in English Literature - National University of Uzbekistan\nTESOL Certification - British Council\nIELTS Teacher Training Certificate",
+    experience: "5+ years",
+    languages: ["Uzbek", "English", "Russian"],
+    subjects: ["English", "IELTS", "Business English", "Conversation Practice"],
+    specializations: ["IELTS Preparation", "Business English", "Academic Writing"],
+    hourlyRate: "50000",
+    trialRate: "25000",
+    packageRates: {
+      package5: "225000",
+      package10: "425000"
+    },
+    timezone: "Asia/Tashkent",
+    isAvailable: true,
+    responseTime: "2 hours",
+    achievements: [
+      "95% student satisfaction rate",
+      "IELTS success rate: 87% band 6.5+",
+      "Featured teacher of the month - March 2024"
+    ],
+    teachingStyle: "I believe in interactive and communicative approach to language learning. My lessons are structured yet flexible, focusing on practical usage and real-world application.",
+    portfolioFiles: [
+      { name: "Teaching_Certificate.pdf", type: "pdf" },
+      { name: "Student_Success_Stories.docx", type: "doc" },
+      { name: "Lesson_Plan_Sample.pdf", type: "pdf" }
+    ]
+  });
+
+  const [newAchievement, setNewAchievement] = useState("");
+  const [newPortfolioFile, setNewPortfolioFile] = useState<File | null>(null);
 
   const languages = ['Uzbek', 'English', 'Russian', 'Arabic', 'Turkish', 'Korean', 'Chinese', 'French', 'German', 'Spanish'];
   const subjects = [
@@ -30,149 +61,81 @@ export default function TeacherProfile() {
     'History', 'Geography', 'Literature', 'Music', 'Art', 'Economics', 'Psychology'
   ];
 
-  // Load teacher profile
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const profile = await apiClient.getTeacherProfile();
-        setProfileData(profile);
-      } catch (error: any) {
-        toast({
-          title: "Error",
-          description: error.message || "Failed to load profile",
-          variant: "destructive",
-        });
-      } finally {
-        setIsInitialLoading(false);
-      }
-    };
-
-    loadProfile();
-  }, [toast]);
-
-  const handleInputChange = (field: keyof TeacherProfileType, value: any) => {
-    setUnsavedChanges(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // In a real app, you would upload to a file storage service
-      // For now, we'll just create a blob URL
       const reader = new FileReader();
       reader.onload = (e) => {
-        const avatar = e.target?.result as string;
-        handleInputChange('avatar', avatar);
+        setProfileImage(e.target?.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // In a real app, you would upload to a file storage service
       const url = URL.createObjectURL(file);
-      handleInputChange('videoIntroUrl', url);
+      setVideoIntro(url);
     }
   };
 
   const handleSave = async () => {
-    if (!profileData || Object.keys(unsavedChanges).length === 0) return;
-
     setIsLoading(true);
-    try {
-      const updatedProfile = await apiClient.updateTeacherProfile(unsavedChanges);
-      setProfileData(updatedProfile);
-      setUnsavedChanges({});
-      setIsEditing(false);
-      
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update profile",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setUnsavedChanges({});
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setIsLoading(false);
     setIsEditing(false);
   };
 
   const toggleLanguage = (language: string) => {
-    if (!profileData || !isEditing) return;
-    
-    const currentLanguages = unsavedChanges.languagesTaught ?? profileData.languagesTaught;
-    const newLanguages = currentLanguages.includes(language)
-      ? currentLanguages.filter(l => l !== language)
-      : [...currentLanguages, language];
-    
-    handleInputChange('languagesTaught', newLanguages);
+    setProfileData(prev => ({
+      ...prev,
+      languages: prev.languages.includes(language)
+        ? prev.languages.filter(l => l !== language)
+        : [...prev.languages, language]
+    }));
   };
 
-  const addEducation = () => {
-    const currentEducation = unsavedChanges.education ?? profileData?.education ?? [];
-    const newEducation = {
-      institution: "",
-      degree: "",
-      field: "",
-      startYear: new Date().getFullYear(),
-      endYear: new Date().getFullYear(),
-      description: ""
-    };
-    handleInputChange('education', [...currentEducation, newEducation]);
+  const toggleSubject = (subject: string) => {
+    setProfileData(prev => ({
+      ...prev,
+      subjects: prev.subjects.includes(subject)
+        ? prev.subjects.filter(s => s !== subject)
+        : [...prev.subjects, subject]
+    }));
   };
 
-  const updateEducation = (index: number, field: string, value: any) => {
-    const currentEducation = unsavedChanges.education ?? profileData?.education ?? [];
-    const updatedEducation = [...currentEducation];
-    updatedEducation[index] = { ...updatedEducation[index], [field]: value };
-    handleInputChange('education', updatedEducation);
+  const addAchievement = () => {
+    if (newAchievement.trim()) {
+      setProfileData(prev => ({
+        ...prev,
+        achievements: [...prev.achievements, newAchievement.trim()]
+      }));
+      setNewAchievement("");
+    }
   };
 
-  const removeEducation = (index: number) => {
-    const currentEducation = unsavedChanges.education ?? profileData?.education ?? [];
-    const updatedEducation = currentEducation.filter((_, i) => i !== index);
-    handleInputChange('education', updatedEducation);
+  const removeAchievement = (index: number) => {
+    setProfileData(prev => ({
+      ...prev,
+      achievements: prev.achievements.filter((_, i) => i !== index)
+    }));
   };
 
-  // Get current value for a field (unsaved changes take precedence)
-  const getCurrentValue = (field: keyof TeacherProfileType) => {
-    return unsavedChanges[field] ?? profileData?.[field];
+  const handlePortfolioUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setNewPortfolioFile(file);
+      // In real app, upload to server and add to portfolioFiles
+      const fileType = file.name.split('.').pop();
+      setProfileData(prev => ({
+        ...prev,
+        portfolioFiles: [...prev.portfolioFiles, { name: file.name, type: fileType || 'unknown' }]
+      }));
+      setNewPortfolioFile(null);
+    }
   };
-
-  if (isInitialLoading) {
-    return (
-      <div className="pt-16 min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!profileData) {
-    return (
-      <div className="pt-16 min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">Failed to load profile</p>
-          <Button onClick={() => window.location.reload()}>Retry</Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="pt-16 min-h-screen bg-gray-50">
@@ -187,11 +150,6 @@ export default function TeacherProfile() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Teacher Profile</h1>
                 <p className="text-gray-600">Manage your teaching profile and preferences</p>
-                {profileData.profileCompletion && (
-                  <p className="text-sm text-gray-500">
-                    Profile completion: {profileData.profileCompletion}%
-                  </p>
-                )}
               </div>
             </div>
             
@@ -202,10 +160,10 @@ export default function TeacherProfile() {
               </Button>
             ) : (
               <div className="flex gap-2">
-                <Button variant="outline" onClick={handleCancel}>
+                <Button variant="outline" onClick={() => setIsEditing(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleSave} disabled={isLoading || Object.keys(unsavedChanges).length === 0}>
+                <Button onClick={handleSave} disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -242,9 +200,9 @@ export default function TeacherProfile() {
                   <CardContent className="text-center space-y-4">
                     <div className="relative mx-auto w-32 h-32">
                       <Avatar className="w-32 h-32">
-                        <AvatarImage src={getCurrentValue('avatar') || "/placeholder.svg"} alt="Profile" />
+                        <AvatarImage src={profileImage} alt="Profile" />
                         <AvatarFallback className="text-2xl">
-                          {getCurrentValue('firstName')?.[0]}{getCurrentValue('lastName')?.[0]}
+                          {profileData.firstName[0]}{profileData.lastName[0]}
                         </AvatarFallback>
                       </Avatar>
                       {isEditing && (
@@ -290,8 +248,8 @@ export default function TeacherProfile() {
                         <Label htmlFor="firstName">First Name</Label>
                         <Input
                           id="firstName"
-                          value={getCurrentValue('firstName') || ""}
-                          onChange={(e) => handleInputChange('firstName', e.target.value)}
+                          value={profileData.firstName}
+                          onChange={(e) => setProfileData(prev => ({...prev, firstName: e.target.value}))}
                           disabled={!isEditing}
                         />
                       </div>
@@ -299,19 +257,30 @@ export default function TeacherProfile() {
                         <Label htmlFor="lastName">Last Name</Label>
                         <Input
                           id="lastName"
-                          value={getCurrentValue('lastName') || ""}
-                          onChange={(e) => handleInputChange('lastName', e.target.value)}
+                          value={profileData.lastName}
+                          onChange={(e) => setProfileData(prev => ({...prev, lastName: e.target.value}))}
                           disabled={!isEditing}
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="bioEn">Professional Bio (English)</Label>
+                      <Label htmlFor="title">Professional Title</Label>
+                      <Input
+                        id="title"
+                        value={profileData.title}
+                        onChange={(e) => setProfileData(prev => ({...prev, title: e.target.value}))}
+                        disabled={!isEditing}
+                        placeholder="e.g., English Language Expert & IELTS Specialist"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="bio">Professional Bio</Label>
                       <Textarea
-                        id="bioEn"
-                        value={getCurrentValue('bioEn') || ""}
-                        onChange={(e) => handleInputChange('bioEn', e.target.value)}
+                        id="bio"
+                        value={profileData.bio}
+                        onChange={(e) => setProfileData(prev => ({...prev, bio: e.target.value}))}
                         disabled={!isEditing}
                         rows={4}
                         placeholder="Tell students about your teaching experience and methodology..."
@@ -319,57 +288,33 @@ export default function TeacherProfile() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="bioUz">Professional Bio (Uzbek)</Label>
+                      <Label htmlFor="education">Education & Certifications</Label>
                       <Textarea
-                        id="bioUz"
-                        value={getCurrentValue('bioUz') || ""}
-                        onChange={(e) => handleInputChange('bioUz', e.target.value)}
+                        id="education"
+                        value={profileData.education}
+                        onChange={(e) => setProfileData(prev => ({...prev, education: e.target.value}))}
                         disabled={!isEditing}
                         rows={4}
-                        placeholder="O'qituvchilik tajribangiz va metodologiyangiz haqida gapirib bering..."
+                        placeholder="List your education background and certifications..."
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="bioRu">Professional Bio (Russian)</Label>
-                      <Textarea
-                        id="bioRu"
-                        value={getCurrentValue('bioRu') || ""}
-                        onChange={(e) => handleInputChange('bioRu', e.target.value)}
-                        disabled={!isEditing}
-                        rows={4}
-                        placeholder="Расскажите студентам о своем опыте преподавания и методологии..."
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="experienceYears">Years of Experience</Label>
-                      <Input
-                        id="experienceYears"
-                        type="number"
-                        min="0"
-                        max="50"
-                        value={getCurrentValue('experienceYears') || 0}
-                        onChange={(e) => handleInputChange('experienceYears', parseInt(e.target.value) || 0)}
-                        disabled={!isEditing}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="timezone">Timezone</Label>
+                      <Label htmlFor="experience">Years of Experience</Label>
                       <Select
-                        value={getCurrentValue('timezone') || "Asia/Tashkent"}
-                        onValueChange={(value) => handleInputChange('timezone', value)}
+                        value={profileData.experience}
+                        onValueChange={(value) => setProfileData(prev => ({...prev, experience: value}))}
                         disabled={!isEditing}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select timezone" />
+                          <SelectValue placeholder="Select experience level" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Asia/Tashkent">Tashkent (UTC+5)</SelectItem>
-                          <SelectItem value="Europe/London">London (UTC+0)</SelectItem>
-                          <SelectItem value="America/New_York">New York (UTC-5)</SelectItem>
-                          <SelectItem value="Asia/Tokyo">Tokyo (UTC+9)</SelectItem>
+                          <SelectItem value="0-1">Less than 1 year</SelectItem>
+                          <SelectItem value="1-2">1-2 years</SelectItem>
+                          <SelectItem value="3-5">3-5 years</SelectItem>
+                          <SelectItem value="6-10">6-10 years</SelectItem>
+                          <SelectItem value="10+">10+ years</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -383,135 +328,94 @@ export default function TeacherProfile() {
               <div className="grid lg:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Languages & Experience</CardTitle>
+                    <CardTitle>Languages & Subjects</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-3">
                       <Label>Languages You Teach In</Label>
                       <div className="flex flex-wrap gap-2">
-                        {languages.map((language) => {
-                          const currentLanguages = getCurrentValue('languagesTaught') || [];
-                          const isSelected = currentLanguages.includes(language);
-                          return (
-                            <Badge
-                              key={language}
-                              variant={isSelected ? "default" : "outline"}
-                              className={`cursor-pointer ${!isEditing ? 'pointer-events-none' : ''}`}
-                              onClick={() => isEditing && toggleLanguage(language)}
-                            >
-                              {language}
-                            </Badge>
-                          );
-                        })}
+                        {languages.map((language) => (
+                          <Badge
+                            key={language}
+                            variant={profileData.languages.includes(language) ? "default" : "outline"}
+                            className={`cursor-pointer ${!isEditing ? 'pointer-events-none' : ''}`}
+                            onClick={() => isEditing && toggleLanguage(language)}
+                          >
+                            {language}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label>Subjects You Teach</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {subjects.map((subject) => (
+                          <Badge
+                            key={subject}
+                            variant={profileData.subjects.includes(subject) ? "default" : "outline"}
+                            className={`cursor-pointer ${!isEditing ? 'pointer-events-none' : ''}`}
+                            onClick={() => isEditing && toggleSubject(subject)}
+                          >
+                            {subject}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="cancellationPolicy">Cancellation Policy</Label>
+                      <Label htmlFor="teachingStyle">Teaching Style & Methodology</Label>
                       <Textarea
-                        id="cancellationPolicy"
-                        value={getCurrentValue('cancellationPolicy') || ""}
-                        onChange={(e) => handleInputChange('cancellationPolicy', e.target.value)}
+                        id="teachingStyle"
+                        value={profileData.teachingStyle}
+                        onChange={(e) => setProfileData(prev => ({...prev, teachingStyle: e.target.value}))}
                         disabled={!isEditing}
-                        rows={3}
-                        placeholder="Describe your cancellation policy..."
+                        rows={4}
+                        placeholder="Describe your teaching approach and methodology..."
                       />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="minNoticeHours">Min Notice Hours</Label>
-                        <Input
-                          id="minNoticeHours"
-                          type="number"
-                          min="1"
-                          max="168"
-                          value={getCurrentValue('minNoticeHours') || 12}
-                          onChange={(e) => handleInputChange('minNoticeHours', parseInt(e.target.value) || 12)}
-                          disabled={!isEditing}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="maxAdvanceDays">Max Advance Days</Label>
-                        <Input
-                          id="maxAdvanceDays"
-                          type="number"
-                          min="1"
-                          max="365"
-                          value={getCurrentValue('maxAdvanceDays') || 30}
-                          onChange={(e) => handleInputChange('maxAdvanceDays', parseInt(e.target.value) || 30)}
-                          disabled={!isEditing}
-                        />
-                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Education & Certifications</CardTitle>
+                    <CardTitle>Achievements</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="space-y-4">
-                      {(getCurrentValue('education') || []).map((edu: any, index: number) => (
-                        <div key={index} className="border rounded-lg p-4 space-y-3">
-                          <div className="flex justify-between items-start">
-                            <h4 className="font-medium">Education #{index + 1}</h4>
-                            {isEditing && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeEducation(index)}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            )}
+                    <div className="space-y-2">
+                      {profileData.achievements.map((achievement, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 border rounded">
+                          <div className="flex items-center gap-2">
+                            <Award className="h-4 w-4 text-yellow-500" />
+                            <span className="text-sm">{achievement}</span>
                           </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <Input
-                              placeholder="Institution"
-                              value={edu.institution || ""}
-                              onChange={(e) => updateEducation(index, 'institution', e.target.value)}
-                              disabled={!isEditing}
-                            />
-                            <Input
-                              placeholder="Degree"
-                              value={edu.degree || ""}
-                              onChange={(e) => updateEducation(index, 'degree', e.target.value)}
-                              disabled={!isEditing}
-                            />
-                          </div>
-                          <Input
-                            placeholder="Field of Study"
-                            value={edu.field || ""}
-                            onChange={(e) => updateEducation(index, 'field', e.target.value)}
-                            disabled={!isEditing}
-                          />
-                          <div className="grid grid-cols-2 gap-3">
-                            <Input
-                              type="number"
-                              placeholder="Start Year"
-                              value={edu.startYear || ""}
-                              onChange={(e) => updateEducation(index, 'startYear', parseInt(e.target.value))}
-                              disabled={!isEditing}
-                            />
-                            <Input
-                              type="number"
-                              placeholder="End Year"
-                              value={edu.endYear || ""}
-                              onChange={(e) => updateEducation(index, 'endYear', parseInt(e.target.value))}
-                              disabled={!isEditing}
-                            />
-                          </div>
+                          {isEditing && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeAchievement(index)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          )}
                         </div>
                       ))}
                     </div>
 
                     {isEditing && (
-                      <Button onClick={addEducation} variant="outline" className="w-full">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Education
-                      </Button>
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Add new achievement..."
+                            value={newAchievement}
+                            onChange={(e) => setNewAchievement(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && addAchievement()}
+                          />
+                          <Button onClick={addAchievement} size="sm">
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
@@ -526,11 +430,76 @@ export default function TeacherProfile() {
                     <DollarSign className="h-5 w-5" />
                     Lesson Pricing
                   </CardTitle>
-                  <p className="text-sm text-gray-600">
-                    Pricing is managed through your subject offerings. You can add and edit subjects in the Subjects section.
-                  </p>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="trialRate">Trial Lesson (30 min)</Label>
+                      <div className="relative">
+                        <Input
+                          id="trialRate"
+                          type="number"
+                          value={profileData.trialRate}
+                          onChange={(e) => setProfileData(prev => ({...prev, trialRate: e.target.value}))}
+                          disabled={!isEditing}
+                          className="pr-12"
+                        />
+                        <span className="absolute right-3 top-3 text-sm text-gray-500">UZS</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="hourlyRate">Single Lesson (60 min)</Label>
+                      <div className="relative">
+                        <Input
+                          id="hourlyRate"
+                          type="number"
+                          value={profileData.hourlyRate}
+                          onChange={(e) => setProfileData(prev => ({...prev, hourlyRate: e.target.value}))}
+                          disabled={!isEditing}
+                          className="pr-12"
+                        />
+                        <span className="absolute right-3 top-3 text-sm text-gray-500">UZS</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="package5">5 Lessons Package</Label>
+                      <div className="relative">
+                        <Input
+                          id="package5"
+                          type="number"
+                          value={profileData.packageRates.package5}
+                          onChange={(e) => setProfileData(prev => ({
+                            ...prev, 
+                            packageRates: {...prev.packageRates, package5: e.target.value}
+                          }))}
+                          disabled={!isEditing}
+                          className="pr-12"
+                        />
+                        <span className="absolute right-3 top-3 text-sm text-gray-500">UZS</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="package10">10 Lessons Package</Label>
+                      <div className="relative">
+                        <Input
+                          id="package10"
+                          type="number"
+                          value={profileData.packageRates.package10}
+                          onChange={(e) => setProfileData(prev => ({
+                            ...prev, 
+                            packageRates: {...prev.packageRates, package10: e.target.value}
+                          }))}
+                          disabled={!isEditing}
+                          className="pr-12"
+                        />
+                        <span className="absolute right-3 top-3 text-sm text-gray-500">UZS</span>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <h4 className="font-medium text-blue-900 mb-2">Pricing Tips</h4>
                     <ul className="text-sm text-blue-700 space-y-1">
@@ -555,10 +524,10 @@ export default function TeacherProfile() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {getCurrentValue('videoIntroUrl') ? (
+                    {videoIntro ? (
                       <div className="relative">
                         <video
-                          src={getCurrentValue('videoIntroUrl')}
+                          src={videoIntro}
                           controls
                           className="w-full h-48 object-cover rounded-lg"
                         />
@@ -612,35 +581,60 @@ export default function TeacherProfile() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <BookOpen className="h-5 w-5" />
-                      Verification Status
+                      Portfolio & Documents
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-3 border rounded">
-                      <div>
-                        <p className="font-medium">Verification Status</p>
-                        <p className="text-sm text-gray-600">
-                          {profileData.verificationStatus === 'APPROVED' ? 'Your profile is verified' :
-                           profileData.verificationStatus === 'PENDING' ? 'Verification pending' :
-                           'Verification rejected'}
-                        </p>
-                      </div>
-                      <Badge 
-                        variant={
-                          profileData.verificationStatus === 'APPROVED' ? 'default' :
-                          profileData.verificationStatus === 'PENDING' ? 'secondary' : 'destructive'
-                        }
-                      >
-                        {profileData.verificationStatus}
-                      </Badge>
+                    <div className="space-y-2">
+                      {profileData.portfolioFiles.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 border rounded">
+                          <div className="flex items-center gap-2">
+                            <BookOpen className="h-4 w-4 text-blue-500" />
+                            <span className="text-sm">{file.name}</span>
+                          </div>
+                          {isEditing && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setProfileData(prev => ({
+                                  ...prev,
+                                  portfolioFiles: prev.portfolioFiles.filter((_, i) => i !== index)
+                                }));
+                              }}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
                     </div>
 
-                    {profileData.verificationReason && (
-                      <div className="p-3 border rounded bg-yellow-50">
-                        <p className="text-sm font-medium">Admin Notes:</p>
-                        <p className="text-sm text-gray-600">{profileData.verificationReason}</p>
+                    {isEditing && (
+                      <div>
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                          onChange={handlePortfolioUpload}
+                          className="hidden"
+                          id="portfolio-upload"
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={() => document.getElementById('portfolio-upload')?.click()}
+                          className="w-full"
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Document
+                        </Button>
                       </div>
                     )}
+
+                    <div className="text-xs text-gray-500">
+                      <p>• Certificates, diplomas, lesson samples</p>
+                      <p>• Max file size: 10MB each</p>
+                      <p>• Formats: PDF, DOC, DOCX, JPG, PNG</p>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -659,10 +653,48 @@ export default function TeacherProfile() {
                       <p className="text-sm text-gray-600">Make your profile visible to students</p>
                     </div>
                     <Switch
-                      checked={getCurrentValue('isActive') || false}
-                      onCheckedChange={(checked) => handleInputChange('isActive', checked)}
+                      checked={profileData.isAvailable}
+                      onCheckedChange={(checked) => setProfileData(prev => ({...prev, isAvailable: checked}))}
                       disabled={!isEditing}
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="timezone">Timezone</Label>
+                    <Select
+                      value={profileData.timezone}
+                      onValueChange={(value) => setProfileData(prev => ({...prev, timezone: value}))}
+                      disabled={!isEditing}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Asia/Tashkent">Tashkent (UTC+5)</SelectItem>
+                        <SelectItem value="Europe/London">London (UTC+0)</SelectItem>
+                        <SelectItem value="America/New_York">New York (UTC-5)</SelectItem>
+                        <SelectItem value="Asia/Tokyo">Tokyo (UTC+9)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="responseTime">Typical Response Time</Label>
+                    <Select
+                      value={profileData.responseTime}
+                      onValueChange={(value) => setProfileData(prev => ({...prev, responseTime: value}))}
+                      disabled={!isEditing}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1 hour">Within 1 hour</SelectItem>
+                        <SelectItem value="2 hours">Within 2 hours</SelectItem>
+                        <SelectItem value="4 hours">Within 4 hours</SelectItem>
+                        <SelectItem value="24 hours">Within 24 hours</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </CardContent>
               </Card>

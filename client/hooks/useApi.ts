@@ -155,9 +155,6 @@ export function useTeacherSearch(
   return useQuery({
     queryKey: queryKeys.teacherSearch(params),
     queryFn: () => apiClient.searchTeachers(params),
-<<<<<<< HEAD
-    staleTime: 1000 * 60 * 2, // 2 minutes
-=======
     enabled: true,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: (failureCount, error: any) => {
@@ -165,7 +162,6 @@ export function useTeacherSearch(
       if (error?.status === 400) return false;
       return failureCount < 3;
     },
->>>>>>> refs/remotes/origin/main
     ...options,
   });
 }
@@ -363,40 +359,6 @@ export function useDeleteAvailabilityRule() {
     onError: (error: ApiError) => {
       toast.error(error.message || "Vaqt jadvali o'chirilmadi");
     },
-  });
-}
-
-export function useBulkUpdateAvailability() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      rules,
-      replaceExisting,
-    }: {
-      rules: Array<Omit<AvailabilityRule, "id">>;
-      replaceExisting?: boolean;
-    }) => apiClient.bulkUpdateAvailability(rules, replaceExisting),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["availability"] });
-      toast.success("Vaqt jadvali ommaviy yangilandi");
-    },
-    onError: (error: ApiError) => {
-      toast.error(error.message || "Ommaviy yangilashda xato");
-    },
-  });
-}
-
-export function useTeacherSchedule(
-  teacherId: string,
-  startDate: string,
-  endDate: string,
-  timezone: string = "Asia/Tashkent"
-) {
-  return useQuery({
-    queryKey: ["schedule", teacherId, startDate, endDate, timezone],
-    queryFn: () => apiClient.getTeacherSchedule(teacherId, startDate, endDate, timezone),
-    enabled: !!teacherId && !!startDate && !!endDate,
   });
 }
 
