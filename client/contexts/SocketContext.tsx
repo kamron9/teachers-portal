@@ -47,7 +47,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
 
       newSocket.on('disconnect', () => {
-        console.log('Socket disconnected');
+        // Socket disconnected
         setIsConnected(false);
       });
 
