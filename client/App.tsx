@@ -13,6 +13,7 @@ import TeacherDetails from "./pages/TeacherDetails";
 import TeacherRegister from "./pages/TeacherRegister";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import TeacherSchedule from "./pages/TeacherSchedule";
+import TeacherSubjects from "./pages/TeacherSubjects";
 import StudentRegister from "./pages/StudentRegister";
 import StudentProfile from "./pages/StudentProfile";
 import StudentDashboard from "./pages/StudentDashboard";
