@@ -507,7 +507,7 @@ export default function StudentDashboard() {
             </TabsContent>
             <TabsContent value="profile">
               <div className="text-center py-12">
-                <User className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <UserIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <p>Profile management coming soon...</p>
               </div>
             </TabsContent>
