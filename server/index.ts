@@ -24,6 +24,14 @@ export function createServer() {
     res.json({ message: ping });
   });
 
+  app.get("/api/debug", (_req, res) => {
+    res.json({
+      message: "Debug endpoint working",
+      timestamp: new Date().toISOString(),
+      baseUrl: "/api"
+    });
+  });
+
   app.get("/api/demo", handleDemo);
 
   // Mock tutoring marketplace API routes
