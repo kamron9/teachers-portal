@@ -9,6 +9,13 @@ import {
   handleGetWalletEntries,
   handleNotImplemented
 } from "./routes/teachers";
+import {
+  handleLogin,
+  handleRegister,
+  handleGetCurrentUser,
+  handleLogout,
+  handleRefreshToken
+} from "./routes/auth";
 
 export function createServer() {
   const app = express();
