@@ -109,7 +109,7 @@ export default function StudentRegister() {
     if (otpCode === "123456") { // Demo OTP
       setCurrentStep(4);
     } else {
-      alert("Invalid OTP. Use 123456 for demo.");
+      toast.error("Noto'g'ri kod. Demo uchun 123456 ishlatilng.");
     }
   };
 
