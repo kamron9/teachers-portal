@@ -410,6 +410,40 @@ export function useDeleteAvailabilityRule() {
   });
 }
 
+export function useBulkUpdateAvailability() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      rules,
+      replaceExisting,
+    }: {
+      rules: Array<Omit<AvailabilityRule, "id">>;
+      replaceExisting?: boolean;
+    }) => apiClient.bulkUpdateAvailability(rules, replaceExisting),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Vaqt jadvali ommaviy yangilandi");
+    },
+    onError: (error: ApiError) => {
+      toast.error(error.message || "Ommaviy yangilashda xato");
+    },
+  });
+}
+
+export function useTeacherSchedule(
+  teacherId: string,
+  startDate: string,
+  endDate: string,
+  timezone: string = "Asia/Tashkent"
+) {
+  return useQuery({
+    queryKey: ["schedule", teacherId, startDate, endDate, timezone],
+    queryFn: () => apiClient.getTeacherSchedule(teacherId, startDate, endDate, timezone),
+    enabled: !!teacherId && !!startDate && !!endDate,
+  });
+}
+
 // Booking Hooks
 export function useBookings(params?: {
   status?: string[];
