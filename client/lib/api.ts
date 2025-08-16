@@ -1032,6 +1032,46 @@ class ApiClient {
     }>(`/search?${searchParams}`);
   }
 
+  // Payment status method
+  async getPaymentStatus(paymentId: string): Promise<Payment> {
+    return this.request<Payment>(`/payments/${paymentId}/status`);
+  }
+
+  // Wallet methods
+  async getWalletBalance(): Promise<{ availableBalance: number; pendingBalance: number; totalEarnings: number }> {
+    return this.request<{ availableBalance: number; pendingBalance: number; totalEarnings: number }>("/wallet/balance");
+  }
+
+  async getWalletEntries(params?: {
+    status?: "PENDING" | "AVAILABLE" | "PAID";
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<PaginatedResponse<any>> {
+    const searchParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.set(key, value.toString());
+        }
+      });
+    }
+    return this.request<PaginatedResponse<any>>(`/wallet/entries?${searchParams}`);
+  }
+
+  async requestPayout(data: {
+    amount: number;
+    method: "bank_transfer" | "card";
+    accountRef: string;
+    note?: string;
+  }): Promise<{ message: string; payoutId: string }> {
+    return this.request<{ message: string; payoutId: string }>("/wallet/payout", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
   // Get auth state
   isAuthenticated(): boolean {
     return !!this.tokens?.accessToken;
