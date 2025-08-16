@@ -5,7 +5,7 @@ import { body } from "express-validator";
 import { prisma } from "../lib/prisma";
 import { config } from "../config";
 import { authValidators } from "../validators/authValidators";
-import { validationMiddleware } from "../middleware/validation";
+import { validateRequest } from "../middleware/validation";
 import { authMiddleware } from "../middleware/auth";
 import { logger } from "../utils/logger";
 import { AppError } from "../utils/errors";
@@ -80,8 +80,7 @@ const router = express.Router();
  */
 router.post(
   "/register",
-  authValidators.register,
-  validationMiddleware,
+  validateRequest(authValidators.registerSchema),
   async (req, res) => {
     const { email, password, firstName, lastName, phone, role } = req.body;
 
@@ -208,8 +207,7 @@ router.post(
  */
 router.post(
   "/login",
-  authValidators.login,
-  validationMiddleware,
+  validateRequest(authValidators.loginSchema),
   async (req, res) => {
     const { email, password } = req.body;
 
