@@ -46,6 +46,13 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Authentication routes
+  app.post("/api/auth/login", handleLogin);
+  app.post("/api/auth/register", handleRegister);
+  app.get("/api/auth/me", handleGetCurrentUser);
+  app.post("/api/auth/logout", handleLogout);
+  app.post("/api/auth/refresh", handleRefreshToken);
+
   // Mock tutoring marketplace API routes
   app.get("/api/search/teachers", handleSearchTeachers);
   app.get("/api/subjects", handleGetSubjects);
