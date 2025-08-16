@@ -622,6 +622,41 @@ class ApiClient {
     });
   }
 
+  async bulkUpdateAvailability(
+    rules: Array<Omit<AvailabilityRule, "id">>,
+    replaceExisting: boolean = false
+  ): Promise<{ message: string; rulesCreated: number }> {
+    return this.request<{ message: string; rulesCreated: number }>("/availability/bulk", {
+      method: "POST",
+      body: JSON.stringify({ rules, replaceExisting }),
+    });
+  }
+
+  async getTeacherSchedule(
+    teacherId: string,
+    startDate: string,
+    endDate: string,
+    timezone: string = "Asia/Tashkent"
+  ): Promise<{
+    schedule: any[];
+    availabilityRules: AvailabilityRule[];
+    bookings: number;
+    timezone: string;
+  }> {
+    const params = new URLSearchParams({
+      startDate,
+      endDate,
+      timezone,
+    });
+
+    return this.request<{
+      schedule: any[];
+      availabilityRules: AvailabilityRule[];
+      bookings: number;
+      timezone: string;
+    }>(`/availability/${teacherId}/schedule?${params}`);
+  }
+
   async getAvailableSlots(
     teacherId: string,
     params: {
