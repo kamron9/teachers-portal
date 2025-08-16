@@ -116,6 +116,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import {
+  useTeacherProfile,
+  useBookings,
+  useUpdateBookingStatus,
+  useCancelBooking,
+} from "@/hooks/useApi";
+import { formatPrice, formatTimezone, Booking } from "@/lib/api";
 
 interface SidebarItem {
   id: string;
