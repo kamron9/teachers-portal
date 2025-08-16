@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,26 +6,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslation } from "react-i18next";
 
 const languages = [
   { code: "uz", name: "O'zbek", flag: "🇺🇿" },
   { code: "ru", name: "Русский", flag: "🇷🇺" },
+  { code: "en", name: "English", flag: "🇺🇸" },
 ];
 
 export default function LanguageSwitcher() {
-  const [currentLanguage, setCurrentLanguage] = useState("uz");
+  const { i18n } = useTranslation();
 
   const getCurrentLanguage = () => {
     return (
-      languages.find((lang) => lang.code === currentLanguage) || languages[0]
+      languages.find((lang) => lang.code === i18n.language) || languages[0]
     );
   };
 
   const handleLanguageChange = (langCode: string) => {
-    setCurrentLanguage(langCode);
-    // Bu yerda til o'zgarishi logic bo'ladi
-    // localStorage.setItem('language', langCode);
-    // i18n.changeLanguage(langCode);
+    i18n.changeLanguage(langCode);
   };
 
   return (
