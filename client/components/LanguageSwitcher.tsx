@@ -32,7 +32,6 @@ export default function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="gap-2">
           <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">{getCurrentLanguage().flag}</span>
           <span className="hidden sm:inline">{getCurrentLanguage().name}</span>
         </Button>
       </DropdownMenuTrigger>
