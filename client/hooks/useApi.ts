@@ -182,66 +182,12 @@ export function useSubjects(
 ) {
   return useQuery({
     queryKey: queryKeys.subjects(params),
-    queryFn: async () => {
-      // Fallback mock data for development
-      return {
-        subjects: [
-          {
-            id: "1",
-            name: "Ingliz tili",
-            teacherCount: 45,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "2",
-            name: "Matematika",
-            teacherCount: 32,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "3",
-            name: "Fizika",
-            teacherCount: 28,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "4",
-            name: "Kimyo",
-            teacherCount: 21,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "5",
-            name: "Dasturlash",
-            teacherCount: 18,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "6",
-            name: "IELTS",
-            teacherCount: 15,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ],
-        categories: ["Tillar", "Aniq fanlar", "Texnologiya"],
-        totalCount: 6,
-        page: 1,
-        totalPages: 1,
-      };
-    },
+    queryFn: () => apiClient.getSubjects(params),
     staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: (failureCount, error: any) => {
+      if (error?.status === 400) return false;
+      return failureCount < 3;
+    },
     ...options,
   });
 }
