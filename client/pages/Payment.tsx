@@ -121,7 +121,7 @@ export default function Payment() {
 
   const handlePayment = async () => {
     if (!agreedToTerms) {
-      alert("Iltimos, shartlar va qoidalarni qabul qiling");
+      toast.error("Iltimos, shartlar va qoidalarni qabul qiling");
       return;
     }
 
