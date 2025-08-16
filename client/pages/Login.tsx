@@ -10,7 +10,7 @@ import {
   Loader2,
   Shield,
   CheckCircle,
-  User,
+  User as UserIcon,
   GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
