@@ -10,7 +10,7 @@ import {
   Loader2,
   Shield,
   CheckCircle,
-  User,
+  User as UserIcon,
   GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -165,7 +165,7 @@ export default function Login() {
                       htmlFor="student"
                       className="flex-1 flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                     >
-                      <User className="h-5 w-5 text-blue-600" />
+                      <UserIcon className="h-5 w-5 text-blue-600" />
                       <div>
                         <div className="font-medium">Student</div>
                         <div className="text-sm text-gray-600">
@@ -364,7 +364,7 @@ export default function Login() {
                 <div className="flex gap-2">
                   <Link to="/student-register" className="flex-1">
                     <Button variant="outline" size="sm" className="w-full">
-                      <User className="h-4 w-4 mr-2" />
+                      <UserIcon className="h-4 w-4 mr-2" />
                       Sign up as Student
                     </Button>
                   </Link>

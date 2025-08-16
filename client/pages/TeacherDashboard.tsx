@@ -116,6 +116,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import {
+  useTeacherProfile,
+  useBookings,
+  useUpdateBookingStatus,
+  useCancelBooking,
+} from "@/hooks/useApi";
+import { formatPrice, formatTimezone, Booking } from "@/lib/api";
 
 interface SidebarItem {
   id: string;
@@ -129,6 +136,28 @@ export default function TeacherDashboard() {
   const [activeSection, setActiveSection] = useState("overview");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Fetch real data
+  const { data: teacherProfile, isLoading: profileLoading } = useTeacherProfile();
+  const { data: bookingsData, isLoading: bookingsLoading } = useBookings({
+    limit: 10,
+    sortBy: "startAt",
+    sortOrder: "asc",
+  });
+  const { data: upcomingBookingsData } = useBookings({
+    status: ["PENDING", "CONFIRMED"],
+    limit: 5,
+    sortBy: "startAt",
+    sortOrder: "asc",
+  });
+
+  // Booking mutations
+  const updateBookingMutation = useUpdateBookingStatus();
+  const cancelBookingMutation = useCancelBooking();
+
+  // Extract data
+  const bookings = bookingsData?.data || [];
+  const upcomingBookings = upcomingBookingsData?.data || [];
 
   // Profile management state - moved to top level to follow Rules of Hooks
   const [isEditing, setIsEditing] = useState(false);
@@ -478,21 +507,35 @@ export default function TeacherDashboard() {
     setHasUnsavedChanges(true);
   };
 
-  // Mock teacher data
-  const teacher = {
-    name: "Aziza Karimova",
-    email: "aziza@example.com",
+  // Teacher data from API
+  const teacher = teacherProfile ? {
+    name: `${teacherProfile.firstName} ${teacherProfile.lastName}`,
+    email: teacherProfile.user?.email || "",
+    image: teacherProfile.avatar || "/placeholder.svg",
+    title: teacherProfile.bioEn || teacherProfile.bioUz || "Teacher",
+    joinDate: teacherProfile.createdAt,
+    isOnline: teacherProfile.isActive,
+    profileCompletion: teacherProfile.profileCompletion || 0,
+    rating: teacherProfile.rating || 0,
+    totalStudents: 0, // This would be calculated from bookings
+    totalLessons: teacherProfile.totalLessons || 0,
+    totalEarnings: teacherProfile.totalEarnings || 0,
+    pendingBookings: upcomingBookings.filter(b => b.status === "PENDING").length,
+    unreadMessages: 0, // This would come from messages API
+  } : {
+    name: "Teacher",
+    email: "",
     image: "/placeholder.svg",
-    title: "English Language Expert",
-    joinDate: "2024-01-01",
-    isOnline: true,
-    profileCompletion: 85,
-    rating: 4.9,
-    totalStudents: 89,
-    totalLessons: 340,
-    totalEarnings: 17000000,
-    pendingBookings: 3,
-    unreadMessages: 5,
+    title: "Teacher",
+    joinDate: "",
+    isOnline: false,
+    profileCompletion: 0,
+    rating: 0,
+    totalStudents: 0,
+    totalLessons: 0,
+    totalEarnings: 0,
+    pendingBookings: 0,
+    unreadMessages: 0,
   };
 
   const sidebarItems: SidebarItem[] = [
@@ -2394,10 +2437,10 @@ export default function TeacherDashboard() {
           <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={() => setShowAvailabilityModal(true)}
+              onClick={() => navigate("/teacher-availability")}
             >
               <Settings className="h-4 w-4 mr-2" />
-              Set Availability
+              Manage Availability
             </Button>
             <Button variant="outline">
               <Plus className="h-4 w-4 mr-2" />

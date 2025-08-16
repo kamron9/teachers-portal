@@ -27,6 +27,7 @@ import searchRoutes from "./routes/search";
 import adminRoutes from "./routes/admin";
 import notificationRoutes from "./routes/notifications";
 import reportRoutes from "./routes/reports";
+import availabilityRoutes from "./routes/availability";
 
 const app = express();
 const server = createServer(app);
@@ -135,6 +136,12 @@ app.use(
   notificationRoutes,
 );
 app.use(`${apiVersion}/reports`, authMiddleware, auditMiddleware, reportRoutes);
+app.use(
+  `${apiVersion}/availability`,
+  authMiddleware,
+  auditMiddleware,
+  availabilityRoutes,
+);
 
 // Admin routes (admin auth required)
 app.use(`${apiVersion}/admin`, authMiddleware, auditMiddleware, adminRoutes);

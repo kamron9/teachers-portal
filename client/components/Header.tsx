@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   Menu,
   X,
-  User,
+  User as UserIcon,
   BookOpen,
   MessageCircle,
   Settings,
@@ -171,13 +171,13 @@ export default function Header() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link to={getDashboardLink()}>
-                        <User className="mr-2 h-4 w-4" />
+                        <UserIcon className="mr-2 h-4 w-4" />
                         <span>Bosh sahifa</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/profile">
-                        <User className="mr-2 h-4 w-4" />
+                        <UserIcon className="mr-2 h-4 w-4" />
                         <span>Profil</span>
                       </Link>
                     </DropdownMenuItem>
@@ -299,7 +299,7 @@ export default function Header() {
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <Button variant="ghost" className="w-full justify-start">
-                        <User className="mr-2 h-4 w-4" />
+                        <UserIcon className="mr-2 h-4 w-4" />
                         Bosh sahifa
                       </Button>
                     </Link>
@@ -308,7 +308,7 @@ export default function Header() {
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <Button variant="ghost" className="w-full justify-start">
-                        <User className="mr-2 h-4 w-4" />
+                        <UserIcon className="mr-2 h-4 w-4" />
                         Profil
                       </Button>
                     </Link>

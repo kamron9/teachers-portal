@@ -5,6 +5,7 @@ import { createServer } from "./server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  root: "./",
   server: {
     host: "::",
     port: 8080,
@@ -12,13 +13,14 @@ export default defineConfig(({ mode }) => ({
       allow: ["./client", "./shared"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
     },
-    proxy: {
-      "/api/v1": {
-        target: "http://localhost:3001",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    // Proxy disabled - API served directly by Express plugin
+    // proxy: {
+    //   "/api/v1": {
+    //     target: "http://localhost:3001",
+    //     changeOrigin: true,
+    //     secure: false,
+    //   },
+    // },
   },
   build: {
     outDir: "dist/spa",
