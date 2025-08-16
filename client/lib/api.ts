@@ -363,43 +363,6 @@ class ApiClient {
       console.error(`[API] Fetch error for ${url}:`, error);
       throw error;
     }
-
-    // Handle 401 responses
-    if (response.status === 401 && this.tokens) {
-      const refreshed = await this.refreshTokens();
-      if (refreshed) {
-        // Retry the original request with new token
-        headers.Authorization = `Bearer ${this.tokens!.accessToken}`;
-        const retryResponse = await fetch(url, {
-          ...options,
-          headers,
-        });
-
-        if (!retryResponse.ok) {
-          const error: ApiError = await retryResponse.json().catch(() => ({
-            error: "RequestFailed",
-            message: "Request failed",
-          }));
-          throw error;
-        }
-
-        return retryResponse.json();
-      } else {
-        // Refresh failed, redirect to login
-        window.location.href = "/login";
-        throw new Error("Authentication required");
-      }
-    }
-
-    if (!response.ok) {
-      const error: ApiError = await response.json().catch(() => ({
-        error: "RequestFailed",
-        message: "Request failed",
-      }));
-      throw error;
-    }
-
-    return response.json();
   }
 
   // Auth methods
