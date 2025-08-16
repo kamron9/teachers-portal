@@ -408,7 +408,7 @@ export default function TeacherRegister() {
                     <Label htmlFor="experience">O'qitish tajribasi (yillar) *</Label>
                     <Select value={basicInfo.experience} onValueChange={(value) => setBasicInfo(prev => ({...prev, experience: value}))}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select your experience level" />
+                        <SelectValue placeholder="Tajriba darajangizni tanlang" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="0-1">Less than 1 year</SelectItem>
