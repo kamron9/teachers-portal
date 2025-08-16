@@ -113,7 +113,7 @@ export function createServer() {
   });
 
   // Availability endpoints (without parameterized routes for now)
-  app.post("/api/v1/availability", (_req, res) => {
+  app.post("/api/v1/availability", (req, res) => {
     res.status(201).json({
       id: `rule-${Date.now()}`,
       ...req.body,
