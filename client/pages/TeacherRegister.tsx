@@ -421,7 +421,7 @@ export default function TeacherRegister() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label>Languages You Teach In *</Label>
+                    <Label>O'qitish tillari *</Label>
                     <div className="flex flex-wrap gap-2">
                       {languages.map((language) => (
                         <Badge
