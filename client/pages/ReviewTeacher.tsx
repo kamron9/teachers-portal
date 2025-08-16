@@ -81,7 +81,7 @@ export default function ReviewTeacher() {
       await new Promise(resolve => setTimeout(resolve, 2000));
       setIsSubmitted(true);
     } catch (error) {
-      alert("Failed to submit review. Please try again.");
+      toast.error("Sharh yuborishda xato. Qayta urinib ko'ring.");
     } finally {
       setIsSubmitting(false);
     }
