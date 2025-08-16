@@ -27,10 +27,10 @@ interface SocketProviderProps {
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const { user, token } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (user && token) {
+    if (user && isAuthenticated) {
       // Create socket connection with authentication
       const newSocket = io(
         process.env.NODE_ENV === "production"
@@ -38,7 +38,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
           : "http://localhost:3001",
         {
           auth: {
-            token: token,
+            userId: user.id,
           },
           transports: ["websocket"],
         },
@@ -69,7 +69,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         setIsConnected(false);
       };
     }
-  }, [user, token]);
+  }, [user, isAuthenticated]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected }}>

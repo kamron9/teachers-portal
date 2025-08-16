@@ -5,7 +5,7 @@ import { body } from "express-validator";
 import { prisma } from "../lib/prisma";
 import { config } from "../config";
 import { authValidators } from "../validators/authValidators";
-import { validationMiddleware } from "../middleware/validation";
+import { validateRequest } from "../middleware/validation";
 import { authMiddleware } from "../middleware/auth";
 import { logger } from "../utils/logger";
 import { AppError } from "../utils/errors";
@@ -80,8 +80,7 @@ const router = express.Router();
  */
 router.post(
   "/register",
-  authValidators.register,
-  validationMiddleware,
+  validateRequest(authValidators.registerSchema),
   async (req, res) => {
     const { email, password, firstName, lastName, phone, role } = req.body;
 
@@ -102,36 +101,50 @@ router.post(
       data: {
         email,
         password: hashedPassword,
-        firstName,
-        lastName,
         phone,
         role: role as "STUDENT" | "TEACHER",
       },
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
         phone: true,
         role: true,
-        avatar: true,
-        isVerified: true,
+        emailVerified: true,
         status: true,
         createdAt: true,
       },
     });
 
+    // Profile yaratish
+    if (role === "STUDENT") {
+      await prisma.studentProfile.create({
+        data: {
+          userId: user.id,
+          firstName,
+          lastName,
+        },
+      });
+    } else if (role === "TEACHER") {
+      await prisma.teacherProfile.create({
+        data: {
+          userId: user.id,
+          firstName,
+          lastName,
+        },
+      });
+    }
+
     // Token yaratish
     const accessToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       config.jwtSecret,
-      { expiresIn: config.jwtExpiration },
+      { expiresIn: config.jwtExpiresIn },
     );
 
     const refreshToken = jwt.sign(
       { userId: user.id },
       config.jwtRefreshSecret,
-      { expiresIn: config.jwtRefreshExpiration },
+      { expiresIn: config.jwtRefreshExpiresIn },
     );
 
     logger.info("User registered successfully", { userId: user.id, email });
@@ -194,8 +207,7 @@ router.post(
  */
 router.post(
   "/login",
-  authValidators.login,
-  validationMiddleware,
+  validateRequest(authValidators.loginSchema),
   async (req, res) => {
     const { email, password } = req.body;
 
@@ -206,14 +218,25 @@ router.post(
         id: true,
         email: true,
         password: true,
-        firstName: true,
-        lastName: true,
         phone: true,
         role: true,
-        avatar: true,
-        isVerified: true,
+        emailVerified: true,
         status: true,
         createdAt: true,
+        studentProfile: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
+        teacherProfile: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
       },
     });
 
@@ -236,13 +259,13 @@ router.post(
     const accessToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       config.jwtSecret,
-      { expiresIn: config.jwtExpiration },
+      { expiresIn: config.jwtExpiresIn },
     );
 
     const refreshToken = jwt.sign(
       { userId: user.id },
       config.jwtRefreshSecret,
-      { expiresIn: config.jwtRefreshExpiration },
+      { expiresIn: config.jwtRefreshExpiresIn },
     );
 
     // Parolni response dan olib tashlash
@@ -319,13 +342,13 @@ router.post("/refresh", async (req, res) => {
     const newAccessToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       config.jwtSecret,
-      { expiresIn: config.jwtExpiration },
+      { expiresIn: config.jwtExpiresIn },
     );
 
     const newRefreshToken = jwt.sign(
       { userId: user.id },
       config.jwtRefreshSecret,
-      { expiresIn: config.jwtRefreshExpiration },
+      { expiresIn: config.jwtRefreshExpiresIn },
     );
 
     res.json({
@@ -363,15 +386,26 @@ router.get("/profile", authMiddleware, async (req, res) => {
     select: {
       id: true,
       email: true,
-      firstName: true,
-      lastName: true,
       phone: true,
       role: true,
-      avatar: true,
-      isVerified: true,
+      emailVerified: true,
       status: true,
       createdAt: true,
       updatedAt: true,
+      studentProfile: {
+        select: {
+          firstName: true,
+          lastName: true,
+          avatar: true,
+        },
+      },
+      teacherProfile: {
+        select: {
+          firstName: true,
+          lastName: true,
+          avatar: true,
+        },
+      },
     },
   });
 
