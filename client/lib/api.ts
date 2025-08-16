@@ -260,7 +260,6 @@ class ApiClient {
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
-    console.log(`[API] ApiClient constructor - baseURL: ${baseURL}`);
     this.loadTokens();
   }
 
