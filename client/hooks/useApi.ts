@@ -387,11 +387,12 @@ export function useTeacherSchedule(
   teacherId: string,
   startDate: string,
   endDate: string,
-  timezone: string = "Asia/Tashkent"
+  timezone: string = "Asia/Tashkent",
 ) {
   return useQuery({
     queryKey: ["schedule", teacherId, startDate, endDate, timezone],
-    queryFn: () => apiClient.getTeacherSchedule(teacherId, startDate, endDate, timezone),
+    queryFn: () =>
+      apiClient.getTeacherSchedule(teacherId, startDate, endDate, timezone),
     enabled: !!teacherId && !!startDate && !!endDate,
   });
 }
@@ -554,7 +555,6 @@ export function useCreatePayment() {
     },
   });
 }
-
 
 // Review Hooks
 export function useTeacherReviews(
