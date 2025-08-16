@@ -41,7 +41,7 @@ export default function LanguageSwitcher() {
             key={language.code}
             onClick={() => handleLanguageChange(language.code)}
             className={`cursor-pointer ${
-              currentLanguage === language.code ? "bg-gray-100" : ""
+              i18n.language === language.code ? "bg-gray-100" : ""
             }`}
           >
             <span className="mr-2">{language.flag}</span>
