@@ -115,7 +115,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
           navigate("/");
       }
     } catch (error: any) {
-      console.error("Registration failed:", error);
       toast.error(error.message || "Ro'yxatdan o'tish xatosi");
       throw error;
     } finally {
