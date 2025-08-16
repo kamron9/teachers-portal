@@ -35,7 +35,7 @@ export function createServer() {
   app.get("/api/wallet/entries", handleGetWalletEntries);
 
   // Catch-all for unimplemented API routes - return mock "not implemented" response
-  app.use("/api/*", handleNotImplemented);
+  app.use("/api*", handleNotImplemented);
 
   return app;
 }
