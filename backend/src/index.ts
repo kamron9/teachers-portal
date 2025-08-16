@@ -27,6 +27,7 @@ import searchRoutes from "./routes/search";
 import adminRoutes from "./routes/admin";
 import notificationRoutes from "./routes/notifications";
 import reportRoutes from "./routes/reports";
+import availabilityRoutes from "./routes/availability";
 
 const app = express();
 const server = createServer(app);
