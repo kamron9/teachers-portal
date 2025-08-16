@@ -155,7 +155,17 @@ export function useTeacherSearch(
   return useQuery({
     queryKey: queryKeys.teacherSearch(params),
     queryFn: () => apiClient.searchTeachers(params),
+<<<<<<< HEAD
     staleTime: 1000 * 60 * 2, // 2 minutes
+=======
+    enabled: true,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: (failureCount, error: any) => {
+      // Don't retry on 400 errors (bad request)
+      if (error?.status === 400) return false;
+      return failureCount < 3;
+    },
+>>>>>>> refs/remotes/origin/main
     ...options,
   });
 }
@@ -176,66 +186,12 @@ export function useSubjects(
 ) {
   return useQuery({
     queryKey: queryKeys.subjects(params),
-    queryFn: async () => {
-      // Fallback mock data for development
-      return {
-        subjects: [
-          {
-            id: "1",
-            name: "Ingliz tili",
-            teacherCount: 45,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "2",
-            name: "Matematika",
-            teacherCount: 32,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "3",
-            name: "Fizika",
-            teacherCount: 28,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "4",
-            name: "Kimyo",
-            teacherCount: 21,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "5",
-            name: "Dasturlash",
-            teacherCount: 18,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "6",
-            name: "IELTS",
-            teacherCount: 15,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ],
-        categories: ["Tillar", "Aniq fanlar", "Texnologiya"],
-        totalCount: 6,
-        page: 1,
-        totalPages: 1,
-      };
-    },
+    queryFn: () => apiClient.getSubjects(params),
     staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: (failureCount, error: any) => {
+      if (error?.status === 400) return false;
+      return failureCount < 3;
+    },
     ...options,
   });
 }
@@ -585,12 +541,13 @@ export function useCreatePayment() {
 
   return useMutation({
     mutationFn: (data: {
+      amount: number;
+      provider: "CLICK" | "PAYME" | "UZUM_BANK" | "STRIPE";
       bookingId?: string;
       packageId?: string;
-      provider: string;
       returnUrl: string;
       cancelUrl: string;
-      paymentMethodId?: string;
+      savePaymentMethod?: boolean;
     }) => apiClient.createPayment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
@@ -598,6 +555,63 @@ export function useCreatePayment() {
     },
     onError: (error: ApiError) => {
       toast.error(error.message || "To'lov yaratilmadi");
+    },
+  });
+}
+
+export function usePaymentStatus(
+  paymentId: string,
+  options?: Partial<UseQueryOptions>,
+) {
+  return useQuery({
+    queryKey: ["payment", "status", paymentId],
+    queryFn: () => apiClient.getPaymentStatus(paymentId),
+    enabled: !!paymentId,
+    refetchInterval: 2000, // Poll every 2 seconds
+    staleTime: 0, // Always fetch fresh data
+    ...options,
+  });
+}
+
+// Wallet Hooks
+export function useWalletBalance() {
+  return useQuery({
+    queryKey: ["wallet", "balance"],
+    queryFn: () => apiClient.getWalletBalance(),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+export function useWalletEntries(params?: {
+  status?: "PENDING" | "AVAILABLE" | "PAID";
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}) {
+  return useQuery({
+    queryKey: ["wallet", "entries", params],
+    queryFn: () => apiClient.getWalletEntries(params),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+export function useRequestPayout() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      amount: number;
+      method: "bank_transfer" | "card";
+      accountRef: string;
+      note?: string;
+    }) => apiClient.requestPayout(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wallet"] });
+      toast.success("To'lov so'rovi yuborildi");
+    },
+    onError: (error: ApiError) => {
+      toast.error(error.message || "To'lov so'rovi yuborilmadi");
     },
   });
 }
@@ -738,17 +752,12 @@ export function useNotifications(
 ) {
   return useQuery({
     queryKey: queryKeys.notifications(params),
-    queryFn: async () => {
-      // Fallback mock data for development
-      return {
-        notifications: [],
-        unreadCount: 0,
-        totalCount: 0,
-        page: 1,
-        totalPages: 1,
-      };
-    },
+    queryFn: () => apiClient.getNotifications(params),
     staleTime: 1000 * 30, // 30 seconds
+    retry: (failureCount, error: any) => {
+      if (error?.status === 400) return false;
+      return failureCount < 3;
+    },
     ...options,
   });
 }
