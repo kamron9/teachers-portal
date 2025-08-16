@@ -275,7 +275,7 @@ export default function TeacherRegister() {
                         Kod yuborilmoqda...
                       </>
                     ) : (
-                      `Send Verification Code`
+                      'Tasdiqlash kodini yuborish'
                     )}
                   </Button>
                 </div>
