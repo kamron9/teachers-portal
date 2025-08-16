@@ -3,6 +3,9 @@ import { z } from "zod";
 // Base API configuration
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
+// Debug log to verify the API base URL being used
+console.log(`[API] Using API_BASE_URL: ${API_BASE_URL}`);
+
 // Types from backend
 export interface User {
   id: string;
