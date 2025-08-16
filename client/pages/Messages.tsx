@@ -87,8 +87,7 @@ export default function Messages() {
   };
 
   const handleCallStart = (type: 'audio' | 'video') => {
-    console.log(`Starting ${type} call with user:`, selectedUser?.id);
-    // Implement call functionality
+    // TODO: Implement call functionality
   };
 
   const handleUserInfo = () => {
