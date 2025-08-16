@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   Menu,
   X,
-  User,
+  User as UserIcon,
   BookOpen,
   MessageCircle,
   Settings,
