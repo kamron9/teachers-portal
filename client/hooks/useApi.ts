@@ -155,9 +155,6 @@ export function useTeacherSearch(
   return useQuery({
     queryKey: queryKeys.teacherSearch(params),
     queryFn: () => apiClient.searchTeachers(params),
-<<<<<<< HEAD
-    staleTime: 1000 * 60 * 2, // 2 minutes
-=======
     enabled: true,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: (failureCount, error: any) => {
@@ -165,7 +162,6 @@ export function useTeacherSearch(
       if (error?.status === 400) return false;
       return failureCount < 3;
     },
->>>>>>> refs/remotes/origin/main
     ...options,
   });
 }
