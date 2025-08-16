@@ -158,9 +158,14 @@ export function useTeacherSearch(
     enabled: true,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: (failureCount, error: any) => {
-      // Don't retry on 400 errors (bad request)
-      if (error?.status === 400) return false;
+      // Don't retry on 400 errors (bad request) or 501 (not implemented)
+      if (error?.status === 400 || error?.status === 501) return false;
       return failureCount < 3;
+    },
+    onError: (error: any) => {
+      if (error?.status !== 501) {
+        console.error("Teacher search failed:", error);
+      }
     },
     ...options,
   });
