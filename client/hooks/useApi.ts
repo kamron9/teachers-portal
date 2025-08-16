@@ -504,7 +504,7 @@ export function useCreatePayment() {
   return useMutation({
     mutationFn: (data: {
       amount: number;
-      provider: 'CLICK' | 'PAYME' | 'UZUM_BANK' | 'STRIPE';
+      provider: "CLICK" | "PAYME" | "UZUM_BANK" | "STRIPE";
       bookingId?: string;
       packageId?: string;
       returnUrl: string;
@@ -521,9 +521,12 @@ export function useCreatePayment() {
   });
 }
 
-export function usePaymentStatus(paymentId: string, options?: Partial<UseQueryOptions>) {
+export function usePaymentStatus(
+  paymentId: string,
+  options?: Partial<UseQueryOptions>,
+) {
   return useQuery({
-    queryKey: ['payment', 'status', paymentId],
+    queryKey: ["payment", "status", paymentId],
     queryFn: () => apiClient.getPaymentStatus(paymentId),
     enabled: !!paymentId,
     refetchInterval: 2000, // Poll every 2 seconds
@@ -535,21 +538,21 @@ export function usePaymentStatus(paymentId: string, options?: Partial<UseQueryOp
 // Wallet Hooks
 export function useWalletBalance() {
   return useQuery({
-    queryKey: ['wallet', 'balance'],
+    queryKey: ["wallet", "balance"],
     queryFn: () => apiClient.getWalletBalance(),
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }
 
 export function useWalletEntries(params?: {
-  status?: 'PENDING' | 'AVAILABLE' | 'PAID';
+  status?: "PENDING" | "AVAILABLE" | "PAID";
   startDate?: string;
   endDate?: string;
   page?: number;
   limit?: number;
 }) {
   return useQuery({
-    queryKey: ['wallet', 'entries', params],
+    queryKey: ["wallet", "entries", params],
     queryFn: () => apiClient.getWalletEntries(params),
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
@@ -561,12 +564,12 @@ export function useRequestPayout() {
   return useMutation({
     mutationFn: (data: {
       amount: number;
-      method: 'bank_transfer' | 'card';
+      method: "bank_transfer" | "card";
       accountRef: string;
       note?: string;
     }) => apiClient.requestPayout(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
+      queryClient.invalidateQueries({ queryKey: ["wallet"] });
       toast.success("To'lov so'rovi yuborildi");
     },
     onError: (error: ApiError) => {

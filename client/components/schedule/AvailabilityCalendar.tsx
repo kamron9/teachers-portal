@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +33,7 @@ interface TimeSlot {
   isAvailable: boolean;
   price: number;
   duration: number;
-  type: 'trial' | 'regular';
+  type: "trial" | "regular";
 }
 
 interface AvailabilityCalendarProps {
@@ -46,42 +46,56 @@ interface AvailabilityCalendarProps {
   className?: string;
 }
 
-const WEEKDAYS = ['Yak', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh'];
+const WEEKDAYS = ["Yak", "Du", "Se", "Ch", "Pa", "Ju", "Sh"];
 const MONTHS = [
-  'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun',
-  'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'
+  "Yanvar",
+  "Fevral",
+  "Mart",
+  "Aprel",
+  "May",
+  "Iyun",
+  "Iyul",
+  "Avgust",
+  "Sentabr",
+  "Oktabr",
+  "Noyabr",
+  "Dekabr",
 ];
 
 export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
   teacherId,
   teacherName,
   teacherAvatar,
-  timezone = 'Asia/Tashkent',
+  timezone = "Asia/Tashkent",
   onSlotSelect,
   selectedSlotId,
   className,
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState<'month' | 'week'>('week');
+  const [viewMode, setViewMode] = useState<"month" | "week">("week");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [duration, setDuration] = useState(60);
 
   // Calculate date range for API call
-  const startDate = viewMode === 'month' 
-    ? new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-    : new Date(currentDate.getTime() - (currentDate.getDay() * 24 * 60 * 60 * 1000));
-    
-  const endDate = viewMode === 'month'
-    ? new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
-    : new Date(startDate.getTime() + (6 * 24 * 60 * 60 * 1000));
+  const startDate =
+    viewMode === "month"
+      ? new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+      : new Date(
+          currentDate.getTime() - currentDate.getDay() * 24 * 60 * 60 * 1000,
+        );
 
-  const { 
-    data: slotsData, 
+  const endDate =
+    viewMode === "month"
+      ? new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
+      : new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
+
+  const {
+    data: slotsData,
     isLoading: slotsLoading,
-    error: slotsError 
+    error: slotsError,
   } = useAvailableSlots(teacherId, {
-    startDate: startDate.toISOString().split('T')[0],
-    endDate: endDate.toISOString().split('T')[0],
+    startDate: startDate.toISOString().split("T")[0],
+    endDate: endDate.toISOString().split("T")[0],
     timezone,
     duration,
   });
@@ -89,27 +103,30 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
   const slots: TimeSlot[] = slotsData?.slots || [];
 
   // Group slots by date
-  const slotsByDate = slots.reduce((acc, slot) => {
-    const date = new Date(slot.startAt).toISOString().split('T')[0];
-    if (!acc[date]) acc[date] = [];
-    acc[date].push(slot);
-    return acc;
-  }, {} as Record<string, TimeSlot[]>);
+  const slotsByDate = slots.reduce(
+    (acc, slot) => {
+      const date = new Date(slot.startAt).toISOString().split("T")[0];
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(slot);
+      return acc;
+    },
+    {} as Record<string, TimeSlot[]>,
+  );
 
   const navigateMonth = (direction: 1 | -1) => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev) => {
       const newDate = new Date(prev);
-      if (viewMode === 'month') {
+      if (viewMode === "month") {
         newDate.setMonth(newDate.getMonth() + direction);
       } else {
-        newDate.setDate(newDate.getDate() + (direction * 7));
+        newDate.setDate(newDate.getDate() + direction * 7);
       }
       return newDate;
     });
   };
 
   const generateCalendarDays = () => {
-    if (viewMode === 'week') {
+    if (viewMode === "week") {
       const days = [];
       const start = new Date(startDate);
       for (let i = 0; i < 7; i++) {
@@ -157,29 +174,31 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
   };
 
   const hasSlots = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = date.toISOString().split("T")[0];
     return slotsByDate[dateStr]?.length > 0;
   };
 
   const getDaySlots = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = date.toISOString().split("T")[0];
     return slotsByDate[dateStr] || [];
   };
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('uz-UZ', {
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Date(dateString).toLocaleTimeString("uz-UZ", {
+      hour: "2-digit",
+      minute: "2-digit",
       timeZone: timezone,
     });
   };
 
   const getSlotTypeLabel = (type: string) => {
-    return type === 'trial' ? 'Sinov' : 'Oddiy';
+    return type === "trial" ? "Sinov" : "Oddiy";
   };
 
   const getSlotTypeColor = (type: string) => {
-    return type === 'trial' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
+    return type === "trial"
+      ? "bg-green-100 text-green-800"
+      : "bg-blue-100 text-blue-800";
   };
 
   const handleDateClick = (date: Date) => {
@@ -193,20 +212,25 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
   };
 
   const renderCalendarGrid = () => {
-    if (viewMode === 'week') {
+    if (viewMode === "week") {
       return (
         <div className="space-y-4">
           {/* Week Header */}
           <div className="grid grid-cols-7 gap-1">
             {calendarDays.map((date, index) => (
               <div key={index} className="text-center p-2">
-                <div className="text-xs text-gray-500">{WEEKDAYS[date.getDay()]}</div>
-                <div className={cn(
-                  "text-lg font-medium mt-1 w-8 h-8 flex items-center justify-center rounded-full mx-auto",
-                  isToday(date) && "bg-primary text-white",
-                  selectedDate?.toDateString() === date.toDateString() && "bg-primary/20",
-                  isPast(date) && "text-gray-300"
-                )}>
+                <div className="text-xs text-gray-500">
+                  {WEEKDAYS[date.getDay()]}
+                </div>
+                <div
+                  className={cn(
+                    "text-lg font-medium mt-1 w-8 h-8 flex items-center justify-center rounded-full mx-auto",
+                    isToday(date) && "bg-primary text-white",
+                    selectedDate?.toDateString() === date.toDateString() &&
+                      "bg-primary/20",
+                    isPast(date) && "text-gray-300",
+                  )}
+                >
                   {date.getDate()}
                 </div>
                 {hasSlots(date) && !isPast(date) && (
@@ -234,12 +258,14 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                     daySlots.slice(0, 4).map((slot) => (
                       <Button
                         key={slot.id}
-                        variant={selectedSlotId === slot.id ? "default" : "outline"}
+                        variant={
+                          selectedSlotId === slot.id ? "default" : "outline"
+                        }
                         size="sm"
                         className={cn(
                           "w-full text-xs h-8",
                           !slot.isAvailable && "opacity-50 cursor-not-allowed",
-                          selectedSlotId === slot.id && "ring-2 ring-primary"
+                          selectedSlotId === slot.id && "ring-2 ring-primary",
                         )}
                         onClick={() => handleSlotClick(slot)}
                         disabled={!slot.isAvailable}
@@ -267,7 +293,10 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
         {/* Month Header */}
         <div className="grid grid-cols-7 gap-1 mb-2">
           {WEEKDAYS.map((day) => (
-            <div key={day} className="text-center text-sm font-medium text-gray-600 py-2">
+            <div
+              key={day}
+              className="text-center text-sm font-medium text-gray-600 py-2"
+            >
               {day}
             </div>
           ))}
@@ -278,7 +307,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
           {calendarDays.map((date, index) => {
             const daySlots = getDaySlots(date);
             const isAvailable = hasSlots(date) && !isPast(date);
-            
+
             return (
               <button
                 key={index}
@@ -290,8 +319,11 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                   isPast(date) && "text-gray-300 cursor-not-allowed",
                   isAvailable && "hover:bg-primary/10 cursor-pointer",
                   isToday(date) && "ring-2 ring-primary",
-                  selectedDate?.toDateString() === date.toDateString() && "bg-primary text-white",
-                  isAvailable && !selectedDate && "bg-green-50 text-green-700 font-medium"
+                  selectedDate?.toDateString() === date.toDateString() &&
+                    "bg-primary text-white",
+                  isAvailable &&
+                    !selectedDate &&
+                    "bg-green-50 text-green-700 font-medium",
                 )}
               >
                 {date.getDate()}
@@ -312,12 +344,12 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     if (!selectedDate) return null;
 
     const daySlots = getDaySlots(selectedDate);
-    
+
     return (
       <Card className="mt-4">
         <CardHeader>
           <CardTitle className="text-lg">
-            {selectedDate.toLocaleDateString('uz-UZ')} - Mavjud vaqtlar
+            {selectedDate.toLocaleDateString("uz-UZ")} - Mavjud vaqtlar
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -334,7 +366,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                   className={cn(
                     "flex flex-col h-auto p-3",
                     !slot.isAvailable && "opacity-50 cursor-not-allowed",
-                    selectedSlotId === slot.id && "ring-2 ring-primary"
+                    selectedSlotId === slot.id && "ring-2 ring-primary",
                   )}
                   onClick={() => handleSlotClick(slot)}
                   disabled={!slot.isAvailable}
@@ -346,7 +378,10 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                     </span>
                   </div>
                   <div className="text-xs mt-1">
-                    <Badge className={getSlotTypeColor(slot.type)} variant="secondary">
+                    <Badge
+                      className={getSlotTypeColor(slot.type)}
+                      variant="secondary"
+                    >
                       {getSlotTypeLabel(slot.type)}
                     </Badge>
                   </div>
@@ -371,7 +406,11 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
             <CardTitle className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
                 {teacherAvatar ? (
-                  <img src={teacherAvatar} alt={teacherName} className="w-full h-full rounded-full" />
+                  <img
+                    src={teacherAvatar}
+                    alt={teacherName}
+                    className="w-full h-full rounded-full"
+                  />
                 ) : (
                   <User className="h-5 w-5 text-gray-500" />
                 )}
@@ -385,7 +424,10 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
             </CardTitle>
 
             <div className="flex gap-2">
-              <Select value={duration.toString()} onValueChange={(v) => setDuration(parseInt(v))}>
+              <Select
+                value={duration.toString()}
+                onValueChange={(v) => setDuration(parseInt(v))}
+              >
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
@@ -397,7 +439,10 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                 </SelectContent>
               </Select>
 
-              <Select value={viewMode} onValueChange={(v: 'month' | 'week') => setViewMode(v)}>
+              <Select
+                value={viewMode}
+                onValueChange={(v: "month" | "week") => setViewMode(v)}
+              >
                 <SelectTrigger className="w-24">
                   <SelectValue />
                 </SelectTrigger>
@@ -417,17 +462,24 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              {viewMode === 'month' 
+              {viewMode === "month"
                 ? `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`
-                : `${startDate.getDate()}-${endDate.getDate()} ${MONTHS[startDate.getMonth()]} ${startDate.getFullYear()}`
-              }
+                : `${startDate.getDate()}-${endDate.getDate()} ${MONTHS[startDate.getMonth()]} ${startDate.getFullYear()}`}
             </CardTitle>
-            
+
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigateMonth(-1)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigateMonth(-1)}
+              >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={() => navigateMonth(1)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigateMonth(1)}
+              >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>

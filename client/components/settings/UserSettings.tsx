@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -57,19 +57,19 @@ interface UserSettingsProps {
 
 export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState("profile");
   const [isLoading, setIsLoading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Profile settings
   const [profileData, setProfileData] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '+998901234567',
-    bio: '',
-    timezone: 'Asia/Tashkent',
-    language: 'uz',
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@example.com",
+    phone: "+998901234567",
+    bio: "",
+    timezone: "Asia/Tashkent",
+    language: "uz",
   });
 
   // Notification settings
@@ -94,14 +94,14 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
       lessonReminders: true,
       soundEnabled: true,
       quietHoursEnabled: false,
-      quietHoursStart: '22:00',
-      quietHoursEnd: '08:00',
+      quietHoursStart: "22:00",
+      quietHoursEnd: "08:00",
     },
   });
 
   // Privacy settings
   const [privacySettings, setPrivacySettings] = useState({
-    profileVisibility: 'public' as 'public' | 'private' | 'students_only',
+    profileVisibility: "public" as "public" | "private" | "students_only",
     showOnlineStatus: true,
     showLastSeen: true,
     allowDirectMessages: true,
@@ -122,8 +122,8 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
 
   // Display settings
   const [displaySettings, setDisplaySettings] = useState({
-    theme: 'light' as 'light' | 'dark' | 'system',
-    fontSize: 'medium' as 'small' | 'medium' | 'large',
+    theme: "light" as "light" | "dark" | "system",
+    fontSize: "medium" as "small" | "medium" | "large",
     compactMode: false,
     animationsEnabled: true,
   });
@@ -132,10 +132,10 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
     setIsLoading(true);
     try {
       // API call to update profile
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Mock delay
-      toast.success('Profil ma\'lumotlari saqlandi');
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Mock delay
+      toast.success("Profil ma'lumotlari saqlandi");
     } catch (error) {
-      toast.error('Profil saqlanmadi');
+      toast.error("Profil saqlanmadi");
     } finally {
       setIsLoading(false);
     }
@@ -145,10 +145,10 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
     setIsLoading(true);
     try {
       // API call to update notification settings
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Mock delay
-      toast.success('Bildirishnoma sozlamalari saqlandi');
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Mock delay
+      toast.success("Bildirishnoma sozlamalari saqlandi");
     } catch (error) {
-      toast.error('Sozlamalar saqlanmadi');
+      toast.error("Sozlamalar saqlanmadi");
     } finally {
       setIsLoading(false);
     }
@@ -158,10 +158,10 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
     setIsLoading(true);
     try {
       // API call to delete account
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Mock delay
-      toast.success('Hisob o\'chirildi');
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Mock delay
+      toast.success("Hisob o'chirildi");
     } catch (error) {
-      toast.error('Hisob o\'chirilmadi');
+      toast.error("Hisob o'chirilmadi");
     } finally {
       setIsLoading(false);
       setShowDeleteDialog(false);
@@ -171,9 +171,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
   const handleExportData = async () => {
     try {
       // API call to export user data
-      toast.success('Ma\'lumotlar export qilindi');
+      toast.success("Ma'lumotlar export qilindi");
     } catch (error) {
-      toast.error('Export qilinmadi');
+      toast.error("Export qilinmadi");
     }
   };
 
@@ -214,7 +214,12 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
               <Input
                 id="firstName"
                 value={profileData.firstName}
-                onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
+                onChange={(e) =>
+                  setProfileData((prev) => ({
+                    ...prev,
+                    firstName: e.target.value,
+                  }))
+                }
               />
             </div>
             <div>
@@ -222,37 +227,48 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
               <Input
                 id="lastName"
                 value={profileData.lastName}
-                onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
+                onChange={(e) =>
+                  setProfileData((prev) => ({
+                    ...prev,
+                    lastName: e.target.value,
+                  }))
+                }
               />
             </div>
           </div>
-          
+
           <div>
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
               value={profileData.email}
-              onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+              onChange={(e) =>
+                setProfileData((prev) => ({ ...prev, email: e.target.value }))
+              }
             />
           </div>
-          
+
           <div>
             <Label htmlFor="phone">Telefon raqam</Label>
             <Input
               id="phone"
               value={profileData.phone}
-              onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
+              onChange={(e) =>
+                setProfileData((prev) => ({ ...prev, phone: e.target.value }))
+              }
             />
           </div>
-          
+
           <div>
             <Label htmlFor="bio">Bio</Label>
             <Textarea
               id="bio"
               placeholder="O'zingiz haqingizda qisqacha..."
               value={profileData.bio}
-              onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
+              onChange={(e) =>
+                setProfileData((prev) => ({ ...prev, bio: e.target.value }))
+              }
               rows={3}
             />
           </div>
@@ -267,7 +283,12 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
         <CardContent className="space-y-4">
           <div>
             <Label htmlFor="timezone">Vaqt mintaqasi</Label>
-            <Select value={profileData.timezone} onValueChange={(value) => setProfileData(prev => ({ ...prev, timezone: value }))}>
+            <Select
+              value={profileData.timezone}
+              onValueChange={(value) =>
+                setProfileData((prev) => ({ ...prev, timezone: value }))
+              }
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -278,10 +299,15 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
               </SelectContent>
             </Select>
           </div>
-          
+
           <div>
             <Label htmlFor="language">Til</Label>
-            <Select value={profileData.language} onValueChange={(value) => setProfileData(prev => ({ ...prev, language: value }))}>
+            <Select
+              value={profileData.language}
+              onValueChange={(value) =>
+                setProfileData((prev) => ({ ...prev, language: value }))
+              }
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -297,7 +323,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
 
       <Button onClick={handleSaveProfile} disabled={isLoading}>
         <Save className="h-4 w-4 mr-2" />
-        {isLoading ? 'Saqlanmoqda...' : 'Saqlash'}
+        {isLoading ? "Saqlanmoqda..." : "Saqlash"}
       </Button>
     </div>
   );
@@ -316,20 +342,20 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
           {Object.entries(notificationSettings.email).map(([key, value]) => (
             <div key={key} className="flex items-center justify-between">
               <Label htmlFor={`email-${key}`} className="text-sm">
-                {key === 'bookingUpdates' && 'Dars yangilanishlari'}
-                {key === 'paymentConfirmations' && 'To\'lov tasdiqlamalari'}
-                {key === 'lessonReminders' && 'Dars eslatmalari'}
-                {key === 'messageNotifications' && 'Yangi xabarlar'}
-                {key === 'marketingEmails' && 'Marketing xabarlari'}
-                {key === 'weeklyReports' && 'Haftalik hisobotlar'}
+                {key === "bookingUpdates" && "Dars yangilanishlari"}
+                {key === "paymentConfirmations" && "To'lov tasdiqlamalari"}
+                {key === "lessonReminders" && "Dars eslatmalari"}
+                {key === "messageNotifications" && "Yangi xabarlar"}
+                {key === "marketingEmails" && "Marketing xabarlari"}
+                {key === "weeklyReports" && "Haftalik hisobotlar"}
               </Label>
               <Switch
                 id={`email-${key}`}
                 checked={value}
-                onCheckedChange={(checked) => 
-                  setNotificationSettings(prev => ({
+                onCheckedChange={(checked) =>
+                  setNotificationSettings((prev) => ({
                     ...prev,
-                    email: { ...prev.email, [key]: checked }
+                    email: { ...prev.email, [key]: checked },
                   }))
                 }
               />
@@ -350,17 +376,18 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
           {Object.entries(notificationSettings.sms).map(([key, value]) => (
             <div key={key} className="flex items-center justify-between">
               <Label htmlFor={`sms-${key}`} className="text-sm">
-                {key === 'urgentNotifications' && 'Shoshilinch bildirishnomalar'}
-                {key === 'lessonReminders' && 'Dars eslatmalari'}
-                {key === 'paymentUpdates' && 'To\'lov yangilanishlari'}
+                {key === "urgentNotifications" &&
+                  "Shoshilinch bildirishnomalar"}
+                {key === "lessonReminders" && "Dars eslatmalari"}
+                {key === "paymentUpdates" && "To'lov yangilanishlari"}
               </Label>
               <Switch
                 id={`sms-${key}`}
                 checked={value}
-                onCheckedChange={(checked) => 
-                  setNotificationSettings(prev => ({
+                onCheckedChange={(checked) =>
+                  setNotificationSettings((prev) => ({
                     ...prev,
-                    sms: { ...prev.sms, [key]: checked }
+                    sms: { ...prev.sms, [key]: checked },
                   }))
                 }
               />
@@ -385,10 +412,10 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
             <Switch
               id="push-enabled"
               checked={notificationSettings.push.enabled}
-              onCheckedChange={(checked) => 
-                setNotificationSettings(prev => ({
+              onCheckedChange={(checked) =>
+                setNotificationSettings((prev) => ({
                   ...prev,
-                  push: { ...prev.push, enabled: checked }
+                  push: { ...prev.push, enabled: checked },
                 }))
               }
             />
@@ -396,21 +423,30 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
 
           {notificationSettings.push.enabled && (
             <>
-              {['bookingUpdates', 'messages', 'lessonReminders', 'soundEnabled'].map((key) => (
+              {[
+                "bookingUpdates",
+                "messages",
+                "lessonReminders",
+                "soundEnabled",
+              ].map((key) => (
                 <div key={key} className="flex items-center justify-between">
                   <Label htmlFor={`push-${key}`} className="text-sm">
-                    {key === 'bookingUpdates' && 'Dars yangilanishlari'}
-                    {key === 'messages' && 'Yangi xabarlar'}
-                    {key === 'lessonReminders' && 'Dars eslatmalari'}
-                    {key === 'soundEnabled' && 'Ovozli bildirishnomalar'}
+                    {key === "bookingUpdates" && "Dars yangilanishlari"}
+                    {key === "messages" && "Yangi xabarlar"}
+                    {key === "lessonReminders" && "Dars eslatmalari"}
+                    {key === "soundEnabled" && "Ovozli bildirishnomalar"}
                   </Label>
                   <Switch
                     id={`push-${key}`}
-                    checked={notificationSettings.push[key as keyof typeof notificationSettings.push] as boolean}
-                    onCheckedChange={(checked) => 
-                      setNotificationSettings(prev => ({
+                    checked={
+                      notificationSettings.push[
+                        key as keyof typeof notificationSettings.push
+                      ] as boolean
+                    }
+                    onCheckedChange={(checked) =>
+                      setNotificationSettings((prev) => ({
                         ...prev,
-                        push: { ...prev.push, [key]: checked }
+                        push: { ...prev.push, [key]: checked },
                       }))
                     }
                   />
@@ -426,10 +462,10 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   <Switch
                     id="quiet-hours"
                     checked={notificationSettings.push.quietHoursEnabled}
-                    onCheckedChange={(checked) => 
-                      setNotificationSettings(prev => ({
+                    onCheckedChange={(checked) =>
+                      setNotificationSettings((prev) => ({
                         ...prev,
-                        push: { ...prev.push, quietHoursEnabled: checked }
+                        push: { ...prev.push, quietHoursEnabled: checked },
                       }))
                     }
                   />
@@ -438,29 +474,39 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                 {notificationSettings.push.quietHoursEnabled && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="quiet-start" className="text-xs">Boshlanishi</Label>
+                      <Label htmlFor="quiet-start" className="text-xs">
+                        Boshlanishi
+                      </Label>
                       <Input
                         id="quiet-start"
                         type="time"
                         value={notificationSettings.push.quietHoursStart}
-                        onChange={(e) => 
-                          setNotificationSettings(prev => ({
+                        onChange={(e) =>
+                          setNotificationSettings((prev) => ({
                             ...prev,
-                            push: { ...prev.push, quietHoursStart: e.target.value }
+                            push: {
+                              ...prev.push,
+                              quietHoursStart: e.target.value,
+                            },
                           }))
                         }
                       />
                     </div>
                     <div>
-                      <Label htmlFor="quiet-end" className="text-xs">Tugashi</Label>
+                      <Label htmlFor="quiet-end" className="text-xs">
+                        Tugashi
+                      </Label>
                       <Input
                         id="quiet-end"
                         type="time"
                         value={notificationSettings.push.quietHoursEnd}
-                        onChange={(e) => 
-                          setNotificationSettings(prev => ({
+                        onChange={(e) =>
+                          setNotificationSettings((prev) => ({
                             ...prev,
-                            push: { ...prev.push, quietHoursEnd: e.target.value }
+                            push: {
+                              ...prev.push,
+                              quietHoursEnd: e.target.value,
+                            },
                           }))
                         }
                       />
@@ -475,7 +521,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
 
       <Button onClick={handleSaveNotifications} disabled={isLoading}>
         <Save className="h-4 w-4 mr-2" />
-        {isLoading ? 'Saqlanmoqda...' : 'Saqlash'}
+        {isLoading ? "Saqlanmoqda..." : "Saqlash"}
       </Button>
     </div>
   );
@@ -492,35 +538,54 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
         <CardContent className="space-y-4">
           <div>
             <Label htmlFor="profile-visibility">Profil ko'rinishi</Label>
-            <Select 
-              value={privacySettings.profileVisibility} 
-              onValueChange={(value: any) => setPrivacySettings(prev => ({ ...prev, profileVisibility: value }))}
+            <Select
+              value={privacySettings.profileVisibility}
+              onValueChange={(value: any) =>
+                setPrivacySettings((prev) => ({
+                  ...prev,
+                  profileVisibility: value,
+                }))
+              }
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="public">Hammaga ochiq</SelectItem>
-                <SelectItem value="students_only">Faqat o'quvchilarga</SelectItem>
+                <SelectItem value="students_only">
+                  Faqat o'quvchilarga
+                </SelectItem>
                 <SelectItem value="private">Shaxsiy</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {[
-            { key: 'showOnlineStatus', label: 'Onlayn holatni ko\'rsatish' },
-            { key: 'showLastSeen', label: 'Oxirgi ko\'rilgan vaqtni ko\'rsatish' },
-            { key: 'allowDirectMessages', label: 'To\'g\'ridan-to\'g\'ri xabarlarga ruxsat berish' },
-            { key: 'showReviews', label: 'Sharhlarni ko\'rsatish' },
-            { key: 'showEarnings', label: 'Daromadni ko\'rsatish' },
+            { key: "showOnlineStatus", label: "Onlayn holatni ko'rsatish" },
+            {
+              key: "showLastSeen",
+              label: "Oxirgi ko'rilgan vaqtni ko'rsatish",
+            },
+            {
+              key: "allowDirectMessages",
+              label: "To'g'ridan-to'g'ri xabarlarga ruxsat berish",
+            },
+            { key: "showReviews", label: "Sharhlarni ko'rsatish" },
+            { key: "showEarnings", label: "Daromadni ko'rsatish" },
           ].map(({ key, label }) => (
             <div key={key} className="flex items-center justify-between">
-              <Label htmlFor={key} className="text-sm">{label}</Label>
+              <Label htmlFor={key} className="text-sm">
+                {label}
+              </Label>
               <Switch
                 id={key}
-                checked={privacySettings[key as keyof typeof privacySettings] as boolean}
-                onCheckedChange={(checked) => 
-                  setPrivacySettings(prev => ({ ...prev, [key]: checked }))
+                checked={
+                  privacySettings[
+                    key as keyof typeof privacySettings
+                  ] as boolean
+                }
+                onCheckedChange={(checked) =>
+                  setPrivacySettings((prev) => ({ ...prev, [key]: checked }))
                 }
               />
             </div>
@@ -540,8 +605,11 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
             <Switch
               id="data-collection"
               checked={privacySettings.dataCollection}
-              onCheckedChange={(checked) => 
-                setPrivacySettings(prev => ({ ...prev, dataCollection: checked }))
+              onCheckedChange={(checked) =>
+                setPrivacySettings((prev) => ({
+                  ...prev,
+                  dataCollection: checked,
+                }))
               }
             />
           </div>
@@ -553,8 +621,11 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
             <Switch
               id="analytics-opt-out"
               checked={privacySettings.analyticsOptOut}
-              onCheckedChange={(checked) => 
-                setPrivacySettings(prev => ({ ...prev, analyticsOptOut: checked }))
+              onCheckedChange={(checked) =>
+                setPrivacySettings((prev) => ({
+                  ...prev,
+                  analyticsOptOut: checked,
+                }))
               }
             />
           </div>
@@ -575,13 +646,20 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <Label className="text-sm font-medium">Ikki faktorli autentifikatsiya</Label>
-              <p className="text-xs text-gray-500">Qo'shimcha xavfsizlik qatlami</p>
+              <Label className="text-sm font-medium">
+                Ikki faktorli autentifikatsiya
+              </Label>
+              <p className="text-xs text-gray-500">
+                Qo'shimcha xavfsizlik qatlami
+              </p>
             </div>
             <Switch
               checked={securitySettings.twoFactorEnabled}
-              onCheckedChange={(checked) => 
-                setSecuritySettings(prev => ({ ...prev, twoFactorEnabled: checked }))
+              onCheckedChange={(checked) =>
+                setSecuritySettings((prev) => ({
+                  ...prev,
+                  twoFactorEnabled: checked,
+                }))
               }
             />
           </div>
@@ -631,8 +709,11 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
               id="session-timeout"
               type="number"
               value={securitySettings.sessionTimeout}
-              onChange={(e) => 
-                setSecuritySettings(prev => ({ ...prev, sessionTimeout: parseInt(e.target.value) || 30 }))
+              onChange={(e) =>
+                setSecuritySettings((prev) => ({
+                  ...prev,
+                  sessionTimeout: parseInt(e.target.value) || 30,
+                }))
               }
               min="1"
               max="365"
@@ -646,8 +727,11 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
             <Switch
               id="login-notifications"
               checked={securitySettings.loginNotifications}
-              onCheckedChange={(checked) => 
-                setSecuritySettings(prev => ({ ...prev, loginNotifications: checked }))
+              onCheckedChange={(checked) =>
+                setSecuritySettings((prev) => ({
+                  ...prev,
+                  loginNotifications: checked,
+                }))
               }
             />
           </div>
@@ -696,10 +780,11 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
           <Alert className="mb-4">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Bu amalni bekor qilib bo'lmaydi. Barcha ma'lumotlaringiz butunlay o'chiriladi.
+              Bu amalni bekor qilib bo'lmaydi. Barcha ma'lumotlaringiz butunlay
+              o'chiriladi.
             </AlertDescription>
           </Alert>
-          
+
           <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
             <DialogTrigger asChild>
               <Button variant="destructive">
@@ -711,28 +796,28 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
               <DialogHeader>
                 <DialogTitle>Hisobni o'chirishni tasdiqlang</DialogTitle>
                 <DialogDescription>
-                  Bu amalni bekor qilib bo'lmaydi. Barcha ma'lumotlaringiz, 
+                  Bu amalni bekor qilib bo'lmaydi. Barcha ma'lumotlaringiz,
                   darslaringiz va to'lovlaringiz butunlay o'chiriladi.
                 </DialogDescription>
               </DialogHeader>
-              
+
               <div className="space-y-4">
                 <Input placeholder="Tasdiqlash uchun 'DELETE' deb yozing" />
                 <div className="flex gap-3">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => setShowDeleteDialog(false)}
                     className="flex-1"
                   >
                     Bekor qilish
                   </Button>
-                  <Button 
+                  <Button
                     variant="destructive"
                     onClick={handleDeleteAccount}
                     disabled={isLoading}
                     className="flex-1"
                   >
-                    {isLoading ? 'O\'chirilmoqda...' : 'O\'chirish'}
+                    {isLoading ? "O'chirilmoqda..." : "O'chirish"}
                   </Button>
                 </div>
               </div>
@@ -744,11 +829,36 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
   );
 
   const tabs = [
-    { id: 'profile', label: 'Profil', icon: User, content: renderProfileSettings },
-    { id: 'notifications', label: 'Bildirishnomalar', icon: Bell, content: renderNotificationSettings },
-    { id: 'privacy', label: 'Maxfiylik', icon: Eye, content: renderPrivacySettings },
-    { id: 'security', label: 'Xavfsizlik', icon: Shield, content: renderSecuritySettings },
-    { id: 'data', label: 'Ma\'lumotlar', icon: Download, content: renderDataSettings },
+    {
+      id: "profile",
+      label: "Profil",
+      icon: User,
+      content: renderProfileSettings,
+    },
+    {
+      id: "notifications",
+      label: "Bildirishnomalar",
+      icon: Bell,
+      content: renderNotificationSettings,
+    },
+    {
+      id: "privacy",
+      label: "Maxfiylik",
+      icon: Eye,
+      content: renderPrivacySettings,
+    },
+    {
+      id: "security",
+      label: "Xavfsizlik",
+      icon: Shield,
+      content: renderSecuritySettings,
+    },
+    {
+      id: "data",
+      label: "Ma'lumotlar",
+      icon: Download,
+      content: renderDataSettings,
+    },
   ];
 
   return (
@@ -757,13 +867,19 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Sozlamalar</h1>
-          <p className="text-gray-600">Hisobingizni va sozlamalaringizni boshqaring</p>
+          <p className="text-gray-600">
+            Hisobingizni va sozlamalaringizni boshqaring
+          </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-5">
             {tabs.map(({ id, label, icon: Icon }) => (
-              <TabsTrigger key={id} value={id} className="flex items-center gap-2">
+              <TabsTrigger
+                key={id}
+                value={id}
+                className="flex items-center gap-2"
+              >
                 <Icon className="h-4 w-4" />
                 <span className="hidden sm:inline">{label}</span>
               </TabsTrigger>
