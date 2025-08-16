@@ -322,8 +322,6 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
-    console.log(`[API] Making request to: ${url}`);
-
     // Check if token is expired and refresh if needed
     if (this.tokens && this.tokens.expiresAt < Date.now() + 60000) {
       // 1 minute buffer
@@ -345,12 +343,9 @@ class ApiClient {
         headers,
       });
 
-      console.log(`[API] Response status: ${response.status} for ${url}`);
-
       // If response is ok, proceed with normal flow
       if (response.ok) {
         const data = await response.json();
-        console.log(`[API] Success for ${url}:`, data);
         return data;
       }
 
@@ -359,10 +354,17 @@ class ApiClient {
         error: "RequestFailed",
         message: `Request failed with status ${response.status}`,
       }));
-      console.error(`[API] Error for ${url}:`, JSON.stringify(errorData, null, 2));
+
+      // Only log errors in development
+      if (import.meta.env.DEV) {
+        console.error(`[API] Error for ${url}:`, JSON.stringify(errorData, null, 2));
+      }
       throw errorData;
     } catch (error) {
-      console.error(`[API] Fetch error for ${url}:`, error instanceof Error ? error.message : JSON.stringify(error, null, 2));
+      // Only log errors in development
+      if (import.meta.env.DEV) {
+        console.error(`[API] Fetch error for ${url}:`, error instanceof Error ? error.message : JSON.stringify(error, null, 2));
+      }
       throw error;
     }
   }
