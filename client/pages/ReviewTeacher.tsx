@@ -70,7 +70,7 @@ export default function ReviewTeacher() {
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      alert("Please provide an overall rating");
+      toast.error("Iltimos, umumiy baho bering");
       return;
     }
 
