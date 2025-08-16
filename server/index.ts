@@ -2,7 +2,13 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import { handleSearchTeachers, handleGetSubjects } from "./routes/teachers";
+import {
+  handleSearchTeachers,
+  handleGetSubjects,
+  handleGetWalletBalance,
+  handleGetWalletEntries,
+  handleNotImplemented
+} from "./routes/teachers";
 
 export function createServer() {
   const app = express();
@@ -23,6 +29,13 @@ export function createServer() {
   // Mock tutoring marketplace API routes
   app.get("/api/search/teachers", handleSearchTeachers);
   app.get("/api/subjects", handleGetSubjects);
+
+  // Wallet endpoints
+  app.get("/api/wallet/balance", handleGetWalletBalance);
+  app.get("/api/wallet/entries", handleGetWalletEntries);
+
+  // Catch-all for unimplemented API routes - return mock "not implemented" response
+  app.use("/api/*", handleNotImplemented);
 
   return app;
 }
