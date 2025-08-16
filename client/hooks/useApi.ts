@@ -200,8 +200,12 @@ export function useSubjects(
       return failureCount < 3;
     },
     onError: (error: any) => {
-      if (error?.status !== 501) {
+      if (error?.status !== 501 && import.meta.env.DEV) {
         console.error("Subjects fetch failed:", error);
+      }
+      // Show user-friendly error message
+      if (error?.status === 500) {
+        toast.error("Fanlar ro'yxatini yuklashda xato.");
       }
     },
     ...options,
