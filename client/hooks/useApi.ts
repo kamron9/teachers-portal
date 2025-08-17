@@ -7,21 +7,15 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-  apiClient,
-  TeacherProfile,
-  StudentProfile,
-  SubjectOffering,
-  AvailabilityRule,
-  AvailabilitySlot,
-  Booking,
-  Payment,
-  Review,
-  MessageThread,
-  Message,
-  Notification,
-  PaginatedResponse,
-  ApiError,
-} from "@/lib/api";
+  mockApi,
+  MockTeacher,
+  MockSubject,
+  MockBooking,
+  MockMessage,
+  MockNotification,
+  MockPaginatedResponse,
+  MockApiResponse,
+} from "@/lib/mockData";
 
 // Query Keys
 export const queryKeys = {
