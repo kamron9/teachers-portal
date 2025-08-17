@@ -359,8 +359,8 @@ export default function Index() {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-16 bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+      {/* How It Works Section - Modern Preply-inspired Design */}
+      <section className="py-20 bg-white overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
