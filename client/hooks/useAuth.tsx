@@ -66,20 +66,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const response = await apiClient.login(email, password);
-      setUser(response.user);
+      const response = await mockApi.login(email, password);
+      localStorage.setItem('authToken', response.data.token);
+      setUser(response.data.user);
 
       toast.success("Kirish muvaffaqiyatli");
 
       // Redirect based on role
-      switch (response.user.role) {
-        case "TEACHER":
+      switch (response.data.user.role) {
+        case "teacher":
           navigate("/teacher-dashboard");
           break;
-        case "STUDENT":
+        case "student":
           navigate("/student-dashboard");
           break;
-        case "ADMIN":
+        case "admin":
           navigate("/admin-dashboard");
           break;
         default:
