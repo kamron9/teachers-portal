@@ -29,8 +29,8 @@ import {
   SortDesc,
   User,
 } from "lucide-react";
-import { useTeacherSearch, useSubjects } from "@/hooks/useApi";
-import { formatPrice } from "@/lib/api";
+import { useTeacherSearch, useSubjects } from "@/hooks/useMockApi";
+import { formatPrice } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
