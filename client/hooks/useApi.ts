@@ -184,21 +184,8 @@ export function useSubjects(
 ) {
   return useQuery({
     queryKey: queryKeys.subjects(params),
-    queryFn: () => apiClient.getSubjects(params),
+    queryFn: () => mockApi.getSubjects(),
     staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: (failureCount, error: any) => {
-      if (error?.status === 400 || error?.status === 501) return false;
-      return failureCount < 3;
-    },
-    onError: (error: any) => {
-      if (error?.status !== 501 && import.meta.env.DEV) {
-        console.error("Subjects fetch failed:", error);
-      }
-      // Show user-friendly error message
-      if (error?.status === 500) {
-        toast.error("Fanlar ro'yxatini yuklashda xato.");
-      }
-    },
     ...options,
   });
 }
