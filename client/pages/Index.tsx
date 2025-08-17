@@ -362,12 +362,12 @@ export default function Index() {
       {/* How It Works Section - Modern Preply-inspired Design */}
       <section className="py-20 bg-white overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Qanday ishlaydi?
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Besh oddiy qadam bilan o'qishni boshlang va bilimlaringizni rivojlantiring
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Besh oddiy qadam bilan professional o'qituvchilar bilan o'qishni boshlang
             </p>
           </div>
 
