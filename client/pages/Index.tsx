@@ -359,6 +359,171 @@ export default function Index() {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="py-16 bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Qanday ishlaydi?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Besh oddiy qadam bilan o'qishni boshlang va bilimlaringizni rivojlantiring
+            </p>
+          </div>
+
+          <div className="max-w-6xl mx-auto">
+            {/* Desktop: Horizontal Stepper */}
+            <div className="hidden lg:block">
+              <div className="relative">
+                {/* Connection Lines */}
+                <div className="absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-200 via-green-200 to-cyan-200"></div>
+
+                <div className="grid grid-cols-5 gap-8">
+                  {[
+                    {
+                      number: 1,
+                      title: "Fan tanlang",
+                      description: "Kerakli fan yoki tilni ro'yxatdan tanlang",
+                      icon: "🎯",
+                      color: "from-blue-400 to-blue-500"
+                    },
+                    {
+                      number: 2,
+                      title: "Ustozni toping",
+                      description: "Reyting va tajribaga qarab ustoz tanlang",
+                      icon: "👨‍🏫",
+                      color: "from-emerald-400 to-emerald-500"
+                    },
+                    {
+                      number: 3,
+                      title: "Darsni bron qiling",
+                      description: "Qulay vaqtni belgilang va darsni bron qiling",
+                      icon: "📅",
+                      color: "from-teal-400 to-teal-500"
+                    },
+                    {
+                      number: 4,
+                      title: "Online darsga qo'shiling",
+                      description: "Platforma orqali video chat orqali darsga qo'shiling",
+                      icon: "💻",
+                      color: "from-cyan-400 to-cyan-500"
+                    },
+                    {
+                      number: 5,
+                      title: "Bilimingizni oshiring",
+                      description: "Muntazam darslar bilan bilimlaringizni rivojlantiring",
+                      icon: "🚀",
+                      color: "from-sky-400 to-sky-500"
+                    }
+                  ].map((step, index) => (
+                    <div key={index} className="relative group">
+                      <div className="text-center">
+                        {/* Step Number Circle */}
+                        <div className={`relative mx-auto w-16 h-16 rounded-full bg-gradient-to-br ${step.color} shadow-lg flex items-center justify-center text-white font-bold text-xl mb-4 group-hover:scale-110 transition-transform duration-300 z-10`}>
+                          {step.number}
+                        </div>
+
+                        {/* Step Card */}
+                        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:-translate-y-2">
+                          <CardContent className="p-0">
+                            <div className="text-4xl mb-3">{step.icon}</div>
+                            <h3 className="font-bold text-lg text-gray-900 mb-2">
+                              {step.title}
+                            </h3>
+                            <p className="text-sm text-gray-600 leading-relaxed">
+                              {step.description}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile & Tablet: Vertical Stepper */}
+            <div className="lg:hidden space-y-8">
+              {[
+                {
+                  number: 1,
+                  title: "Fan tanlang",
+                  description: "Kerakli fan yoki tilni ro'yxatdan tanlang",
+                  icon: "🎯",
+                  color: "from-blue-400 to-blue-500"
+                },
+                {
+                  number: 2,
+                  title: "Ustozni toping",
+                  description: "Reyting va tajribaga qarab ustoz tanlang",
+                  icon: "👨��🏫",
+                  color: "from-emerald-400 to-emerald-500"
+                },
+                {
+                  number: 3,
+                  title: "Darsni bron qiling",
+                  description: "Qulay vaqtni belgilang va darsni bron qiling",
+                  icon: "📅",
+                  color: "from-teal-400 to-teal-500"
+                },
+                {
+                  number: 4,
+                  title: "Online darsga qo'shiling",
+                  description: "Platforma orqali video chat orqali darsga qo'shiling",
+                  icon: "💻",
+                  color: "from-cyan-400 to-cyan-500"
+                },
+                {
+                  number: 5,
+                  title: "Bilimingizni oshiring",
+                  description: "Muntazam darslar bilan bilimlaringizni rivojlantiring",
+                  icon: "🚀",
+                  color: "from-sky-400 to-sky-500"
+                }
+              ].map((step, index) => (
+                <div key={index} className="relative">
+                  {/* Connecting Line */}
+                  {index < 4 && (
+                    <div className="absolute left-8 top-20 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 to-green-200"></div>
+                  )}
+
+                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        {/* Step Number Circle */}
+                        <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${step.color} shadow-lg flex items-center justify-center text-white font-bold text-xl flex-shrink-0`}>
+                          {step.number}
+                        </div>
+
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="text-2xl">{step.icon}</div>
+                            <h3 className="font-bold text-xl text-gray-900">
+                              {step.title}
+                            </h3>
+                          </div>
+                          <p className="text-gray-600 leading-relaxed">
+                            {step.description}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <div className="text-center mt-16">
+            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              Hozir boshlang
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Top Tutors Section - TZ bo'yicha 4-6 ta TutorCard */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
