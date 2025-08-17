@@ -148,25 +148,22 @@ export function useTeacherSearch(
 ) {
   return useQuery({
     queryKey: queryKeys.teacherSearch(params),
-    queryFn: () => apiClient.searchTeachers(params),
+    queryFn: () => mockApi.getTeachers({
+      limit: params.limit,
+      sortBy: params.sortBy,
+      sortOrder: params.sortOrder,
+      subject: params.subjects?.[0],
+      language: params.languages?.[0],
+      priceFrom: params.minPrice?.toString(),
+      priceTo: params.maxPrice?.toString(),
+    }).then(response => ({
+      teachers: response.data.data,
+      total: response.data.total,
+      page: response.data.page,
+      totalPages: response.data.totalPages
+    })),
     enabled: true,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: (failureCount, error: any) => {
-      // Don't retry on 400 errors (bad request) or 501 (not implemented)
-      if (error?.status === 400 || error?.status === 501) return false;
-      return failureCount < 3;
-    },
-    onError: (error: any) => {
-      if (error?.status !== 501 && import.meta.env.DEV) {
-        console.error("Teacher search failed:", error);
-      }
-      // Show user-friendly error message
-      if (error?.status === 500) {
-        toast.error("Server bilan bog'lanishda xato. Keyinroq urinib ko'ring.");
-      } else if (error?.status === 404) {
-        toast.error("O'qituvchilar topilmadi.");
-      }
-    },
     ...options,
   });
 }
