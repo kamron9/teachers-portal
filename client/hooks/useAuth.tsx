@@ -5,9 +5,12 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import { apiClient, User } from "@/lib/api";
+import { mockCurrentUser, mockApi, MockUser } from "@/lib/mockData";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+
+// Map MockUser to User type for compatibility
+type User = MockUser;
 
 interface AuthContextType {
   user: User | null;
