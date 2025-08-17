@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { useTeacherSearch, useSubjects } from "@/hooks/useApi";
 import { formatPrice, Subject } from "@/lib/api";
+import HowItWorksSection from "@/components/HowItWorksSection";
 
 // TutorCard component
 const TutorCard = ({ tutor }: { tutor: any }) => (
