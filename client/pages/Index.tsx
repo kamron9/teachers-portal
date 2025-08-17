@@ -25,8 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useTeacherSearch, useSubjects } from "@/hooks/useApi";
-import { formatPrice, Subject } from "@/lib/api";
+import { useTeacherSearch, useSubjects } from "@/hooks/useMockApi";
+import { formatPrice } from "@/lib/mockData";
 import HowItWorksSection from "@/components/HowItWorksSection";
 
 // TutorCard component
