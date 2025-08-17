@@ -143,12 +143,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      await apiClient.logout();
+      // Simulate logout delay
+      await new Promise(resolve => setTimeout(resolve, 200));
+      localStorage.removeItem('authToken');
       setUser(null);
       toast.success("Chiqish muvaffaqiyatli");
       navigate("/");
     } catch (error) {
       // Force logout even if API call fails
+      localStorage.removeItem('authToken');
       setUser(null);
       navigate("/");
     }
