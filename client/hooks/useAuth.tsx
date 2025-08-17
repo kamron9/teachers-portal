@@ -236,7 +236,7 @@ export function ProtectedRoute({
   }
 
   // Check verification requirement for teachers
-  if (requireVerification && user.role === "TEACHER") {
+  if (requireVerification && user.role === "teacher") {
     // This would need to be expanded to check teacher verification status
     // For now, we'll allow access
   }
