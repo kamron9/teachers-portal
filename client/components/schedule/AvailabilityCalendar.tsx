@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatUZS } from "@/lib/currency";
-import { useAvailableSlots } from "@/hooks/useApi";
+// import { useAvailableSlots } from "@/hooks/useMockApi"; // Temporarily disabled
 
 interface TimeSlot {
   id: string;
