@@ -148,20 +148,23 @@ export function useTeacherSearch(
 ) {
   return useQuery({
     queryKey: queryKeys.teacherSearch(params),
-    queryFn: () => mockApi.getTeachers({
-      limit: params.limit,
-      sortBy: params.sortBy,
-      sortOrder: params.sortOrder,
-      subject: params.subjects?.[0],
-      language: params.languages?.[0],
-      priceFrom: params.minPrice?.toString(),
-      priceTo: params.maxPrice?.toString(),
-    }).then(response => ({
-      teachers: response.data.data,
-      total: response.data.total,
-      page: response.data.page,
-      totalPages: response.data.totalPages
-    })),
+    queryFn: () =>
+      mockApi
+        .getTeachers({
+          limit: params.limit,
+          sortBy: params.sortBy,
+          sortOrder: params.sortOrder,
+          subject: params.subjects?.[0],
+          language: params.languages?.[0],
+          priceFrom: params.minPrice?.toString(),
+          priceTo: params.maxPrice?.toString(),
+        })
+        .then((response) => ({
+          teachers: response.data.data,
+          total: response.data.total,
+          page: response.data.page,
+          totalPages: response.data.totalPages,
+        })),
     enabled: true,
     staleTime: 1000 * 60 * 5, // 5 minutes
     ...options,

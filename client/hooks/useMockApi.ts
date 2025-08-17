@@ -1,7 +1,4 @@
-import {
-  useQuery,
-  UseQueryOptions,
-} from "@tanstack/react-query";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import {
   mockApi,
   MockTeacher,
@@ -40,20 +37,23 @@ export function useTeacherSearch(
 ) {
   return useQuery({
     queryKey: mockQueryKeys.teacherSearch(params),
-    queryFn: () => mockApi.getTeachers({
-      limit: params.limit,
-      sortBy: params.sortBy,
-      sortOrder: params.sortOrder,
-      subject: params.subjects?.[0],
-      language: params.languages?.[0],
-      priceFrom: params.minPrice?.toString(),
-      priceTo: params.maxPrice?.toString(),
-    }).then(response => ({
-      teachers: response.data.data,
-      total: response.data.total,
-      page: response.data.page,
-      totalPages: response.data.totalPages
-    })),
+    queryFn: () =>
+      mockApi
+        .getTeachers({
+          limit: params.limit,
+          sortBy: params.sortBy,
+          sortOrder: params.sortOrder,
+          subject: params.subjects?.[0],
+          language: params.languages?.[0],
+          priceFrom: params.minPrice?.toString(),
+          priceTo: params.maxPrice?.toString(),
+        })
+        .then((response) => ({
+          teachers: response.data.data,
+          total: response.data.total,
+          page: response.data.page,
+          totalPages: response.data.totalPages,
+        })),
     enabled: true,
     staleTime: 1000 * 60 * 5, // 5 minutes
     ...options,
@@ -132,7 +132,7 @@ export function useTeacherById(id: string, enabled = true) {
     queryKey: ["mock-teacher", "byId", id],
     queryFn: async () => {
       const response = await mockApi.getTeachers();
-      const teacher = response.data.data.find(t => t.id === id);
+      const teacher = response.data.data.find((t) => t.id === id);
       if (!teacher) throw new Error("Teacher not found");
       return teacher;
     },
@@ -147,7 +147,7 @@ export function useSubjectById(id: string, enabled = true) {
     queryKey: ["mock-subject", "byId", id],
     queryFn: async () => {
       const response = await mockApi.getSubjects();
-      const subject = response.data.subjects.find(s => s.id === id);
+      const subject = response.data.subjects.find((s) => s.id === id);
       if (!subject) throw new Error("Subject not found");
       return subject;
     },

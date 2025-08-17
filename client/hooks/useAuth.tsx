@@ -40,19 +40,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  const isAuthenticated = !!user && !!localStorage.getItem('authToken');
+  const isAuthenticated = !!user && !!localStorage.getItem("authToken");
 
   const fetchCurrentUser = async () => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem("authToken");
       if (token) {
         // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         setUser(mockCurrentUser);
       }
     } catch (error) {
       // Clear invalid tokens on auth error
-      localStorage.removeItem('authToken');
+      localStorage.removeItem("authToken");
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       const response = await mockApi.login(email, password);
-      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem("authToken", response.data.token);
       setUser(response.data.user);
 
       toast.success("Kirish muvaffaqiyatli");
@@ -105,19 +105,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       // Simulate registration with mock data
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       const newUser: User = {
         id: Date.now().toString(),
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
         role: data.role,
-        profileImage: '/placeholder.svg',
+        profileImage: "/placeholder.svg",
         phoneNumber: data.phone,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
-      const token = 'mock-jwt-token-' + Date.now();
-      localStorage.setItem('authToken', token);
+      const token = "mock-jwt-token-" + Date.now();
+      localStorage.setItem("authToken", token);
       setUser(newUser);
 
       toast.success("Ro'yxatdan o'tish muvaffaqiyatli");
@@ -144,14 +144,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async () => {
     try {
       // Simulate logout delay
-      await new Promise(resolve => setTimeout(resolve, 200));
-      localStorage.removeItem('authToken');
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      localStorage.removeItem("authToken");
       setUser(null);
       toast.success("Chiqish muvaffaqiyatli");
       navigate("/");
     } catch (error) {
       // Force logout even if API call fails
-      localStorage.removeItem('authToken');
+      localStorage.removeItem("authToken");
       setUser(null);
       navigate("/");
     }

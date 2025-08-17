@@ -14,13 +14,13 @@ export default function HowItWorksSection() {
             Qanday ishlaydi?
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Uchta oddiy qadam bilan professional o'qituvchilar bilan o'qishni boshlang
+            Uchta oddiy qadam bilan professional o'qituvchilar bilan o'qishni
+            boshlang
           </p>
         </div>
 
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
             {/* Step 1: Find your tutor */}
             <Card className="bg-white border-0 shadow-xl overflow-hidden">
               <CardContent className="p-8">
@@ -33,7 +33,8 @@ export default function HowItWorksSection() {
                       Ustozingizni toping
                     </h3>
                     <p className="text-gray-600">
-                      Sizni qiziqtirgan, rag'batlantirgan va ilhomlantirgan ustoz bilan bog'laning.
+                      Sizni qiziqtirgan, rag'batlantirgan va ilhomlantirgan
+                      ustoz bilan bog'laning.
                     </p>
                   </div>
                 </div>
@@ -48,15 +49,21 @@ export default function HowItWorksSection() {
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <h4 className="font-semibold text-gray-900">Millena</h4>
+                          <h4 className="font-semibold text-gray-900">
+                            Millena
+                          </h4>
                           <div className="flex items-center gap-1">
                             <Star className="w-4 h-4 text-yellow-500 fill-current" />
                             <span className="text-sm font-medium">4.9</span>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600">🇺🇸 Ingliz tili ustozi</p>
+                        <p className="text-sm text-gray-600">
+                          🇺🇸 Ingliz tili ustozi
+                        </p>
                         <div className="flex gap-1 mt-1">
-                          <Badge variant="secondary" className="text-xs">Ingliz tili (Native)</Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            Ingliz tili (Native)
+                          </Badge>
                         </div>
                       </div>
                     </div>
@@ -75,9 +82,13 @@ export default function HowItWorksSection() {
                             <span className="text-sm font-medium">4.8</span>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600">🇷🇺 Rus tili ustozi</p>
+                        <p className="text-sm text-gray-600">
+                          🇷🇺 Rus tili ustozi
+                        </p>
                         <div className="flex gap-1 mt-1">
-                          <Badge variant="secondary" className="text-xs">Rus tili (Native)</Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            Rus tili (Native)
+                          </Badge>
                         </div>
                       </div>
                     </div>
@@ -90,7 +101,9 @@ export default function HowItWorksSection() {
                       </Avatar>
                       <div className="flex-1">
                         <h4 className="font-semibold text-gray-900">Sardor</h4>
-                        <p className="text-sm text-gray-600">🔢 Matematika ustozi</p>
+                        <p className="text-sm text-gray-600">
+                          🔢 Matematika ustozi
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -110,7 +123,8 @@ export default function HowItWorksSection() {
                       O'qishni boshlang
                     </h3>
                     <p className="text-gray-600">
-                      Ustozingiz sizni birinchi darsda yo'naltirib, keyingi qadamlarni rejalashtiradi.
+                      Ustozingiz sizni birinchi darsda yo'naltirib, keyingi
+                      qadamlarni rejalashtiradi.
                     </p>
                   </div>
                 </div>
@@ -154,7 +168,8 @@ export default function HowItWorksSection() {
                       Gapiring. O'qing. Yozing. Takrorlang.
                     </h3>
                     <p className="text-gray-600">
-                      Har hafta qancha dars olishni tanlang va maqsadlaringizga erishishga tayyor bo'ling!
+                      Har hafta qancha dars olishni tanlang va maqsadlaringizga
+                      erishishga tayyor bo'ling!
                     </p>
                   </div>
                 </div>
@@ -165,25 +180,37 @@ export default function HowItWorksSection() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Calendar className="w-5 h-5 text-blue-600" />
-                        <span className="font-medium text-gray-900">Haftada 3 dars</span>
+                        <span className="font-medium text-gray-900">
+                          Haftada 3 dars
+                        </span>
                       </div>
-                      <Badge variant="default" className="bg-blue-600">Tavsiya etiladi</Badge>
+                      <Badge variant="default" className="bg-blue-600">
+                        Tavsiya etiladi
+                      </Badge>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">Tez rivojlanish uchun</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Tez rivojlanish uchun
+                    </p>
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-4 border">
                     <div className="flex items-center gap-3">
                       <Calendar className="w-5 h-5 text-gray-600" />
-                      <span className="font-medium text-gray-900">Haftada 2 dars</span>
+                      <span className="font-medium text-gray-900">
+                        Haftada 2 dars
+                      </span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">Barqaror o'qish</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Barqaror o'qish
+                    </p>
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-4 border">
                     <div className="flex items-center gap-3">
                       <Calendar className="w-5 h-5 text-gray-600" />
-                      <span className="font-medium text-gray-900">Haftada 1 dars</span>
+                      <span className="font-medium text-gray-900">
+                        Haftada 1 dars
+                      </span>
                     </div>
                     <p className="text-sm text-gray-600 mt-1">Sekin sur'atda</p>
                   </div>
@@ -204,13 +231,21 @@ export default function HowItWorksSection() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register">
-                <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-4 rounded-xl shadow-lg">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-4 rounded-xl shadow-lg"
+                >
                   <Users className="mr-2 h-5 w-5" />
                   O'quvchi sifatida boshlang
                 </Button>
               </Link>
               <Link to="/teacher-signup">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-8 py-4 rounded-xl">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-8 py-4 rounded-xl"
+                >
                   <BookOpen className="mr-2 h-5 w-5" />
                   O'qituvchi bo'ling
                 </Button>

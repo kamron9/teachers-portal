@@ -328,7 +328,11 @@ export default function Index() {
                 <Card
                   key={index}
                   className="hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-                  onClick={() => handleCategoryClick(item.subject.toLowerCase().replace(/\s+/g, '-'))}
+                  onClick={() =>
+                    handleCategoryClick(
+                      item.subject.toLowerCase().replace(/\s+/g, "-"),
+                    )
+                  }
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4">
@@ -368,7 +372,8 @@ export default function Index() {
               Qanday ishlaydi?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Besh oddiy qadam bilan professional o'qituvchilar bilan o'qishni boshlang
+              Besh oddiy qadam bilan professional o'qituvchilar bilan o'qishni
+              boshlang
             </p>
           </div>
 
@@ -386,41 +391,46 @@ export default function Index() {
                       title: "Fan tanlang",
                       description: "Kerakli fan yoki tilni ro'yxatdan tanlang",
                       icon: "🎯",
-                      color: "from-blue-400 to-blue-500"
+                      color: "from-blue-400 to-blue-500",
                     },
                     {
                       number: 2,
                       title: "Ustozni toping",
                       description: "Reyting va tajribaga qarab ustoz tanlang",
                       icon: "👨‍🏫",
-                      color: "from-emerald-400 to-emerald-500"
+                      color: "from-emerald-400 to-emerald-500",
                     },
                     {
                       number: 3,
                       title: "Darsni bron qiling",
-                      description: "Qulay vaqtni belgilang va darsni bron qiling",
+                      description:
+                        "Qulay vaqtni belgilang va darsni bron qiling",
                       icon: "📅",
-                      color: "from-teal-400 to-teal-500"
+                      color: "from-teal-400 to-teal-500",
                     },
                     {
                       number: 4,
                       title: "Online darsga qo'shiling",
-                      description: "Platforma orqali video chat orqali darsga qo'shiling",
+                      description:
+                        "Platforma orqali video chat orqali darsga qo'shiling",
                       icon: "💻",
-                      color: "from-cyan-400 to-cyan-500"
+                      color: "from-cyan-400 to-cyan-500",
                     },
                     {
                       number: 5,
                       title: "Bilimingizni oshiring",
-                      description: "Muntazam darslar bilan bilimlaringizni rivojlantiring",
+                      description:
+                        "Muntazam darslar bilan bilimlaringizni rivojlantiring",
                       icon: "🚀",
-                      color: "from-sky-400 to-sky-500"
-                    }
+                      color: "from-sky-400 to-sky-500",
+                    },
                   ].map((step, index) => (
                     <div key={index} className="relative group">
                       <div className="text-center">
                         {/* Step Number Circle */}
-                        <div className={`relative mx-auto w-16 h-16 rounded-full bg-gradient-to-br ${step.color} shadow-lg flex items-center justify-center text-white font-bold text-xl mb-4 group-hover:scale-110 transition-transform duration-300 z-10`}>
+                        <div
+                          className={`relative mx-auto w-16 h-16 rounded-full bg-gradient-to-br ${step.color} shadow-lg flex items-center justify-center text-white font-bold text-xl mb-4 group-hover:scale-110 transition-transform duration-300 z-10`}
+                        >
                           {step.number}
                         </div>
 
@@ -451,36 +461,38 @@ export default function Index() {
                   title: "Fan tanlang",
                   description: "Kerakli fan yoki tilni ro'yxatdan tanlang",
                   icon: "🎯",
-                  color: "from-blue-400 to-blue-500"
+                  color: "from-blue-400 to-blue-500",
                 },
                 {
                   number: 2,
                   title: "Ustozni toping",
                   description: "Reyting va tajribaga qarab ustoz tanlang",
                   icon: "👨��🏫",
-                  color: "from-emerald-400 to-emerald-500"
+                  color: "from-emerald-400 to-emerald-500",
                 },
                 {
                   number: 3,
                   title: "Darsni bron qiling",
                   description: "Qulay vaqtni belgilang va darsni bron qiling",
                   icon: "📅",
-                  color: "from-teal-400 to-teal-500"
+                  color: "from-teal-400 to-teal-500",
                 },
                 {
                   number: 4,
                   title: "Online darsga qo'shiling",
-                  description: "Platforma orqali video chat orqali darsga qo'shiling",
+                  description:
+                    "Platforma orqali video chat orqali darsga qo'shiling",
                   icon: "💻",
-                  color: "from-cyan-400 to-cyan-500"
+                  color: "from-cyan-400 to-cyan-500",
                 },
                 {
                   number: 5,
                   title: "Bilimingizni oshiring",
-                  description: "Muntazam darslar bilan bilimlaringizni rivojlantiring",
+                  description:
+                    "Muntazam darslar bilan bilimlaringizni rivojlantiring",
                   icon: "🚀",
-                  color: "from-sky-400 to-sky-500"
-                }
+                  color: "from-sky-400 to-sky-500",
+                },
               ].map((step, index) => (
                 <div key={index} className="relative">
                   {/* Connecting Line */}
@@ -492,7 +504,9 @@ export default function Index() {
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
                         {/* Step Number Circle */}
-                        <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${step.color} shadow-lg flex items-center justify-center text-white font-bold text-xl flex-shrink-0`}>
+                        <div
+                          className={`w-16 h-16 rounded-full bg-gradient-to-br ${step.color} shadow-lg flex items-center justify-center text-white font-bold text-xl flex-shrink-0`}
+                        >
                           {step.number}
                         </div>
 
@@ -517,7 +531,10 @@ export default function Index() {
 
           {/* CTA Button */}
           <div className="text-center mt-16">
-            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
               Hozir boshlang
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>

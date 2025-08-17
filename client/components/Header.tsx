@@ -26,7 +26,6 @@ import { useAuth, useRole } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useMockApi";
 import { useTranslation } from "react-i18next";
 
-
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -35,8 +34,8 @@ export default function Header() {
   const { t } = useTranslation();
 
   const navigation = [
-    { name: t('home'), href: "/" },
-    { name: t('teachers'), href: "/teachers" },
+    { name: t("home"), href: "/" },
+    { name: t("teachers"), href: "/teachers" },
     { name: "Fanlar", href: "/subjects" },
     { name: "Qanday ishlaydi", href: "/how-it-works" },
     { name: "Narxlar", href: "/pricing" },
@@ -123,12 +122,12 @@ export default function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-80" align="end">
-                    <DropdownMenuLabel>{t('notifications')}</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t("notifications")}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <div className="p-2">
                       {unreadCount === 0 ? (
                         <p className="text-sm text-muted-foreground text-center py-4">
-                          {t('noNewNotifications')}
+                          {t("noNewNotifications")}
                         </p>
                       ) : (
                         <Link to="/notifications" className="block">
@@ -136,7 +135,7 @@ export default function Header() {
                             variant="ghost"
                             className="w-full justify-start"
                           >
-                            {t('viewAllNotifications')} ({unreadCount})
+                            {t("viewAllNotifications")} ({unreadCount})
                           </Button>
                         </Link>
                       )}
@@ -175,13 +174,13 @@ export default function Header() {
                     <DropdownMenuItem asChild>
                       <Link to={getDashboardLink()}>
                         <User className="mr-2 h-4 w-4" />
-                        <span>{t('dashboard')}</span>
+                        <span>{t("dashboard")}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/profile">
                         <User className="mr-2 h-4 w-4" />
-                        <span>{t('profile')}</span>
+                        <span>{t("profile")}</span>
                       </Link>
                     </DropdownMenuItem>
                     {(isTeacher || isStudent) && (
@@ -192,26 +191,26 @@ export default function Header() {
                           }
                         >
                           <BookOpen className="mr-2 h-4 w-4" />
-                          <span>{t('myLessons')}</span>
+                          <span>{t("myLessons")}</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
                       <Link to="/messages">
                         <MessageCircle className="mr-2 h-4 w-4" />
-                        <span>{t('messages')}</span>
+                        <span>{t("messages")}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/settings">
                         <Settings className="mr-2 h-4 w-4" />
-                        <span>{t('settings')}</span>
+                        <span>{t("settings")}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>{t('logout')}</span>
+                      <span>{t("logout")}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -219,13 +218,13 @@ export default function Header() {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost">{t('login')}</Button>
+                  <Button variant="ghost">{t("login")}</Button>
                 </Link>
                 <Link to="/register">
-                  <Button>{t('register')}</Button>
+                  <Button>{t("register")}</Button>
                 </Link>
                 <Link to="/teacher-signup">
-                  <Button variant="outline">{t('becomeTeacher')}</Button>
+                  <Button variant="outline">{t("becomeTeacher")}</Button>
                 </Link>
               </>
             )}
@@ -303,7 +302,7 @@ export default function Header() {
                     >
                       <Button variant="ghost" className="w-full justify-start">
                         <User className="mr-2 h-4 w-4" />
-                        {t('dashboard')}
+                        {t("dashboard")}
                       </Button>
                     </Link>
                     <Link
@@ -312,7 +311,7 @@ export default function Header() {
                     >
                       <Button variant="ghost" className="w-full justify-start">
                         <User className="mr-2 h-4 w-4" />
-                        {t('profile')}
+                        {t("profile")}
                       </Button>
                     </Link>
                     {(isTeacher || isStudent) && (
@@ -325,7 +324,7 @@ export default function Header() {
                           className="w-full justify-start"
                         >
                           <BookOpen className="mr-2 h-4 w-4" />
-                          {t('myLessons')}
+                          {t("myLessons")}
                         </Button>
                       </Link>
                     )}
@@ -335,7 +334,7 @@ export default function Header() {
                     >
                       <Button variant="ghost" className="w-full justify-start">
                         <MessageCircle className="mr-2 h-4 w-4" />
-                        {t('messages')}
+                        {t("messages")}
                       </Button>
                     </Link>
                     <Link
@@ -344,7 +343,7 @@ export default function Header() {
                     >
                       <Button variant="ghost" className="w-full justify-start">
                         <Bell className="mr-2 h-4 w-4" />
-                        {t('notifications')}
+                        {t("notifications")}
                         {unreadCount > 0 && (
                           <Badge
                             variant="destructive"
@@ -361,7 +360,7 @@ export default function Header() {
                     >
                       <Button variant="ghost" className="w-full justify-start">
                         <Settings className="mr-2 h-4 w-4" />
-                        {t('settings')}
+                        {t("settings")}
                       </Button>
                     </Link>
                     <Button
@@ -370,28 +369,28 @@ export default function Header() {
                       onClick={handleLogout}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      {t('logout')}
+                      {t("logout")}
                     </Button>
                   </div>
                 ) : (
                   <div className="flex flex-col space-y-2">
                     <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="ghost" className="w-full justify-start">
-                        {t('login')}
+                        {t("login")}
                       </Button>
                     </Link>
                     <Link
                       to="/register"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Button className="w-full">{t('register')}</Button>
+                      <Button className="w-full">{t("register")}</Button>
                     </Link>
                     <Link
                       to="/teacher-signup"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <Button variant="outline" className="w-full">
-                        {t('becomeTeacher')}
+                        {t("becomeTeacher")}
                       </Button>
                     </Link>
                   </div>

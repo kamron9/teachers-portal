@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import {
-  useTeacherById,
-} from "@/hooks/useMockApi";
+import { useTeacherById } from "@/hooks/useMockApi";
 import { formatPrice } from "@/lib/mockData";
 import {
   ArrowLeft,

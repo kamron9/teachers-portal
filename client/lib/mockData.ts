@@ -34,7 +34,7 @@ export interface MockUser {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'student' | 'teacher' | 'admin';
+  role: "student" | "teacher" | "admin";
   profileImage?: string;
   phoneNumber?: string;
   bio?: string;
@@ -51,7 +51,7 @@ export interface MockBooking {
   date: string;
   startTime: string;
   endTime: string;
-  status: 'scheduled' | 'completed' | 'cancelled';
+  status: "scheduled" | "completed" | "cancelled";
   price: number;
   notes?: string;
   rating?: number;
@@ -76,7 +76,7 @@ export interface MockNotification {
   userId: string;
   title: string;
   message: string;
-  type: 'booking' | 'payment' | 'review' | 'system';
+  type: "booking" | "payment" | "review" | "system";
   isRead: boolean;
   createdAt: string;
 }
@@ -99,9 +99,7 @@ export const mockTeachers: MockTeacher[] = [
     experience: 5,
     isVerified: true,
     availability: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    subjectOfferings: [
-      { subjectName: "Ingliz tili", pricePerHour: 50000 }
-    ]
+    subjectOfferings: [{ subjectName: "Ingliz tili", pricePerHour: 50000 }],
   },
   {
     id: "2",
@@ -118,10 +116,15 @@ export const mockTeachers: MockTeacher[] = [
     subjects: ["Matematika", "Algebra", "Geometriya"],
     experience: 8,
     isVerified: true,
-    availability: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    subjectOfferings: [
-      { subjectName: "Matematika", pricePerHour: 45000 }
-    ]
+    availability: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ],
+    subjectOfferings: [{ subjectName: "Matematika", pricePerHour: 45000 }],
   },
   {
     id: "3",
@@ -139,9 +142,7 @@ export const mockTeachers: MockTeacher[] = [
     experience: 6,
     isVerified: true,
     availability: ["Monday", "Tuesday", "Wednesday", "Thursday"],
-    subjectOfferings: [
-      { subjectName: "Dasturlash", pricePerHour: 70000 }
-    ]
+    subjectOfferings: [{ subjectName: "Dasturlash", pricePerHour: 70000 }],
   },
   {
     id: "4",
@@ -159,9 +160,7 @@ export const mockTeachers: MockTeacher[] = [
     experience: 7,
     isVerified: true,
     availability: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    subjectOfferings: [
-      { subjectName: "Fizika", pricePerHour: 40000 }
-    ]
+    subjectOfferings: [{ subjectName: "Fizika", pricePerHour: 40000 }],
   },
   {
     id: "5",
@@ -179,9 +178,7 @@ export const mockTeachers: MockTeacher[] = [
     experience: 5,
     isVerified: true,
     availability: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    subjectOfferings: [
-      { subjectName: "Kimyo", pricePerHour: 42000 }
-    ]
+    subjectOfferings: [{ subjectName: "Kimyo", pricePerHour: 42000 }],
   },
   {
     id: "6",
@@ -199,29 +196,102 @@ export const mockTeachers: MockTeacher[] = [
     experience: 4,
     isVerified: false,
     availability: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    subjectOfferings: [
-      { subjectName: "Tarix", pricePerHour: 35000 }
-    ]
-  }
+    subjectOfferings: [{ subjectName: "Tarix", pricePerHour: 35000 }],
+  },
 ];
 
 // Mock Subjects Data
 export const mockSubjects: MockSubject[] = [
-  { id: "1", name: "Dasturlash", teacherCount: 1400, description: "Web dasturlash, mobil dasturlash va boshqalar" },
-  { id: "2", name: "Ingliz tili", teacherCount: 1000, description: "Ingliz tilini o'rganish barcha darajalar uchun" },
-  { id: "3", name: "Matematika", teacherCount: 850, description: "Algebra, geometriya va matematik tahlil" },
-  { id: "4", name: "Ona tili va adabiyot", teacherCount: 760, description: "O'zbek tili va adabiyot darslari" },
-  { id: "5", name: "Rus tili", teacherCount: 680, description: "Rus tilini o'rganish va rivojlantirish" },
-  { id: "6", name: "Arab tili", teacherCount: 540, description: "Arab tili va uning grammatikasi" },
-  { id: "7", name: "Fizika", teacherCount: 420, description: "Fizika qonunlari va amaliy mashg'ulotlar" },
-  { id: "8", name: "Iqtisodiyot", teacherCount: 410, description: "Iqtisodiyot asoslari va moliya" },
-  { id: "9", name: "Kimyo", teacherCount: 390, description: "Organik va noorganik kimyo" },
-  { id: "10", name: "Biologiya", teacherCount: 370, description: "Tirik organizmlar va ularning hayoti" },
-  { id: "11", name: "Xitoy tili", teacherCount: 320, description: "Xitoy tili va madaniyati" },
-  { id: "12", name: "Yapon tili", teacherCount: 280, description: "Yapon tili va yozuvi" },
-  { id: "13", name: "Huquq", teacherCount: 260, description: "Huquq asoslari va qonunchilik" },
-  { id: "14", name: "Psixologiya", teacherCount: 190, description: "Inson psixologiyasi va xulq-atvor" },
-  { id: "15", name: "Tarix", teacherCount: 300, description: "O'zbekiston va jahon tarixi" }
+  {
+    id: "1",
+    name: "Dasturlash",
+    teacherCount: 1400,
+    description: "Web dasturlash, mobil dasturlash va boshqalar",
+  },
+  {
+    id: "2",
+    name: "Ingliz tili",
+    teacherCount: 1000,
+    description: "Ingliz tilini o'rganish barcha darajalar uchun",
+  },
+  {
+    id: "3",
+    name: "Matematika",
+    teacherCount: 850,
+    description: "Algebra, geometriya va matematik tahlil",
+  },
+  {
+    id: "4",
+    name: "Ona tili va adabiyot",
+    teacherCount: 760,
+    description: "O'zbek tili va adabiyot darslari",
+  },
+  {
+    id: "5",
+    name: "Rus tili",
+    teacherCount: 680,
+    description: "Rus tilini o'rganish va rivojlantirish",
+  },
+  {
+    id: "6",
+    name: "Arab tili",
+    teacherCount: 540,
+    description: "Arab tili va uning grammatikasi",
+  },
+  {
+    id: "7",
+    name: "Fizika",
+    teacherCount: 420,
+    description: "Fizika qonunlari va amaliy mashg'ulotlar",
+  },
+  {
+    id: "8",
+    name: "Iqtisodiyot",
+    teacherCount: 410,
+    description: "Iqtisodiyot asoslari va moliya",
+  },
+  {
+    id: "9",
+    name: "Kimyo",
+    teacherCount: 390,
+    description: "Organik va noorganik kimyo",
+  },
+  {
+    id: "10",
+    name: "Biologiya",
+    teacherCount: 370,
+    description: "Tirik organizmlar va ularning hayoti",
+  },
+  {
+    id: "11",
+    name: "Xitoy tili",
+    teacherCount: 320,
+    description: "Xitoy tili va madaniyati",
+  },
+  {
+    id: "12",
+    name: "Yapon tili",
+    teacherCount: 280,
+    description: "Yapon tili va yozuvi",
+  },
+  {
+    id: "13",
+    name: "Huquq",
+    teacherCount: 260,
+    description: "Huquq asoslari va qonunchilik",
+  },
+  {
+    id: "14",
+    name: "Psixologiya",
+    teacherCount: 190,
+    description: "Inson psixologiyasi va xulq-atvor",
+  },
+  {
+    id: "15",
+    name: "Tarix",
+    teacherCount: 300,
+    description: "O'zbekiston va jahon tarixi",
+  },
 ];
 
 // Mock Current User
@@ -235,7 +305,7 @@ export const mockCurrentUser: MockUser = {
   phoneNumber: "+998901234567",
   bio: "Dasturlashni o'rganayotgan talaba",
   languages: ["O'zbek", "Ingliz", "Rus"],
-  createdAt: "2024-01-15T10:00:00Z"
+  createdAt: "2024-01-15T10:00:00Z",
 };
 
 // Mock Bookings
@@ -252,7 +322,7 @@ export const mockBookings: MockBooking[] = [
     price: 50000,
     notes: "IELTS Speaking tayyorlash",
     teacher: mockTeachers[0],
-    subject: mockSubjects[1]
+    subject: mockSubjects[1],
   },
   {
     id: "booking-2",
@@ -268,7 +338,7 @@ export const mockBookings: MockBooking[] = [
     rating: 5,
     review: "Juda yaxshi dars edi. Tushuntirish usuli ajoyib!",
     teacher: mockTeachers[1],
-    subject: mockSubjects[2]
+    subject: mockSubjects[2],
   },
   {
     id: "booking-3",
@@ -282,8 +352,8 @@ export const mockBookings: MockBooking[] = [
     price: 105000,
     notes: "React hooks o'rganish",
     teacher: mockTeachers[2],
-    subject: mockSubjects[0]
-  }
+    subject: mockSubjects[0],
+  },
 ];
 
 // Mock Messages
@@ -296,7 +366,7 @@ export const mockMessages: MockMessage[] = [
     timestamp: "2024-12-23T14:30:00Z",
     isRead: true,
     senderName: "Malika Karimova",
-    senderAvatar: "/placeholder.svg"
+    senderAvatar: "/placeholder.svg",
   },
   {
     id: "msg-2",
@@ -305,7 +375,7 @@ export const mockMessages: MockMessage[] = [
     content: "Ha, tayyor! IELTS Speaking qismida yordam kerak.",
     timestamp: "2024-12-23T14:32:00Z",
     isRead: true,
-    senderName: "Kamron Alimov"
+    senderName: "Kamron Alimov",
   },
   {
     id: "msg-3",
@@ -315,8 +385,8 @@ export const mockMessages: MockMessage[] = [
     timestamp: "2024-12-23T16:00:00Z",
     isRead: false,
     senderName: "Dilnoza Rahimova",
-    senderAvatar: "/placeholder.svg"
-  }
+    senderAvatar: "/placeholder.svg",
+  },
 ];
 
 // Mock Notifications
@@ -328,7 +398,7 @@ export const mockNotifications: MockNotification[] = [
     message: "Malika Karimova bilan ertaga soat 14:00 da dars",
     type: "booking",
     isRead: false,
-    createdAt: "2024-12-23T12:00:00Z"
+    createdAt: "2024-12-23T12:00:00Z",
   },
   {
     id: "notif-2",
@@ -337,7 +407,7 @@ export const mockNotifications: MockNotification[] = [
     message: "45,000 so'm to'lov amalga oshirildi",
     type: "payment",
     isRead: true,
-    createdAt: "2024-12-22T16:30:00Z"
+    createdAt: "2024-12-22T16:30:00Z",
   },
   {
     id: "notif-3",
@@ -346,8 +416,8 @@ export const mockNotifications: MockNotification[] = [
     message: "Dilnoza Rahimova sizga xabar yubordi",
     type: "system",
     isRead: false,
-    createdAt: "2024-12-23T16:01:00Z"
-  }
+    createdAt: "2024-12-23T16:01:00Z",
+  },
 ];
 
 // Mock API Response Types
@@ -368,9 +438,9 @@ export interface MockPaginatedResponse<T> {
 // Mock API Functions
 export const mockApi = {
   // Teachers
-  getTeachers: (params?: { 
-    limit?: number; 
-    sortBy?: string; 
+  getTeachers: (params?: {
+    limit?: number;
+    sortBy?: string;
     sortOrder?: string;
     subject?: string;
     language?: string;
@@ -380,94 +450,97 @@ export const mockApi = {
     return new Promise((resolve) => {
       setTimeout(() => {
         let filteredTeachers = [...mockTeachers];
-        
+
         // Apply filters
         if (params?.subject) {
-          filteredTeachers = filteredTeachers.filter(teacher => 
-            teacher.subjects.some(subject => 
-              subject.toLowerCase().includes(params.subject!.toLowerCase())
-            )
+          filteredTeachers = filteredTeachers.filter((teacher) =>
+            teacher.subjects.some((subject) =>
+              subject.toLowerCase().includes(params.subject!.toLowerCase()),
+            ),
           );
         }
-        
+
         if (params?.language) {
-          filteredTeachers = filteredTeachers.filter(teacher => 
-            teacher.languages.some(lang => 
-              lang.toLowerCase().includes(params.language!.toLowerCase())
-            )
+          filteredTeachers = filteredTeachers.filter((teacher) =>
+            teacher.languages.some((lang) =>
+              lang.toLowerCase().includes(params.language!.toLowerCase()),
+            ),
           );
         }
-        
+
         if (params?.priceFrom) {
-          filteredTeachers = filteredTeachers.filter(teacher => 
-            teacher.hourlyRate >= parseInt(params.priceFrom!)
+          filteredTeachers = filteredTeachers.filter(
+            (teacher) => teacher.hourlyRate >= parseInt(params.priceFrom!),
           );
         }
-        
+
         if (params?.priceTo) {
-          filteredTeachers = filteredTeachers.filter(teacher => 
-            teacher.hourlyRate <= parseInt(params.priceTo!)
+          filteredTeachers = filteredTeachers.filter(
+            (teacher) => teacher.hourlyRate <= parseInt(params.priceTo!),
           );
         }
-        
+
         // Apply sorting
-        if (params?.sortBy === 'rating' && params?.sortOrder === 'desc') {
+        if (params?.sortBy === "rating" && params?.sortOrder === "desc") {
           filteredTeachers.sort((a, b) => b.averageRating - a.averageRating);
         }
-        
+
         // Apply limit
         const limit = params?.limit || filteredTeachers.length;
         const limitedTeachers = filteredTeachers.slice(0, limit);
-        
+
         resolve({
           data: {
             data: limitedTeachers,
             total: filteredTeachers.length,
             page: 1,
             limit: limit,
-            totalPages: Math.ceil(filteredTeachers.length / limit)
+            totalPages: Math.ceil(filteredTeachers.length / limit),
           },
-          success: true
+          success: true,
         });
       }, 300);
     });
   },
-  
+
   // Subjects
   getSubjects: (): Promise<MockApiResponse<{ subjects: MockSubject[] }>> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
           data: { subjects: mockSubjects },
-          success: true
+          success: true,
         });
       }, 200);
     });
   },
-  
+
   // Auth
   getCurrentUser: (): Promise<MockApiResponse<MockUser>> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
           data: mockCurrentUser,
-          success: true
+          success: true,
         });
       }, 100);
     });
   },
-  
-  login: (email: string, password: string): Promise<MockApiResponse<{ user: MockUser; token: string }>> => {
+
+  login: (
+    email: string,
+    password: string,
+  ): Promise<MockApiResponse<{ user: MockUser; token: string }>> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (email === "test@example.com" && password === "password") {
           resolve({
             data: {
               user: mockCurrentUser,
-              token: "mock-jwt-token"
+              token: "mock-jwt-token",
             },
             success: true,
-            message: "Login successful"
+            message: "Login successful",
           });
         } else {
           reject(new Error("Invalid credentials"));
@@ -475,65 +548,75 @@ export const mockApi = {
       }, 500);
     });
   },
-  
+
   // Bookings
-  getBookings: (params?: { isRead?: boolean; limit?: number }): Promise<MockApiResponse<{ bookings: MockBooking[]; unreadCount?: number }>> => {
+  getBookings: (params?: {
+    isRead?: boolean;
+    limit?: number;
+  }): Promise<
+    MockApiResponse<{ bookings: MockBooking[]; unreadCount?: number }>
+  > => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
           data: {
             bookings: mockBookings,
-            unreadCount: 2
+            unreadCount: 2,
           },
-          success: true
+          success: true,
         });
       }, 200);
     });
   },
-  
+
   // Notifications
-  getNotifications: (params?: { isRead?: boolean; limit?: number }): Promise<MockApiResponse<{ notifications: MockNotification[]; unreadCount?: number }>> => {
+  getNotifications: (params?: {
+    isRead?: boolean;
+    limit?: number;
+  }): Promise<
+    MockApiResponse<{ notifications: MockNotification[]; unreadCount?: number }>
+  > => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const unreadNotifications = mockNotifications.filter(n => !n.isRead);
+        const unreadNotifications = mockNotifications.filter((n) => !n.isRead);
         resolve({
           data: {
             notifications: mockNotifications,
-            unreadCount: unreadNotifications.length
+            unreadCount: unreadNotifications.length,
           },
-          success: true
+          success: true,
         });
       }, 200);
     });
   },
-  
+
   // Messages
   getMessages: (): Promise<MockApiResponse<MockMessage[]>> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
           data: mockMessages,
-          success: true
+          success: true,
         });
       }, 200);
     });
-  }
+  },
 };
 
 // Utility functions
 export const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('uz-UZ', {
-    style: 'currency',
-    currency: 'UZS',
+  return new Intl.NumberFormat("uz-UZ", {
+    style: "currency",
+    currency: "UZS",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(price);
 };
 
 export const getMockTeacherById = (id: string): MockTeacher | undefined => {
-  return mockTeachers.find(teacher => teacher.id === id);
+  return mockTeachers.find((teacher) => teacher.id === id);
 };
 
 export const getMockSubjectById = (id: string): MockSubject | undefined => {
-  return mockSubjects.find(subject => subject.id === id);
+  return mockSubjects.find((subject) => subject.id === id);
 };
