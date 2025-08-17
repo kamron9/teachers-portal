@@ -20,7 +20,7 @@ interface AuthContextType {
   register: (data: {
     email: string;
     password: string;
-    role: "STUDENT" | "TEACHER";
+    role: "student" | "teacher";
     firstName: string;
     lastName: string;
     phone?: string;
