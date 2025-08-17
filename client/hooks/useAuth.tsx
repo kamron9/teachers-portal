@@ -185,7 +185,7 @@ export function useAuth() {
 // Route protection HOCs
 interface ProtectedRouteProps {
   children: ReactNode;
-  roles?: ("STUDENT" | "TEACHER" | "ADMIN")[];
+  roles?: ("student" | "teacher" | "admin")[];
   requireVerification?: boolean;
   fallback?: ReactNode;
 }
