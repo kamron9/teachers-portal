@@ -2,10 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   useTeacherById,
-  useAvailableSlots,
-  useCreateBooking,
-} from "@/hooks/useApi";
-import { formatPrice } from "@/lib/api";
+} from "@/hooks/useMockApi";
+import { formatPrice } from "@/lib/mockData";
 import {
   ArrowLeft,
   Calendar,
