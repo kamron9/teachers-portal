@@ -40,17 +40,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  const isAuthenticated = !!user && apiClient.isAuthenticated();
+  const isAuthenticated = !!user && !!localStorage.getItem('authToken');
 
   const fetchCurrentUser = async () => {
     try {
-      if (apiClient.isAuthenticated()) {
-        const currentUser = await apiClient.getCurrentUser();
-        setUser(currentUser);
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 100));
+        setUser(mockCurrentUser);
       }
     } catch (error) {
       // Clear invalid tokens on auth error
-      await apiClient.logout();
+      localStorage.removeItem('authToken');
       setUser(null);
     } finally {
       setIsLoading(false);
