@@ -229,7 +229,7 @@ export default function Teachers() {
               <Checkbox
                 id="online-only"
                 checked={showOnlineOnly}
-                onCheckedChange={setShowOnlineOnly}
+                onChange={e => setShowOnlineOnly(e.target.checked)}
               />
               <label htmlFor="online-only" className="text-sm font-medium">
                 Online now only
