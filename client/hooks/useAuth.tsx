@@ -249,9 +249,9 @@ export function useRole() {
   const { user } = useAuth();
 
   return {
-    isStudent: user?.role === "STUDENT",
-    isTeacher: user?.role === "TEACHER",
-    isAdmin: user?.role === "ADMIN",
+    isStudent: user?.role === "student",
+    isTeacher: user?.role === "teacher",
+    isAdmin: user?.role === "admin",
     role: user?.role,
   };
 }
