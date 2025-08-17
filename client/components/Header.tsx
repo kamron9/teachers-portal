@@ -23,7 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useAuth, useRole } from "@/hooks/useAuth";
-import { useNotifications } from "@/hooks/useApi";
+import { useNotifications } from "@/hooks/useMockApi";
 import { useTranslation } from "react-i18next";
 
 
