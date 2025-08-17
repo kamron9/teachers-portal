@@ -293,6 +293,72 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Teachers by Subject Statistics Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Fanlarda mavjud o'qituvchilar soni
+            </h2>
+            <p className="text-xl text-gray-600">
+              Har bir fan bo'yicha malakali o'qituvchilar
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { subject: "Dasturlash", count: 1400, icon: "💻" },
+                { subject: "Ingliz tili", count: 1000, icon: "🇺🇸" },
+                { subject: "Matematika", count: 850, icon: "🔢" },
+                { subject: "Ona tili va adabiyot", count: 760, icon: "📚" },
+                { subject: "Rus tili", count: 680, icon: "🇷🇺" },
+                { subject: "Arab tili", count: 540, icon: "🇸🇦" },
+                { subject: "Fizika", count: 420, icon: "⚡" },
+                { subject: "Iqtisodiyot", count: 410, icon: "📈" },
+                { subject: "Kimyo", count: 390, icon: "🧪" },
+                { subject: "Biologiya", count: 370, icon: "🧬" },
+                { subject: "Xitoy tili", count: 320, icon: "🇨🇳" },
+                { subject: "Yapon tili", count: 280, icon: "🇯🇵" },
+                { subject: "Huquq", count: 260, icon: "⚖️" },
+                { subject: "Psixologiya", count: 190, icon: "🧠" },
+                { subject: "Tarix", count: 300, icon: "🏛️" },
+              ].map((item, index) => (
+                <Card
+                  key={index}
+                  className="hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+                  onClick={() => handleCategoryClick(item.subject.toLowerCase().replace(/\s+/g, '-'))}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="text-3xl">{item.icon}</div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg text-gray-900 mb-1">
+                          {item.subject}
+                        </h3>
+                        <p className="text-gray-600 font-medium">
+                          {item.count.toLocaleString()} o'qituvchi
+                        </p>
+                      </div>
+                      <ArrowRight className="h-5 w-5 text-gray-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <Link to="/teachers">
+                <Button size="lg" variant="outline">
+                  Barcha o'qituvchilarni ko'rish
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Top Tutors Section - TZ bo'yicha 4-6 ta TutorCard */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
