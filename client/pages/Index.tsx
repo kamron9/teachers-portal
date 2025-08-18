@@ -1,33 +1,61 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  Search,
-  Star,
-  MapPin,
-  Users,
-  ArrowRight,
-  BookOpen,
-  Heart,
-  MessageCircle,
-  Calculator,
-  Atom,
-  Globe,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useTeacherSearch, useSubjects } from "@/hooks/useMockApi";
-import { formatPrice } from "@/lib/mockData";
-import HowItWorksSection from "@/components/HowItWorksSection";
+} from '@/components/ui/select'
+import { useSubjects, useTeacherSearch } from '@/hooks/useMockApi'
+import { formatPrice } from '@/lib/mockData'
+import { ArrowRight, BookOpen, Search, Star, Users, Video } from 'lucide-react'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+
+const features = [
+  {
+    icon: Search,
+    title: 'Find Perfect Teachers',
+    description:
+      'Search by subject, price, rating, and language to find the ideal tutor for your needs',
+  },
+  {
+    icon: Video,
+    title: 'Live Video Lessons',
+    description:
+      'High-quality video calls with integrated whiteboard and screen sharing tools',
+  },
+  {
+    icon: Users,
+    title: 'Local & International',
+    description:
+      'Connect with both local Uzbek teachers and international experts worldwide',
+  },
+  {
+    icon: BookOpen,
+    title: 'All Subjects Covered',
+    description:
+      'From languages to sciences, find expert tutors for any subject you want to learn',
+  },
+]
+
+const topics = [
+  { subject: 'Dasturlash', count: 1400 },
+  { subject: 'Ingliz tili', count: 1000 },
+  { subject: 'Matematika', count: 850 },
+  { subject: 'Rus tili', count: 680 },
+  { subject: 'Arab tili', count: 540 },
+  { subject: 'Fizika', count: 420 },
+  { subject: 'Kimyo', count: 390 },
+  { subject: 'Biologiya', count: 370 },
+  { subject: 'Xitoy tili', count: 320 },
+  { subject: 'Huquq', count: 260 },
+  { subject: 'Psixologiya', count: 190 },
+  { subject: 'Tarix', count: 300 },
+]
 
 // TutorCard component
 const TutorCard = ({ tutor }: { tutor: any }) => (
@@ -37,7 +65,7 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
         <div className="relative">
           <Avatar className="w-16 h-16">
             <AvatarImage
-              src={tutor.profileImage || "/placeholder.svg"}
+              src={tutor.profileImage || '/placeholder.svg'}
               alt={`${tutor.firstName} ${tutor.lastName}`}
             />
             <AvatarFallback>
@@ -57,14 +85,14 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
             {tutor.firstName} {tutor.lastName}
           </h3>
           <p className="text-primary font-medium">
-            {tutor.subjectOfferings?.[0]?.subjectName || "Fan belgilanmagan"}
+            {tutor.subjectOfferings?.[0]?.subjectName || 'Fan belgilanmagan'}
           </p>
 
           <div className="flex items-center gap-2 mt-2">
             <div className="flex items-center gap-1">
               <Star className="h-4 w-4 text-yellow-500 fill-current" />
               <span className="font-medium">
-                {tutor.averageRating?.toFixed(1) || "N/A"}
+                {tutor.averageRating?.toFixed(1) || 'N/A'}
               </span>
             </div>
             <span className="text-gray-400">•</span>
@@ -90,7 +118,7 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
               <span className="text-xl font-bold text-gray-900">
                 {formatPrice(tutor.subjectOfferings?.[0]?.pricePerHour || 0)}
               </span>
-              <span className="text-gray-600 text-sm">/soat</span>
+              <span className="text-gray-600 text-sm ml-1">so'm/soat</span>
             </div>
             <Link to={`/tutor/${tutor.id}`}>
               <Button size="sm">Ko'rish</Button>
@@ -100,196 +128,246 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
       </div>
     </CardContent>
   </Card>
-);
+)
 
 export default function Index() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   // Search state - TZ bo'yicha SearchBar (Subject, Language, PriceFrom/To)
   const [searchData, setSearchData] = useState({
-    subject: "",
-    language: "",
-    priceFrom: "",
-    priceTo: "",
-  });
+    subject: '',
+    language: '',
+    priceFrom: '',
+    priceTo: '',
+  })
 
   // Fetch featured teachers - TZ bo'yicha GET /teachers?limit=6&sort=rating_desc
+  type Teacher = {
+    id: string
+    firstName: string
+    lastName: string
+    profileImage?: string
+    isVerified?: boolean
+    subjectOfferings?: { subjectName?: string; pricePerHour?: number }[]
+    averageRating?: number
+    totalStudents?: number
+    languages?: string[]
+  }
+
+  type TeachersData = {
+    teachers: Teacher[]
+  }
+
   const {
     data: teachersData,
     isLoading,
     error,
   } = useTeacherSearch(
-    { limit: 6, sortBy: "rating", sortOrder: "desc" },
-    { staleTime: 1000 * 60 * 5 }, // 5 minutes
-  );
+    { limit: 6, sortBy: 'rating', sortOrder: 'desc' },
+    { staleTime: 1000 * 60 * 5 }
+  ) as { data: TeachersData | undefined; isLoading: boolean; error: any }
 
   // Fetch subjects for search dropdown
-  const { data: subjectsData } = useSubjects({}, { staleTime: 1000 * 60 * 10 }); // 10 minutes
+  type Subject = { id: string; name: string; teacherCount?: number }
+  type SubjectsData = { subjects: Subject[] }
+  const { data: subjectsData } = useSubjects(
+    {},
+    { staleTime: 1000 * 60 * 10 }
+  ) as { data: SubjectsData | undefined }
 
-  const tutors = teachersData?.teachers || [];
-  const subjects = subjectsData?.subjects || [];
+  const tutors = teachersData?.teachers || []
+  const subjects = subjectsData?.subjects || []
 
   // Search handler - TZ bo'yicha /search?subject=&language=&priceFrom=&priceTo=
   const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (searchData.subject) params.set("subject", searchData.subject);
-    if (searchData.language) params.set("language", searchData.language);
-    if (searchData.priceFrom) params.set("priceFrom", searchData.priceFrom);
-    if (searchData.priceTo) params.set("priceTo", searchData.priceTo);
+    const params = new URLSearchParams()
+    if (searchData.subject) params.set('subject', searchData.subject)
+    if (searchData.language) params.set('language', searchData.language)
+    if (searchData.priceFrom) params.set('priceFrom', searchData.priceFrom)
+    if (searchData.priceTo) params.set('priceTo', searchData.priceTo)
 
     // Analytics - TZ bo'yicha search_from_home
     // analytics.track('search_from_home', searchData);
 
-    navigate(`/search?${params.toString()}`);
-  };
+    navigate(`/search?${params.toString()}`)
+  }
 
   // Category click handler
   const handleCategoryClick = (categoryId: string) => {
-    navigate(`/search?subject=${categoryId}`);
-  };
+    navigate(`/search?subject=${categoryId}`)
+  }
 
   // Get popular categories from subjects data
   const popularCategories = subjects.slice(0, 6).map((subject) => ({
     id: subject.id,
     name: subject.name,
     count: subject.teacherCount || 0,
-  }));
+  }))
 
   // CTA tutor click handler - TZ bo'yicha cta_tutor_clicked
   const handleTutorCTAClick = () => {
     // analytics.track('cta_tutor_clicked');
-    navigate("/teacher-signup");
-  };
+    navigate('/teacher-signup')
+  }
 
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 pt-20 pb-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Hero content */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Eng yaxshi o'qituvchilar bilan
-              <span className="text-primary block">o'rganing</span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-              Malakali o'qituvchilar bilan individual onlayn darslar. Istalgan
-              fanni uydan turib o'rganing.
-            </p>
+      <section className="relative overflow-hidden pt-20 pb-32">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-purple-600/10" />
+        <div className="container mx-auto px-4 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="pt-10 lg:pt-20">
+              {/* Hero content */}
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-2">
+                Eng yaxshi o'qituvchilar bilan
+                <span className="text-primary"> o'rganing</span>
+              </h1>
+              <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                Malakali o'qituvchilar bilan individual onlayn darslar. Istalgan
+                fanni uydan turib o'rganing.
+              </p>
 
-            {/* SearchBar - TZ bo'yicha (Subject, Language, PriceFrom/To) */}
-            <Card className="p-6 max-w-4xl mx-auto mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Fan</label>
-                  <Select
-                    value={searchData.subject}
-                    onValueChange={(value) =>
-                      setSearchData({ ...searchData, subject: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Fanni tanlang" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {subjects.map((subject) => (
-                        <SelectItem key={subject.id} value={subject.id}>
-                          {subject.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {/* SearchBar - TZ bo'yicha (Subject, Language, PriceFrom/To) */}
+              <Card className="p-6 max-w-4xl mb-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      Fan
+                    </label>
+                    <Select
+                      value={searchData.subject}
+                      onValueChange={(value) =>
+                        setSearchData({ ...searchData, subject: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Fanni tanlang" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subjects.map((subject) => (
+                          <SelectItem key={subject.id} value={subject.id}>
+                            {subject.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      Til
+                    </label>
+                    <Select
+                      value={searchData.language}
+                      onValueChange={(value) =>
+                        setSearchData({ ...searchData, language: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Tilni tanlang" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="uzbek">O'zbek</SelectItem>
+                        <SelectItem value="russian">Rus</SelectItem>
+                        <SelectItem value="english">Ingliz</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      Narx (dan)
+                    </label>
+                    <Select
+                      value={searchData.priceFrom}
+                      onValueChange={(value) =>
+                        setSearchData({ ...searchData, priceFrom: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="0 so'm" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="20000">20,000 so'm</SelectItem>
+                        <SelectItem value="40000">40,000 so'm</SelectItem>
+                        <SelectItem value="60000">60,000 so'm</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      Narx (gacha)
+                    </label>
+                    <Select
+                      value={searchData.priceTo}
+                      onValueChange={(value) =>
+                        setSearchData({ ...searchData, priceTo: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="100,000 so'm" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="40000">40,000 so'm</SelectItem>
+                        <SelectItem value="60000">60,000 so'm</SelectItem>
+                        <SelectItem value="80000">80,000 so'm</SelectItem>
+                        <SelectItem value="100000">100,000 so'm</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Til</label>
-                  <Select
-                    value={searchData.language}
-                    onValueChange={(value) =>
-                      setSearchData({ ...searchData, language: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Tilni tanlang" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="uzbek">O'zbek</SelectItem>
-                      <SelectItem value="russian">Rus</SelectItem>
-                      <SelectItem value="english">Ingliz</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Button
+                  className="w-full mt-6"
+                  size="lg"
+                  onClick={handleSearch}
+                >
+                  <Search className="h-5 w-5 mr-2" />
+                  O'qituvchi qidirish
+                </Button>
+              </Card>
 
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Narx (dan)
-                  </label>
-                  <Select
-                    value={searchData.priceFrom}
-                    onValueChange={(value) =>
-                      setSearchData({ ...searchData, priceFrom: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="0 so'm" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">0 so'm</SelectItem>
-                      <SelectItem value="20000">20,000 so'm</SelectItem>
-                      <SelectItem value="40000">40,000 so'm</SelectItem>
-                      <SelectItem value="60000">60,000 so'm</SelectItem>
-                    </SelectContent>
-                  </Select>
+              {/* Popular categories - TZ bo'yicha tez filter chiplar */}
+              {popularCategories.length > 0 && (
+                <div className="flex flex-wrap gap-3">
+                  {popularCategories.map((category) => (
+                    <Button
+                      key={category.id}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleCategoryClick(category.id)}
+                      className="rounded-full"
+                    >
+                      {category.name}
+                      <Badge variant="secondary" className="ml-2 text-xs">
+                        {category.count}
+                      </Badge>
+                    </Button>
+                  ))}
                 </div>
+              )}
+            </div>
 
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Narx (gacha)
-                  </label>
-                  <Select
-                    value={searchData.priceTo}
-                    onValueChange={(value) =>
-                      setSearchData({ ...searchData, priceTo: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="100,000 so'm" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="40000">40,000 so'm</SelectItem>
-                      <SelectItem value="60000">60,000 so'm</SelectItem>
-                      <SelectItem value="80000">80,000 so'm</SelectItem>
-                      <SelectItem value="100000">100,000 so'm</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="relative">
+              <img
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&w=800&h=600&fit=crop"
+                alt="Students learning languages online with tutors"
+                className="rounded-2xl shadow-2xl w-full h-auto"
+                data-testid="img-hero"
+              />
+              {/* Floating language elements */}
+              <div className="absolute -top-4 -left-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-lg font-medium text-primary">
+                Bonjour! 🇫🇷
               </div>
-
-              <Button className="w-full mt-6" size="lg" onClick={handleSearch}>
-                <Search className="h-5 w-5 mr-2" />
-                O'qituvchi qidirish
-              </Button>
-            </Card>
-
-            {/* Popular categories - TZ bo'yicha tez filter chiplar */}
-            {popularCategories.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-3 mb-12">
-                {popularCategories.map((category) => (
-                  <Button
-                    key={category.id}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleCategoryClick(category.id)}
-                    className="rounded-full"
-                  >
-                    {category.name}
-                    <Badge variant="secondary" className="ml-2 text-xs">
-                      {category.count}
-                    </Badge>
-                  </Button>
-                ))}
+              <div className="absolute top-1/3 -right-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-lg font-medium text-green-500">
+                ¡Hola! 🇪🇸
               </div>
-            )}
+              <div className="absolute -bottom-4 left-1/3 bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-lg font-medium text-red-500">
+                こんにちは 🇯🇵
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -299,49 +377,28 @@ export default function Index() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Fanlarda mavjud o'qituvchilar soni
-            </h2>
-            <p className="text-xl text-gray-600">
               Har bir fan bo'yicha malakali o'qituvchilar
-            </p>
+            </h2>
           </div>
-
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                { subject: "Dasturlash", count: 1400, icon: "💻" },
-                { subject: "Ingliz tili", count: 1000, icon: "🇺🇸" },
-                { subject: "Matematika", count: 850, icon: "🔢" },
-                { subject: "Ona tili va adabiyot", count: 760, icon: "📚" },
-                { subject: "Rus tili", count: 680, icon: "🇷🇺" },
-                { subject: "Arab tili", count: 540, icon: "🇸🇦" },
-                { subject: "Fizika", count: 420, icon: "⚡" },
-                { subject: "Iqtisodiyot", count: 410, icon: "📈" },
-                { subject: "Kimyo", count: 390, icon: "🧪" },
-                { subject: "Biologiya", count: 370, icon: "🧬" },
-                { subject: "Xitoy tili", count: 320, icon: "🇨🇳" },
-                { subject: "Yapon tili", count: 280, icon: "🇯🇵" },
-                { subject: "Huquq", count: 260, icon: "⚖️" },
-                { subject: "Psixologiya", count: 190, icon: "🧠" },
-                { subject: "Tarix", count: 300, icon: "🏛️" },
-              ].map((item, index) => (
+          <div className="mb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {topics.map((item, index) => (
                 <Card
                   key={index}
                   className="hover:shadow-lg transition-shadow duration-300 cursor-pointer"
                   onClick={() =>
                     handleCategoryClick(
-                      item.subject.toLowerCase().replace(/\s+/g, "-"),
+                      item.subject.toLowerCase().replace(/\s+/g, '-')
                     )
                   }
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4">
-                      <div className="text-3xl">{item.icon}</div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-gray-900 mb-1">
+                        <h3 className="font-bold text-xl text-gray-900 mb-1">
                           {item.subject}
                         </h3>
-                        <p className="text-gray-600 font-medium">
+                        <p className="text-gray-400 font-medium text-sm">
                           {item.count.toLocaleString()} o'qituvchi
                         </p>
                       </div>
@@ -351,196 +408,48 @@ export default function Index() {
                 </Card>
               ))}
             </div>
+            <div className="flex justify-center mt-4">
+              
+              <Button variant="outline" onClick={() => navigate('/subjects')}>
+                Barcha fanlar
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+          <div className="container mx-auto px-4">
+            <div className="text-center space-y-4 mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+                Why Choose Our Platform?
+              </h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                We make learning accessible, effective, and enjoyable for
+                students across Uzbekistan
+              </p>
+            </div>
 
-            <div className="text-center mt-12">
-              <Link to="/teachers">
-                <Button size="lg" variant="outline">
-                  Barcha o'qituvchilarni ko'rish
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {features.map((feature, index) => (
+                <Card
+                  key={index}
+                  className="border-0 shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <CardContent className="p-8 text-center space-y-4">
+                    <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto">
+                      <feature.icon className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       {/* How It Works Section - Modern Preply-inspired Design */}
-      <section className="py-20 bg-white overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Qanday ishlaydi?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Besh oddiy qadam bilan professional o'qituvchilar bilan o'qishni
-              boshlang
-            </p>
-          </div>
-
-          <div className="max-w-6xl mx-auto">
-            {/* Desktop: Horizontal Stepper */}
-            <div className="hidden lg:block">
-              <div className="relative">
-                {/* Connection Lines */}
-                <div className="absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-200 via-green-200 to-cyan-200"></div>
-
-                <div className="grid grid-cols-5 gap-8">
-                  {[
-                    {
-                      number: 1,
-                      title: "Fan tanlang",
-                      description: "Kerakli fan yoki tilni ro'yxatdan tanlang",
-                      icon: "🎯",
-                      color: "from-blue-400 to-blue-500",
-                    },
-                    {
-                      number: 2,
-                      title: "Ustozni toping",
-                      description: "Reyting va tajribaga qarab ustoz tanlang",
-                      icon: "👨‍🏫",
-                      color: "from-emerald-400 to-emerald-500",
-                    },
-                    {
-                      number: 3,
-                      title: "Darsni bron qiling",
-                      description:
-                        "Qulay vaqtni belgilang va darsni bron qiling",
-                      icon: "📅",
-                      color: "from-teal-400 to-teal-500",
-                    },
-                    {
-                      number: 4,
-                      title: "Online darsga qo'shiling",
-                      description:
-                        "Platforma orqali video chat orqali darsga qo'shiling",
-                      icon: "💻",
-                      color: "from-cyan-400 to-cyan-500",
-                    },
-                    {
-                      number: 5,
-                      title: "Bilimingizni oshiring",
-                      description:
-                        "Muntazam darslar bilan bilimlaringizni rivojlantiring",
-                      icon: "🚀",
-                      color: "from-sky-400 to-sky-500",
-                    },
-                  ].map((step, index) => (
-                    <div key={index} className="relative group">
-                      <div className="text-center">
-                        {/* Step Number Circle */}
-                        <div
-                          className={`relative mx-auto w-16 h-16 rounded-full bg-gradient-to-br ${step.color} shadow-lg flex items-center justify-center text-white font-bold text-xl mb-4 group-hover:scale-110 transition-transform duration-300 z-10`}
-                        >
-                          {step.number}
-                        </div>
-
-                        {/* Step Card */}
-                        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:-translate-y-2">
-                          <CardContent className="p-0">
-                            <div className="text-4xl mb-3">{step.icon}</div>
-                            <h3 className="font-bold text-lg text-gray-900 mb-2">
-                              {step.title}
-                            </h3>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                              {step.description}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile & Tablet: Vertical Stepper */}
-            <div className="lg:hidden space-y-8">
-              {[
-                {
-                  number: 1,
-                  title: "Fan tanlang",
-                  description: "Kerakli fan yoki tilni ro'yxatdan tanlang",
-                  icon: "🎯",
-                  color: "from-blue-400 to-blue-500",
-                },
-                {
-                  number: 2,
-                  title: "Ustozni toping",
-                  description: "Reyting va tajribaga qarab ustoz tanlang",
-                  icon: "👨��🏫",
-                  color: "from-emerald-400 to-emerald-500",
-                },
-                {
-                  number: 3,
-                  title: "Darsni bron qiling",
-                  description: "Qulay vaqtni belgilang va darsni bron qiling",
-                  icon: "📅",
-                  color: "from-teal-400 to-teal-500",
-                },
-                {
-                  number: 4,
-                  title: "Online darsga qo'shiling",
-                  description:
-                    "Platforma orqali video chat orqali darsga qo'shiling",
-                  icon: "💻",
-                  color: "from-cyan-400 to-cyan-500",
-                },
-                {
-                  number: 5,
-                  title: "Bilimingizni oshiring",
-                  description:
-                    "Muntazam darslar bilan bilimlaringizni rivojlantiring",
-                  icon: "🚀",
-                  color: "from-sky-400 to-sky-500",
-                },
-              ].map((step, index) => (
-                <div key={index} className="relative">
-                  {/* Connecting Line */}
-                  {index < 4 && (
-                    <div className="absolute left-8 top-20 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 to-green-200"></div>
-                  )}
-
-                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        {/* Step Number Circle */}
-                        <div
-                          className={`w-16 h-16 rounded-full bg-gradient-to-br ${step.color} shadow-lg flex items-center justify-center text-white font-bold text-xl flex-shrink-0`}
-                        >
-                          {step.number}
-                        </div>
-
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="text-2xl">{step.icon}</div>
-                            <h3 className="font-bold text-xl text-gray-900">
-                              {step.title}
-                            </h3>
-                          </div>
-                          <p className="text-gray-600 leading-relaxed">
-                            {step.description}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* CTA Button */}
-          <div className="text-center mt-16">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-            >
-              Hozir boshlang
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </section>
 
       {/* Top Tutors Section - TZ bo'yicha 4-6 ta TutorCard */}
       <section className="py-16 bg-gray-50">
@@ -706,5 +615,5 @@ export default function Index() {
         </div>
       </footer>
     </div>
-  );
+  )
 }

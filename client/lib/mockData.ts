@@ -605,9 +605,8 @@ export const mockApi = {
 
 // Utility functions
 export const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('uz-UZ', {
-    style: 'currency',
-    currency: 'UZS',
+  return new Intl.NumberFormat('ru-Ru', {
+    style: 'decimal',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(price)
