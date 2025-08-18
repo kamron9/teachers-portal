@@ -1,61 +1,61 @@
-import React, { useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  MessageCircle, 
-  Archive, 
-  CheckCircle, 
-  Clock,
-  Pin,
-  MoreVertical,
-  Trash2
-} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { useMessageThreads } from '@/hooks/useApi';
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
+import {
+  Archive,
+  CheckCircle,
+  Clock,
+  MessageCircle,
+  MoreVertical,
+  Pin,
+  Search,
+  Trash2,
+} from 'lucide-react'
+import React, { useState } from 'react'
+import { useMockMessageThreads, useMockMessageThreadsLoading } from './mockData'
 
 interface MessageThread {
-  id: string;
-  studentId: string;
-  teacherId: string;
-  bookingId?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  id: string
+  studentId: string
+  teacherId: string
+  bookingId?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
   lastMessage?: {
-    id: string;
-    content: string;
-    senderId: string;
-    createdAt: string;
-    status: 'SENT' | 'DELIVERED' | 'READ';
-  };
+    id: string
+    content: string
+    senderId: string
+    createdAt: string
+    status: 'SENT' | 'DELIVERED' | 'READ'
+  }
   otherUser: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    role: 'student' | 'teacher';
-    isOnline?: boolean;
-    lastSeen?: string;
-  };
-  unreadCount: number;
-  isPinned?: boolean;
+    id: string
+    firstName: string
+    lastName: string
+    avatar?: string
+    role: 'student' | 'teacher'
+    isOnline?: boolean
+    lastSeen?: string
+  }
+  unreadCount: number
+  isPinned?: boolean
 }
 
 interface MessageThreadListProps {
-  currentUserId: string;
-  selectedThreadId?: string;
-  onThreadSelect: (threadId: string) => void;
-  onNewMessage?: () => void;
-  className?: string;
+  currentUserId: string
+  selectedThreadId?: string
+  onThreadSelect: (threadId: string) => void
+  onNewMessage?: () => void
+  className?: string
 }
 
 export const MessageThreadList: React.FC<MessageThreadListProps> = ({
@@ -65,119 +65,129 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
   onNewMessage,
   className,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState<'all' | 'unread' | 'archived'>('all');
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filter, setFilter] = useState<'all' | 'unread' | 'archived'>('all')
 
-  const { data: threadsData, isLoading, error } = useMessageThreads(currentUserId);
-  const threads: MessageThread[] = threadsData?.threads || [];
+  // const { data: threadsData, isLoading, error } = useMessageThreads(currentUserId);
+  const { data: threadsData, isLoading, error } = useMockMessageThreads('2')
+  const threads: MessageThread[] = threadsData?.threads || []
 
-  const filteredThreads = threads.filter(thread => {
+  const filteredThreads = threads.filter((thread) => {
     // Search filter
     if (searchQuery) {
-      const fullName = `${thread.otherUser.firstName} ${thread.otherUser.lastName}`.toLowerCase();
-      const lastMessageContent = thread.lastMessage?.content.toLowerCase() || '';
-      const query = searchQuery.toLowerCase();
-      
+      const fullName =
+        `${thread.otherUser.firstName} ${thread.otherUser.lastName}`.toLowerCase()
+      const lastMessageContent = thread.lastMessage?.content.toLowerCase() || ''
+      const query = searchQuery.toLowerCase()
+
       if (!fullName.includes(query) && !lastMessageContent.includes(query)) {
-        return false;
+        return false
       }
     }
 
     // Status filter
     switch (filter) {
       case 'unread':
-        return thread.unreadCount > 0;
+        return thread.unreadCount > 0
       case 'archived':
-        return !thread.isActive;
+        return !thread.isActive
       case 'all':
       default:
-        return thread.isActive;
+        return thread.isActive
     }
-  });
+  })
 
   // Sort threads: pinned first, then by last message time, then unread
   const sortedThreads = filteredThreads.sort((a, b) => {
     // Pinned threads first
-    if (a.isPinned && !b.isPinned) return -1;
-    if (!a.isPinned && b.isPinned) return 1;
+    if (a.isPinned && !b.isPinned) return -1
+    if (!a.isPinned && b.isPinned) return 1
 
     // Then by unread count
-    if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
-    if (a.unreadCount === 0 && b.unreadCount > 0) return 1;
+    if (a.unreadCount > 0 && b.unreadCount === 0) return -1
+    if (a.unreadCount === 0 && b.unreadCount > 0) return 1
 
     // Finally by last message time
-    const aTime = new Date(a.lastMessage?.createdAt || a.updatedAt).getTime();
-    const bTime = new Date(b.lastMessage?.createdAt || b.updatedAt).getTime();
-    return bTime - aTime;
-  });
+    const aTime = new Date(a.lastMessage?.createdAt || a.updatedAt).getTime()
+    const bTime = new Date(b.lastMessage?.createdAt || b.updatedAt).getTime()
+    return bTime - aTime
+  })
 
   const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / 86400000);
+    const date = new Date(timestamp)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffDays = Math.floor(diffMs / 86400000)
 
     if (diffDays === 0) {
       // Today - show time
       return date.toLocaleTimeString('uz-UZ', {
         hour: '2-digit',
         minute: '2-digit',
-      });
+      })
     } else if (diffDays === 1) {
-      return 'Kecha';
+      return 'Kecha'
     } else if (diffDays < 7) {
-      return date.toLocaleDateString('uz-UZ', { weekday: 'short' });
+      return date.toLocaleDateString('uz-UZ', { weekday: 'short' })
     } else {
       return date.toLocaleDateString('uz-UZ', {
         day: '2-digit',
         month: '2-digit',
-      });
+      })
     }
-  };
+  }
 
   const getLastMessagePreview = (thread: MessageThread) => {
     if (!thread.lastMessage) {
-      return 'Xabarlar yo\'q';
+      return "Xabarlar yo'q"
     }
 
-    const { content, senderId } = thread.lastMessage;
-    const isOwnMessage = senderId === currentUserId;
-    const prefix = isOwnMessage ? 'Siz: ' : '';
-    
+    const { content, senderId } = thread.lastMessage
+    const isOwnMessage = senderId === currentUserId
+    const prefix = isOwnMessage ? 'Siz: ' : ''
+
     if (!content.trim()) {
-      return `${prefix}Fayl yuborildi`;
+      return `${prefix}Fayl yuborildi`
     }
 
-    const preview = content.length > 50 ? content.substring(0, 50) + '...' : content;
-    return `${prefix}${preview}`;
-  };
+    const preview =
+      content.length > 50 ? content.substring(0, 50) + '...' : content
+    return `${prefix}${preview}`
+  }
 
-  const handleThreadAction = (threadId: string, action: 'pin' | 'archive' | 'delete') => {
+  const handleThreadAction = (
+    threadId: string,
+    action: 'pin' | 'archive' | 'delete'
+  ) => {
     // Implement thread actions
-    console.log(`Action ${action} on thread ${threadId}`);
-  };
+    console.log(`Action ${action} on thread ${threadId}`)
+  }
 
   if (isLoading) {
     return (
-      <div className={cn("flex items-center justify-center p-8", className)}>
+      <div className={cn('flex items-center justify-center p-8', className)}>
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    );
+    )
   }
 
   if (error) {
     return (
-      <div className={cn("p-4 text-center", className)}>
+      <div className={cn('p-4 text-center', className)}>
         <div className="text-red-500 mb-2">Xabarlarni yuklashda xatolik</div>
-        <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => window.location.reload()}
+        >
           Qayta yuklash
         </Button>
       </div>
-    );
+    )
   }
 
   return (
-    <div className={cn("flex flex-col h-full bg-white", className)}>
+    <div className={cn('flex flex-col h-full bg-white', className)}>
       {/* Header */}
       <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-4">
@@ -204,24 +214,34 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
         {/* Filter tabs */}
         <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
           {[
-            { key: 'all', label: 'Barchasi', count: threads.filter(t => t.isActive).length },
-            { key: 'unread', label: 'O\'qilmagan', count: threads.filter(t => t.unreadCount > 0).length },
-            { key: 'archived', label: 'Arxiv', count: threads.filter(t => !t.isActive).length },
+            {
+              key: 'all',
+              label: 'Barchasi',
+              count: threads.filter((t) => t.isActive).length,
+            },
+            {
+              key: 'unread',
+              label: "O'qilmagan",
+              count: threads.filter((t) => t.unreadCount > 0).length,
+            },
+            {
+              key: 'archived',
+              label: 'Arxiv',
+              count: threads.filter((t) => !t.isActive).length,
+            },
           ].map(({ key, label, count }) => (
             <button
               key={key}
               onClick={() => setFilter(key as any)}
               className={cn(
-                "flex-1 px-3 py-2 text-sm rounded-md transition-colors",
+                'flex-1 px-3 py-2 text-sm rounded-md transition-colors',
                 filter === key
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
               )}
             >
               {label}
-              {count > 0 && (
-                <span className="ml-1 text-xs">({count})</span>
-              )}
+              {count > 0 && <span className="ml-1 text-xs">({count})</span>}
             </button>
           ))}
         </div>
@@ -235,13 +255,12 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
               <MessageCircle className="h-8 w-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold mb-2">
-              {searchQuery ? 'Hech narsa topilmadi' : 'Xabarlar yo\'q'}
+              {searchQuery ? 'Hech narsa topilmadi' : "Xabarlar yo'q"}
             </h3>
             <p className="text-gray-600 mb-4">
-              {searchQuery 
-                ? 'Boshqa qidiruv so\'zi bilan urinib ko\'ring'
-                : 'O\'qituvchi yoki o\'quvchi bilan suhbatni boshlang'
-              }
+              {searchQuery
+                ? "Boshqa qidiruv so'zi bilan urinib ko'ring"
+                : "O'qituvchi yoki o'quvchi bilan suhbatni boshlang"}
             </p>
             {onNewMessage && !searchQuery && (
               <Button onClick={onNewMessage}>
@@ -256,20 +275,22 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
               <div
                 key={thread.id}
                 className={cn(
-                  "flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer transition-colors relative",
-                  selectedThreadId === thread.id && "bg-primary/5 border-r-2 border-primary"
+                  'flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer transition-colors relative',
+                  selectedThreadId === thread.id &&
+                    'bg-primary/5 border-r-2 border-primary'
                 )}
                 onClick={() => onThreadSelect(thread.id)}
               >
                 {/* Avatar */}
                 <div className="relative flex-shrink-0">
                   <Avatar className="w-12 h-12">
-                    <AvatarImage 
-                      src={thread.otherUser.avatar} 
-                      alt={`${thread.otherUser.firstName} ${thread.otherUser.lastName}`} 
+                    <AvatarImage
+                      src={thread.otherUser.avatar}
+                      alt={`${thread.otherUser.firstName} ${thread.otherUser.lastName}`}
                     />
                     <AvatarFallback>
-                      {thread.otherUser.firstName[0]}{thread.otherUser.lastName[0]}
+                      {thread.otherUser.firstName[0]}
+                      {thread.otherUser.lastName[0]}
                     </AvatarFallback>
                   </Avatar>
                   {thread.otherUser.isOnline && (
@@ -281,14 +302,23 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
-                      <h3 className={cn(
-                        "font-medium truncate",
-                        thread.unreadCount > 0 ? "text-gray-900" : "text-gray-700"
-                      )}>
+                      <h3
+                        className={cn(
+                          'font-medium truncate',
+                          thread.unreadCount > 0
+                            ? 'text-gray-900'
+                            : 'text-gray-700'
+                        )}
+                      >
                         {thread.otherUser.firstName} {thread.otherUser.lastName}
                       </h3>
-                      <Badge variant="outline" className="text-xs flex-shrink-0">
-                        {thread.otherUser.role === 'teacher' ? 'O\'qituvchi' : 'O\'quvchi'}
+                      <Badge
+                        variant="outline"
+                        className="text-xs flex-shrink-0"
+                      >
+                        {thread.otherUser.role === 'teacher'
+                          ? "O'qituvchi"
+                          : "O'quvchi"}
                       </Badge>
                       {thread.isPinned && (
                         <Pin className="h-3 w-3 text-gray-500 flex-shrink-0" />
@@ -302,9 +332,9 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
                       )}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             className="w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => e.stopPropagation()}
                           >
@@ -312,17 +342,25 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleThreadAction(thread.id, 'pin')}>
+                          <DropdownMenuItem
+                            onClick={() => handleThreadAction(thread.id, 'pin')}
+                          >
                             <Pin className="h-4 w-4 mr-2" />
                             {thread.isPinned ? 'Unpin' : 'Pin'}
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleThreadAction(thread.id, 'archive')}>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleThreadAction(thread.id, 'archive')
+                            }
+                          >
                             <Archive className="h-4 w-4 mr-2" />
                             Arxivlash
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="text-red-600"
-                            onClick={() => handleThreadAction(thread.id, 'delete')}
+                            onClick={() =>
+                              handleThreadAction(thread.id, 'delete')
+                            }
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
                             O'chirish
@@ -333,10 +371,14 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <p className={cn(
-                      "text-sm truncate",
-                      thread.unreadCount > 0 ? "text-gray-900 font-medium" : "text-gray-600"
-                    )}>
+                    <p
+                      className={cn(
+                        'text-sm truncate',
+                        thread.unreadCount > 0
+                          ? 'text-gray-900 font-medium'
+                          : 'text-gray-600'
+                      )}
+                    >
                       {getLastMessagePreview(thread)}
                     </p>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -352,7 +394,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
                           )}
                         </div>
                       )}
-                      
+
                       {/* Unread count */}
                       {thread.unreadCount > 0 && (
                         <Badge className="bg-primary text-primary-foreground min-w-[20px] h-5 text-xs flex items-center justify-center">
@@ -368,5 +410,5 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}

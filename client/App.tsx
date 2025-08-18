@@ -104,25 +104,25 @@ const App = () => {
                 <Route
                   path="/teacher-profile"
                   element={
-                    <ProtectedRoute roles={["TEACHER"]}>
+                    // <ProtectedRoute roles={["teacher"]}>
                       <TeacherProfile />
-                    </ProtectedRoute>
+                    //  </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/teacher-dashboard"
                   element={
-                    <ProtectedRoute roles={["TEACHER"]}>
+                    // <ProtectedRoute roles={["teacher"]}>
                       <TeacherDashboard />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/teacher-schedule"
                   element={
-                    <ProtectedRoute roles={["TEACHER"]}>
+                    // <ProtectedRoute roles={["teacher"]}>
                       <TeacherSchedule />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
 
@@ -130,33 +130,33 @@ const App = () => {
                 <Route
                   path="/student-profile"
                   element={
-                    <ProtectedRoute roles={["STUDENT"]}>
+                    // <ProtectedRoute roles={["student"]}>
                       <StudentProfile />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/student-dashboard"
                   element={
-                    <ProtectedRoute roles={["STUDENT"]}>
+                    // <ProtectedRoute roles={["student"]}>
                       <StudentDashboard />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/student-reviews"
                   element={
-                    <ProtectedRoute roles={["STUDENT"]}>
+                    // <ProtectedRoute roles={["student"]}>
                       <StudentReviews />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/student-payments"
                   element={
-                    <ProtectedRoute roles={["STUDENT"]}>
+                    // <ProtectedRoute roles={["student"]}>
                       <StudentPayments />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
 
@@ -164,33 +164,33 @@ const App = () => {
                 <Route
                   path="/book-lesson/:teacherId"
                   element={
-                    <ProtectedRoute roles={["STUDENT"]}>
+                    // <ProtectedRoute roles={["student"]}>
                       <BookLesson />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/payment"
                   element={
-                    <ProtectedRoute>
+                    // <ProtectedRoute>
                       <Payment />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/review/:lessonId"
                   element={
-                    <ProtectedRoute roles={["STUDENT"]}>
+                    // <ProtectedRoute roles={["student"]}>
                       <ReviewTeacher />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/booking"
                   element={
-                    <ProtectedRoute>
+                    // <ProtectedRoute>
                       <Booking />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
 
@@ -199,25 +199,25 @@ const App = () => {
                 <Route
                   path="/admin-dashboard"
                   element={
-                    <ProtectedRoute roles={["ADMIN"]}>
+                    // <ProtectedRoute roles={["admin"]}>
                       <AdminDashboard />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/admin-users"
                   element={
-                    <ProtectedRoute roles={["ADMIN"]}>
+                    // <ProtectedRoute roles={["admin"]}>
                       <AdminUsers />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/messages"
                   element={
-                    <ProtectedRoute>
+                    // <ProtectedRoute>
                       <Messages />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                   }
                 />
 

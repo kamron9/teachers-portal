@@ -1,60 +1,51 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { MessageThreadList } from "@/components/messaging/MessageThreadList";
-import { ChatWindow } from "@/components/messaging/ChatWindow";
-import { Button } from "@/components/ui/button";
-import {
-  ArrowLeft,
-  MessageCircle,
-  Users,
-  Phone,
-  Video,
-  UserPlus,
-  Search,
-} from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { cn } from "@/lib/utils";
+import { ChatWindow } from '@/components/messaging/ChatWindow'
+import { MessageThreadList } from '@/components/messaging/MessageThreadList'
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/useAuth'
+import { ArrowLeft, MessageCircle, Search, UserPlus } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 interface ChatUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  avatar?: string;
-  isOnline?: boolean;
-  lastSeen?: string;
-  role: "student" | "teacher";
+  id: string
+  firstName: string
+  lastName: string
+  avatar?: string
+  isOnline?: boolean
+  lastSeen?: string
+  role: 'student' | 'teacher'
 }
 
 export default function Messages() {
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useAuth();
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { user } = useAuth()
 
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(
-    searchParams.get("thread") || null,
-  );
-  const [isMobileView, setIsMobileView] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null);
+    searchParams.get('thread') || null
+  )
+  const [isMobileView, setIsMobileView] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null)
 
   // Check screen size for responsive behavior
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobileView(window.innerWidth < 768);
-    };
+      setIsMobileView(window.innerWidth < 768)
+    }
 
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
 
   // Update URL when thread selection changes
   useEffect(() => {
     if (selectedThreadId) {
-      setSearchParams({ thread: selectedThreadId });
+      setSearchParams({ thread: selectedThreadId })
     } else {
-      setSearchParams({});
+      setSearchParams({})
     }
-  }, [selectedThreadId, setSearchParams]);
+  }, [selectedThreadId, setSearchParams])
 
   // Mock function to get user details for selected thread
   // In real app, this would come from the thread data
@@ -62,60 +53,60 @@ export default function Messages() {
     if (selectedThreadId) {
       // Mock user data - in real app, get from thread data
       setSelectedUser({
-        id: "2",
-        firstName: "Aziza",
-        lastName: "Karimova",
-        avatar: "/placeholder.svg",
+        id: '2',
+        firstName: 'Aziza',
+        lastName: 'Karimova',
+        avatar: '/placeholder.svg',
         isOnline: true,
-        role: "teacher",
-      });
+        role: 'teacher',
+      })
     }
-  }, [selectedThreadId]);
+  }, [selectedThreadId])
 
   const handleThreadSelect = (threadId: string) => {
-    setSelectedThreadId(threadId);
-  };
+    setSelectedThreadId(threadId)
+  }
 
   const handleBack = () => {
-    setSelectedThreadId(null);
-    setSelectedUser(null);
-  };
+    setSelectedThreadId(null)
+    setSelectedUser(null)
+  }
 
   const handleNewMessage = () => {
     // Navigate to teacher/student search for new conversation
-    navigate("/teachers");
-  };
+    navigate('/teachers')
+  }
 
-  const handleCallStart = (type: "audio" | "video") => {
+  const handleCallStart = (type: 'audio' | 'video') => {
     // TODO: Implement call functionality
-  };
+  }
 
   const handleUserInfo = () => {
     if (selectedUser) {
       // Navigate to user profile
-      if (selectedUser.role === "teacher") {
-        navigate(`/teacher/${selectedUser.id}`);
+      if (selectedUser.role === 'teacher') {
+        navigate(`/teacher/${selectedUser.id}`)
       } else {
-        navigate(`/student/${selectedUser.id}`);
+        navigate(`/student/${selectedUser.id}`)
       }
     }
-  };
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Kirish talab qilinadi
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Xabarlarni ko'rish uchun tizimga kirishingiz kerak.
-          </p>
-          <Button onClick={() => navigate("/login")}>Tizimga kirish</Button>
-        </div>
-      </div>
-    );
   }
+
+  // if (!user) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  //       <div className="text-center">
+  //         <h1 className="text-2xl font-bold text-gray-900 mb-4">
+  //           Kirish talab qilinadi
+  //         </h1>
+  //         <p className="text-gray-600 mb-6">
+  //           Xabarlarni ko'rish uchun tizimga kirishingiz kerak.
+  //         </p>
+  //         <Button onClick={() => navigate("/login")}>Tizimga kirish</Button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Mobile view - show only thread list or chat window
   if (isMobileView) {
@@ -164,7 +155,7 @@ export default function Messages() {
           </div>
         )}
       </div>
-    );
+    )
   }
 
   // Desktop view - show both panels
@@ -194,7 +185,7 @@ export default function Messages() {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm border h-full">
                 <MessageThreadList
-                  currentUserId={user.id}
+                  currentUserId={user.id || 'current-user'}
                   selectedThreadId={selectedThreadId}
                   onThreadSelect={handleThreadSelect}
                   onNewMessage={handleNewMessage}
@@ -233,7 +224,7 @@ export default function Messages() {
                       </Button>
                       <Button
                         variant="outline"
-                        onClick={() => navigate("/teachers")}
+                        onClick={() => navigate('/teachers')}
                       >
                         <Search className="h-4 w-4 mr-2" />
                         O'qituvchi topish
@@ -247,5 +238,5 @@ export default function Messages() {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -16,6 +16,7 @@ import {
   MockPaginatedResponse,
   MockApiResponse,
 } from "@/lib/mockData";
+import { apiClient, ApiError, AvailabilityRule, StudentProfile, SubjectOffering, TeacherProfile } from '@/lib/api'
 
 // Query Keys
 export const queryKeys = {
