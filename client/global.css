@@ -104,3 +104,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+.rdp-month_caption{
+  display: none;
+}
+.rdp-root nav{
+  display: none;
+}
+
+.rdp-month_grid thead{
+  display: none;
+
+}
