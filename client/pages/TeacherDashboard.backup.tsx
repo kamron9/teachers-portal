@@ -1,468 +1,490 @@
-import LanguageSwitcher from '@/components/LanguageSwitcher'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  LayoutDashboard,
+  User,
+  Calendar,
+  BookOpen,
+  DollarSign,
+  Star,
+  Settings,
+  Bell,
+  MessageCircle,
+  Video,
+  Clock,
+  TrendingUp,
+  Users,
+  CheckCircle,
+  AlertCircle,
+  ChevronRight,
+  Play,
+  Download,
+  MoreHorizontal,
+  Edit3,
+  LogOut,
+  Camera,
+  Upload,
+  Award,
+  GraduationCap,
+  Plus,
+  Minus,
+  ChevronLeft,
+  ChevronDown,
+  Eye,
+  Filter,
+  Search,
+  RefreshCw,
+  Printer,
+  Globe,
+  Save,
+  X,
+  Check,
+  AlertTriangle,
+  BarChart3,
+  PieChart,
+  Calendar as CalendarIcon,
+  Timer,
+  MapPin,
+  Phone,
+  Mail,
+  ZoomIn,
+  ZoomOut,
+  Grid3X3,
+  List,
+  Sun,
+  Moon,
+  Coffee,
+  BookOpenCheck,
+  CreditCard,
+  Wallet,
+  Receipt,
+  TrendingDown,
+  Target,
+  Percent,
+  Calculator,
+  FileText,
+  ArrowUpRight,
+  ArrowDownRight,
+  Banknote,
+  Building,
+  CreditCard as BankCard,
+  Smartphone,
+  ChartLine,
+  Coins,
+  PiggyBank,
+  ShieldCheck,
+  Heart,
+  ThumbsUp,
+  ThumbsDown,
+  MessageSquare,
+  Flag,
+  TrendingUp as TrendingUpIcon,
+  Quote,
+  Verified,
+  Shield,
+  FilterX,
+  SortAsc,
+  SortDesc,
+  Reply,
+  Send,
+  Share,
+  Lock,
+  KeyRound,
+  Volume2,
+  VolumeX,
+  Monitor,
+  Wifi,
+  Database,
+  Cloud,
+  Link2,
+  UserCheck,
+  EyeOff,
+  ToggleLeft,
+  ToggleRight,
+  Trash2,
+  RotateCcw,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Progress } from '@/components/ui/progress'
-import { useToast } from '@/hooks/use-toast'
-import {
-  AlertCircle,
-  AlertTriangle,
-  ArrowUpRight,
-  Award,
-  CreditCard as BankCard,
-  Banknote,
-  BarChart3,
-  Bell,
-  BookOpen,
-  Building,
-  Calculator,
-  Calendar,
-  Calendar as CalendarIcon,
-  Camera,
-  ChartLine,
-  Check,
-  CheckCircle,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  Cloud,
-  Coins,
-  CreditCard,
-  Database,
-  DollarSign,
-  Download,
-  Edit3,
-  Eye,
-  FileText,
-  Filter,
-  Flag,
-  Globe,
-  GraduationCap,
-  LayoutDashboard,
-  Link2,
-  Lock,
-  LogOut,
-  Mail,
-  Menu,
-  MessageCircle,
-  MessageSquare,
-  Monitor,
-  MoreHorizontal,
-  Phone,
-  PieChart,
-  PiggyBank,
-  Plus,
-  Printer,
-  Quote,
-  Receipt,
-  RefreshCw,
-  Reply,
-  RotateCcw,
-  Save,
-  Search,
-  Send,
-  Settings,
-  Share,
-  Shield,
-  ShieldCheck,
-  Smartphone,
-  Star,
-  Sun,
-  Target,
-  ThumbsUp,
-  Trash2,
-  TrendingUp,
-  TrendingUp as TrendingUpIcon,
-  Upload,
-  User,
-  Users,
-  Verified,
-  Video,
-  Wallet,
-  X,
-} from 'lucide-react'
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router-dom'
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
-export interface SidebarItem {
-  id: string
-  label: string
-  icon: React.ComponentType<any>
-  href?: string
-  count?: number
+interface SidebarItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<any>;
+  href?: string;
+  count?: number;
 }
 
 export default function TeacherDashboard() {
-  const [activeSection, setActiveSection] = useState('overview')
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  const [showLogoutModal, setShowLogoutModal] = useState(false)
-  const navigate = useNavigate()
-  const { toast } = useToast()
-  const { t } = useTranslation()
+  const [activeSection, setActiveSection] = useState("overview");
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Profile management state - moved to top level to follow Rules of Hooks
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
 
   // Schedule management state
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const [calendarView, setCalendarView] = useState<'month' | 'week' | 'day'>(
-    'month'
-  )
-  const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([])
-  const [showAvailabilityModal, setShowAvailabilityModal] = useState(false)
-  const [scheduleTemplate, setScheduleTemplate] = useState('default')
-  const [autoApproval, setAutoApproval] = useState(false)
-  const [minAdvanceBooking, setMinAdvanceBooking] = useState('2h')
-  const [maxFutureBooking, setMaxFutureBooking] = useState('1m')
-  const [bufferTime, setBufferTime] = useState(15)
-  const [maxLessonsPerDay, setMaxLessonsPerDay] = useState(8)
-  const [defaultLessonDuration, setDefaultLessonDuration] = useState(60)
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [calendarView, setCalendarView] = useState<"month" | "week" | "day">(
+    "month",
+  );
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]);
+  const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
+  const [scheduleTemplate, setScheduleTemplate] = useState("default");
+  const [autoApproval, setAutoApproval] = useState(false);
+  const [minAdvanceBooking, setMinAdvanceBooking] = useState("2h");
+  const [maxFutureBooking, setMaxFutureBooking] = useState("1m");
+  const [bufferTime, setBufferTime] = useState(15);
+  const [maxLessonsPerDay, setMaxLessonsPerDay] = useState(8);
+  const [defaultLessonDuration, setDefaultLessonDuration] = useState(60);
   const [weeklyAvailability, setWeeklyAvailability] = useState({
-    monday: { enabled: true, start: '09:00', end: '17:00', breaks: [] },
-    tuesday: { enabled: true, start: '09:00', end: '17:00', breaks: [] },
-    wednesday: { enabled: true, start: '09:00', end: '17:00', breaks: [] },
-    thursday: { enabled: true, start: '09:00', end: '17:00', breaks: [] },
-    friday: { enabled: true, start: '09:00', end: '17:00', breaks: [] },
-    saturday: { enabled: false, start: '10:00', end: '16:00', breaks: [] },
-    sunday: { enabled: false, start: '10:00', end: '16:00', breaks: [] },
-  })
+    monday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
+    tuesday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
+    wednesday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
+    thursday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
+    friday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
+    saturday: { enabled: false, start: "10:00", end: "16:00", breaks: [] },
+    sunday: { enabled: false, start: "10:00", end: "16:00", breaks: [] },
+  });
 
   // Bookings management state
   const [activeBookingTab, setActiveBookingTab] = useState<
-    'pending' | 'today' | 'upcoming' | 'history'
-  >('pending')
-  const [selectedBookings, setSelectedBookings] = useState<number[]>([])
-  const [searchFilter, setSearchFilter] = useState('')
+    "pending" | "today" | "upcoming" | "history"
+  >("pending");
+  const [selectedBookings, setSelectedBookings] = useState<number[]>([]);
+  const [searchFilter, setSearchFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<
-    'all' | 'confirmed' | 'pending' | 'cancelled' | 'completed'
-  >('all')
-  const [showMessageModal, setShowMessageModal] = useState(false)
-  const [selectedStudent, setSelectedStudent] = useState<any>(null)
-  const [messageText, setMessageText] = useState('')
-  const [showRescheduleModal, setShowRescheduleModal] = useState(false)
-  const [selectedBooking, setSelectedBooking] = useState<any>(null)
+    "all" | "confirmed" | "pending" | "cancelled" | "completed"
+  >("all");
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [messageText, setMessageText] = useState("");
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
   // Earnings management state
   const [earningsTimeframe, setEarningsTimeframe] = useState<
-    'week' | 'month' | 'year'
-  >('month')
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('bank')
-  const [showPayoutModal, setShowPayoutModal] = useState(false)
-  const [showTaxModal, setShowTaxModal] = useState(false)
+    "week" | "month" | "year"
+  >("month");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("bank");
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [showTaxModal, setShowTaxModal] = useState(false);
   const [paymentFilter, setPaymentFilter] = useState<
-    'all' | 'completed' | 'pending' | 'failed'
-  >('all')
-  const [earningsGoal, setEarningsGoal] = useState(3000000) // 3M UZS
+    "all" | "completed" | "pending" | "failed"
+  >("all");
+  const [earningsGoal, setEarningsGoal] = useState(3000000); // 3M UZS
 
   // Reviews management state
-  const [reviewsTab, setReviewsTab] = useState<'recent' | 'all' | 'analytics'>(
-    'recent'
-  )
+  const [reviewsTab, setReviewsTab] = useState<"recent" | "all" | "analytics">(
+    "recent",
+  );
   const [reviewFilter, setReviewFilter] = useState<
-    'all' | '5' | '4' | '3' | '2' | '1'
-  >('all')
+    "all" | "5" | "4" | "3" | "2" | "1"
+  >("all");
   const [reviewSort, setReviewSort] = useState<
-    'newest' | 'oldest' | 'highest' | 'lowest'
-  >('newest')
-  const [showReplyModal, setShowReplyModal] = useState(false)
-  const [selectedReview, setSelectedReview] = useState<any>(null)
-  const [replyText, setReplyText] = useState('')
-  const [searchReviews, setSearchReviews] = useState('')
+    "newest" | "oldest" | "highest" | "lowest"
+  >("newest");
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<any>(null);
+  const [replyText, setReplyText] = useState("");
+  const [searchReviews, setSearchReviews] = useState("");
 
   // Settings management state
   const [activeSettingsTab, setActiveSettingsTab] = useState<
-    | 'account'
-    | 'professional'
-    | 'notifications'
-    | 'privacy'
-    | 'billing'
-    | 'calendar'
-    | 'communication'
-    | 'integrations'
-    | 'data'
-  >('account')
-  const [settingsChanged, setSettingsChanged] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
+    | "account"
+    | "professional"
+    | "notifications"
+    | "privacy"
+    | "billing"
+    | "calendar"
+    | "communication"
+    | "integrations"
+    | "data"
+  >("account");
+  const [settingsChanged, setSettingsChanged] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState({
     bookingRequests: true,
     paymentConfirmations: true,
     studentMessages: true,
     scheduleReminders: true,
     marketing: false,
-  })
+  });
   const [smsNotifications, setSmsNotifications] = useState({
     urgentBookings: true,
     lessonReminders: true,
     payments: false,
     emergency: true,
-  })
+  });
   const [pushNotifications, setPushNotifications] = useState({
     mobile: true,
     browser: true,
     sounds: true,
     quietHours: false,
-  })
+  });
   const [privacySettings, setPrivacySettings] = useState({
-    profileVisibility: 'public',
+    profileVisibility: "public",
     searchVisible: true,
-    contactSharing: 'verified',
+    contactSharing: "verified",
     showReviews: true,
     activityStatus: true,
-  })
+  });
   const [calendarSync, setCalendarSync] = useState({
     google: false,
     outlook: false,
     apple: false,
-  })
+  });
   const [languageSettings, setLanguageSettings] = useState({
-    primary: 'English',
-    interface: 'English',
+    primary: "English",
+    interface: "English",
     autoTranslate: true,
-  })
+  });
   const [profileData, setProfileData] = useState({
-    firstName: 'Aziza',
-    lastName: 'Karimova',
-    email: 'aziza@example.com',
-    phone: '+998901234567',
-    location: 'Tashkent, Uzbekistan',
-    title: 'English Language Expert & IELTS Specialist',
-    bio: 'Certified English teacher with extensive experience in IELTS preparation and business communication. I help students achieve their language goals through personalized lessons and proven methodologies.',
-    experience: '5+ years',
+    firstName: "Aziza",
+    lastName: "Karimova",
+    email: "aziza@example.com",
+    phone: "+998901234567",
+    location: "Tashkent, Uzbekistan",
+    title: "English Language Expert & IELTS Specialist",
+    bio: "Certified English teacher with extensive experience in IELTS preparation and business communication. I help students achieve their language goals through personalized lessons and proven methodologies.",
+    experience: "5+ years",
     education:
-      'Masters in English Literature - National University of Uzbekistan\nTESOL Certification - British Council\nIELTS Teacher Training Certificate',
-    subjects: ['English', 'IELTS', 'Business English', 'Conversation Practice'],
-    hourlyRate: '50000',
-    languages: ['Uzbek', 'English', 'Russian'],
-  })
-  const [profileImage, setProfileImage] = useState('/placeholder.svg')
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+      "Masters in English Literature - National University of Uzbekistan\nTESOL Certification - British Council\nIELTS Teacher Training Certificate",
+    subjects: ["English", "IELTS", "Business English", "Conversation Practice"],
+    hourlyRate: "50000",
+    languages: ["Uzbek", "English", "Russian"],
+  });
+  const [profileImage, setProfileImage] = useState("/placeholder.svg");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Subjects & Pricing management state
   const [subjectCards, setSubjectCards] = useState([
     {
-      id: '1',
-      name: 'General English',
-      level: 'All Levels',
+      id: "1",
+      name: "General English",
+      level: "All Levels",
       price: 50000,
-      delivery: 'Online',
-      icon: 'book',
+      delivery: "Online",
+      icon: "book",
     },
     {
-      id: '2',
-      name: 'IELTS Preparation',
-      level: 'Intermediate+',
+      id: "2",
+      name: "IELTS Preparation",
+      level: "Intermediate+",
       price: 65000,
-      delivery: 'Online',
-      icon: 'bar-chart',
+      delivery: "Online",
+      icon: "bar-chart",
     },
     {
-      id: '3',
-      name: 'Business English',
-      level: 'Intermediate+',
+      id: "3",
+      name: "Business English",
+      level: "Intermediate+",
       price: 70000,
-      delivery: 'Online',
-      icon: 'briefcase',
+      delivery: "Online",
+      icon: "briefcase",
     },
     {
-      id: '4',
-      name: 'Conversation Practice',
-      level: 'All Levels',
+      id: "4",
+      name: "Conversation Practice",
+      level: "All Levels",
       price: 40000,
-      delivery: 'Online',
-      icon: 'speech-bubble',
+      delivery: "Online",
+      icon: "speech-bubble",
     },
-  ])
+  ]);
   const [teachingLevels, setTeachingLevels] = useState([
-    'Beginner',
-    'Elementary',
-    'Intermediate',
-    'Upper-Intermediate',
-    'Advanced',
-  ])
+    "Beginner",
+    "Elementary",
+    "Intermediate",
+    "Upper-Intermediate",
+    "Advanced",
+  ]);
   const [examPreparation, setExamPreparation] = useState([
-    'IELTS',
-    'TOEFL',
-    'Cambridge English',
-    'Business English Certificate',
-  ])
-  const [editingSubjectId, setEditingSubjectId] = useState<string | null>(null)
+    "IELTS",
+    "TOEFL",
+    "Cambridge English",
+    "Business English Certificate",
+  ]);
+  const [editingSubjectId, setEditingSubjectId] = useState<string | null>(null);
   const [newSubject, setNewSubject] = useState({
-    name: '',
-    level: 'All Levels',
+    name: "",
+    level: "All Levels",
     price: 50000,
-    delivery: 'Online',
-    icon: 'book',
-  })
-  const [showAddSubject, setShowAddSubject] = useState(false)
-  const [draggedSubject, setDraggedSubject] = useState<string | null>(null)
+    delivery: "Online",
+    icon: "book",
+  });
+  const [showAddSubject, setShowAddSubject] = useState(false);
+  const [draggedSubject, setDraggedSubject] = useState<string | null>(null);
 
   // Helper functions for subjects & pricing
   const levelOptions = [
-    'All Levels',
-    'Beginner',
-    'Elementary',
-    'Intermediate',
-    'Upper-Intermediate',
-    'Advanced',
-    'Intermediate+',
-  ]
-  const deliveryOptions = ['Online', 'Offline', 'Hybrid']
+    "All Levels",
+    "Beginner",
+    "Elementary",
+    "Intermediate",
+    "Upper-Intermediate",
+    "Advanced",
+    "Intermediate+",
+  ];
+  const deliveryOptions = ["Online", "Offline", "Hybrid"];
   const iconOptions = [
-    { value: 'book', label: '📚 Book', component: BookOpen },
-    { value: 'bar-chart', label: '📊 Chart', component: BarChart3 },
-    { value: 'briefcase', label: '💼 Briefcase', component: null },
-    { value: 'speech-bubble', label: '💬 Speech', component: MessageCircle },
-  ]
+    { value: "book", label: "📚 Book", component: BookOpen },
+    { value: "bar-chart", label: "📊 Chart", component: BarChart3 },
+    { value: "briefcase", label: "💼 Briefcase", component: null },
+    { value: "speech-bubble", label: "💬 Speech", component: MessageCircle },
+  ];
   const allTeachingLevels = [
-    'Beginner',
-    'Elementary',
-    'Intermediate',
-    'Upper-Intermediate',
-    'Advanced',
-  ]
+    "Beginner",
+    "Elementary",
+    "Intermediate",
+    "Upper-Intermediate",
+    "Advanced",
+  ];
   const allExamPreparations = [
-    'IELTS',
-    'TOEFL',
-    'Cambridge English',
-    'Business English Certificate',
-    'OET',
-    'TOEIC',
-    'PTE',
-  ]
+    "IELTS",
+    "TOEFL",
+    "Cambridge English",
+    "Business English Certificate",
+    "OET",
+    "TOEIC",
+    "PTE",
+  ];
 
   const formatPrice = (price: number) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' UZS'
-  }
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UZS";
+  };
 
   const getIconComponent = (iconValue: string) => {
     switch (iconValue) {
-      case 'book':
-        return BookOpen
-      case 'bar-chart':
-        return BarChart3
-      case 'briefcase':
-        return null // Will use emoji
-      case 'speech-bubble':
-        return MessageCircle
+      case "book":
+        return BookOpen;
+      case "bar-chart":
+        return BarChart3;
+      case "briefcase":
+        return null; // Will use emoji
+      case "speech-bubble":
+        return MessageCircle;
       default:
-        return BookOpen
+        return BookOpen;
     }
-  }
+  };
 
   const getIconEmoji = (iconValue: string) => {
     switch (iconValue) {
-      case 'book':
-        return '📚'
-      case 'bar-chart':
-        return '📊'
-      case 'briefcase':
-        return '💼'
-      case 'speech-bubble':
-        return '💬'
+      case "book":
+        return "📚";
+      case "bar-chart":
+        return "📊";
+      case "briefcase":
+        return "💼";
+      case "speech-bubble":
+        return "💬";
       default:
-        return '📚'
+        return "📚";
     }
-  }
+  };
 
   const addSubject = () => {
     if (!newSubject.name.trim()) {
       toast({
-        title: 'Validation Error',
-        description: 'Subject name is required.',
-        variant: 'destructive',
-      })
-      return
+        title: "Validation Error",
+        description: "Subject name is required.",
+        variant: "destructive",
+      });
+      return;
     }
 
     if (newSubject.price <= 0) {
       toast({
-        title: 'Validation Error',
-        description: 'Price must be greater than 0.',
-        variant: 'destructive',
-      })
-      return
+        title: "Validation Error",
+        description: "Price must be greater than 0.",
+        variant: "destructive",
+      });
+      return;
     }
 
     const subject = {
       ...newSubject,
       id: Date.now().toString(),
-    }
-    setSubjectCards([...subjectCards, subject])
+    };
+    setSubjectCards([...subjectCards, subject]);
     setNewSubject({
-      name: '',
-      level: 'All Levels',
+      name: "",
+      level: "All Levels",
       price: 50000,
-      delivery: 'Online',
-      icon: 'book',
-    })
-    setShowAddSubject(false)
-    setHasUnsavedChanges(true)
+      delivery: "Online",
+      icon: "book",
+    });
+    setShowAddSubject(false);
+    setHasUnsavedChanges(true);
 
     toast({
-      title: 'Subject Added',
+      title: "Subject Added",
       description: `${subject.name} has been added to your offerings.`,
-    })
-  }
+    });
+  };
 
   const updateSubject = (id: string, updates: any) => {
     setSubjectCards((cards) =>
-      cards.map((card) => (card.id === id ? { ...card, ...updates } : card))
-    )
-    setHasUnsavedChanges(true)
-  }
+      cards.map((card) => (card.id === id ? { ...card, ...updates } : card)),
+    );
+    setHasUnsavedChanges(true);
+  };
 
   const deleteSubject = (id: string) => {
-    const subject = subjectCards.find((card) => card.id === id)
-    setSubjectCards((cards) => cards.filter((card) => card.id !== id))
-    setHasUnsavedChanges(true)
+    const subject = subjectCards.find((card) => card.id === id);
+    setSubjectCards((cards) => cards.filter((card) => card.id !== id));
+    setHasUnsavedChanges(true);
 
     if (subject) {
       toast({
-        title: 'Subject Removed',
+        title: "Subject Removed",
         description: `${subject.name} has been removed from your offerings.`,
-      })
+      });
     }
-  }
+  };
 
   const moveSubject = (dragIndex: number, hoverIndex: number) => {
-    const draggedCard = subjectCards[dragIndex]
-    const newCards = [...subjectCards]
-    newCards.splice(dragIndex, 1)
-    newCards.splice(hoverIndex, 0, draggedCard)
-    setSubjectCards(newCards)
-    setHasUnsavedChanges(true)
-  }
+    const draggedCard = subjectCards[dragIndex];
+    const newCards = [...subjectCards];
+    newCards.splice(dragIndex, 1);
+    newCards.splice(hoverIndex, 0, draggedCard);
+    setSubjectCards(newCards);
+    setHasUnsavedChanges(true);
+  };
 
   const toggleTeachingLevel = (level: string) => {
     setTeachingLevels((prev) =>
-      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
-    )
-    setHasUnsavedChanges(true)
-  }
+      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level],
+    );
+    setHasUnsavedChanges(true);
+  };
 
   const toggleExamPreparation = (exam: string) => {
     setExamPreparation((prev) =>
-      prev.includes(exam) ? prev.filter((e) => e !== exam) : [...prev, exam]
-    )
-    setHasUnsavedChanges(true)
-  }
+      prev.includes(exam) ? prev.filter((e) => e !== exam) : [...prev, exam],
+    );
+    setHasUnsavedChanges(true);
+  };
 
   // Mock teacher data
   const teacher = {
-    name: 'Aziza Karimova',
-    email: 'aziza@example.com',
-    image: '/placeholder.svg',
-    title: 'English Language Expert',
-    joinDate: '2024-01-01',
+    name: "Aziza Karimova",
+    email: "aziza@example.com",
+    image: "/placeholder.svg",
+    title: "English Language Expert",
+    joinDate: "2024-01-01",
     isOnline: true,
     profileCompletion: 85,
     rating: 4.9,
@@ -471,44 +493,44 @@ export default function TeacherDashboard() {
     totalEarnings: 17000000,
     pendingBookings: 3,
     unreadMessages: 5,
-  }
+  };
 
   const sidebarItems: SidebarItem[] = [
-    { id: 'overview', label: t('dashboardOverview'), icon: LayoutDashboard },
-    { id: 'profile', label: t('profileManagement'), icon: User },
-    { id: 'schedule', label: t('scheduleAvailability'), icon: Calendar },
+    { id: "overview", label: "Dashboard Overview", icon: LayoutDashboard },
+    { id: "profile", label: "Profile Management", icon: User },
+    { id: "schedule", label: "Schedule & Availability", icon: Calendar },
     {
-      id: 'bookings',
-      label: t('bookingsLessons'),
+      id: "bookings",
+      label: "Bookings & Lessons",
       icon: BookOpen,
       count: teacher.pendingBookings,
     },
-    { id: 'earnings', label: t('earningsPayments'), icon: DollarSign },
-    { id: 'reviews', label: t('reviewsRatings'), icon: Star },
-    { id: 'settings', label: t('settings'), icon: Settings },
-  ]
+    { id: "earnings", label: "Earnings & Payments", icon: DollarSign },
+    { id: "reviews", label: "Reviews & Ratings", icon: Star },
+    { id: "settings", label: "Settings", icon: Settings },
+  ];
 
   // Mock recent bookings
   const recentBookings = [
     {
       id: 1,
-      student: { name: 'Maria Garcia', image: '/placeholder.svg' },
-      requestedDate: '2024-01-22',
-      requestedTime: '15:00',
-      type: 'English Conversation',
-      status: 'pending',
-      bookedAt: '2024-01-19T10:30:00',
+      student: { name: "Maria Garcia", image: "/placeholder.svg" },
+      requestedDate: "2024-01-22",
+      requestedTime: "15:00",
+      type: "English Conversation",
+      status: "pending",
+      bookedAt: "2024-01-19T10:30:00",
     },
     {
       id: 2,
-      student: { name: 'David Wilson', image: '/placeholder.svg' },
-      requestedDate: '2024-01-23',
-      requestedTime: '14:00',
-      type: 'IELTS Speaking',
-      status: 'pending',
-      bookedAt: '2024-01-19T09:15:00',
+      student: { name: "David Wilson", image: "/placeholder.svg" },
+      requestedDate: "2024-01-23",
+      requestedTime: "14:00",
+      type: "IELTS Speaking",
+      status: "pending",
+      bookedAt: "2024-01-19T09:15:00",
     },
-  ]
+  ];
 
   const renderOverview = () => (
     <div className="space-y-6">
@@ -516,18 +538,20 @@ export default function TeacherDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            {t('welcomeBack', { name: teacher.name.split(' ')[0] })}
+            Welcome back, {teacher.name.split(" ")[0]}!
           </h1>
-          <p className="text-gray-600">{t('hereWhatHappeningToday')}</p>
+          <p className="text-gray-600">
+            Here's what's happening with your teaching today
+          </p>
         </div>
         <div className="flex gap-3">
-          <Button onClick={() => setActiveSection('schedule')}>
+          <Button onClick={() => setActiveSection("schedule")}>
             <Calendar className="h-4 w-4 mr-2" />
-            {t('manageSchedule')}
+            Manage Schedule
           </Button>
-          <Button variant="outline" onClick={() => setActiveSection('profile')}>
+          <Button variant="outline" onClick={() => setActiveSection("profile")}>
             <Edit3 className="h-4 w-4 mr-2" />
-            {t('editProfile')}
+            Edit Profile
           </Button>
         </div>
       </div>
@@ -541,21 +565,19 @@ export default function TeacherDashboard() {
                 <AlertCircle className="h-5 w-5 text-amber-600" />
                 <div>
                   <div className="font-medium text-amber-900">
-                    {t('completeProfileMoreBookings')}
+                    Complete your profile to get more bookings
                   </div>
                   <div className="text-sm text-amber-700">
-                    {t('profilePercentComplete', {
-                      percent: teacher.profileCompletion,
-                    })}
+                    Your profile is {teacher.profileCompletion}% complete
                   </div>
                 </div>
               </div>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setActiveSection('profile')}
+                onClick={() => setActiveSection("profile")}
               >
-                {t('completeNow')}
+                Complete Profile
               </Button>
             </div>
             <Progress value={teacher.profileCompletion} className="mt-3" />
@@ -570,7 +592,7 @@ export default function TeacherDashboard() {
             <div className="text-3xl font-bold text-primary mb-2">
               {teacher.totalLessons}
             </div>
-            <div className="text-gray-600">{t('totalLessons')}</div>
+            <div className="text-gray-600">Total Lessons</div>
           </CardContent>
         </Card>
         <Card>
@@ -578,7 +600,7 @@ export default function TeacherDashboard() {
             <div className="text-3xl font-bold text-primary mb-2">
               {teacher.totalStudents}
             </div>
-            <div className="text-gray-600">{t('studentsTaught')}</div>
+            <div className="text-gray-600">Students Taught</div>
           </CardContent>
         </Card>
         <Card>
@@ -586,7 +608,7 @@ export default function TeacherDashboard() {
             <div className="text-3xl font-bold text-primary mb-2">
               {teacher.rating}
             </div>
-            <div className="text-gray-600">{t('averageRating')}</div>
+            <div className="text-gray-600">Average Rating</div>
           </CardContent>
         </Card>
         <Card>
@@ -594,7 +616,7 @@ export default function TeacherDashboard() {
             <div className="text-3xl font-bold text-primary mb-2">
               {(teacher.totalEarnings / 1000000).toFixed(1)}M
             </div>
-            <div className="text-gray-600">{t('totalEarnings')}</div>
+            <div className="text-gray-600">Total Earnings</div>
           </CardContent>
         </Card>
       </div>
@@ -605,22 +627,22 @@ export default function TeacherDashboard() {
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              {t('todaysLessons')}
+              Today's Lessons
             </span>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setActiveSection('schedule')}
+              onClick={() => setActiveSection("schedule")}
             >
-              {t('viewAll')} <ChevronRight className="h-4 w-4 ml-1" />
+              View All <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {mockBookings.filter((b) => b.status === 'confirmed').length > 0 ? (
+          {mockBookings.filter((b) => b.status === "confirmed").length > 0 ? (
             <div className="space-y-4">
               {mockBookings
-                .filter((b) => b.status === 'confirmed')
+                .filter((b) => b.status === "confirmed")
                 .map((lesson) => (
                   <div
                     key={lesson.id}
@@ -634,9 +656,9 @@ export default function TeacherDashboard() {
                         />
                         <AvatarFallback>
                           {lesson.student.name
-                            .split(' ')
+                            .split(" ")
                             .map((n) => n[0])
-                            .join('')}
+                            .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
@@ -657,9 +679,9 @@ export default function TeacherDashboard() {
                     <div className="flex items-center gap-3">
                       <Badge
                         className={
-                          lesson.status === 'confirmed'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                          lesson.status === "confirmed"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
                         }
                       >
                         {lesson.status}
@@ -667,7 +689,7 @@ export default function TeacherDashboard() {
                       {lesson.meetingLink && (
                         <Button size="sm">
                           <Video className="h-4 w-4 mr-2" />
-                          {t('joinLesson')}
+                          Join
                         </Button>
                       )}
                     </div>
@@ -677,12 +699,12 @@ export default function TeacherDashboard() {
           ) : (
             <div className="text-center py-8 text-gray-500">
               <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>{t('noLessonsToday')}</p>
+              <p>No lessons scheduled for today</p>
               <Button
                 className="mt-4"
-                onClick={() => setActiveSection('schedule')}
+                onClick={() => setActiveSection("schedule")}
               >
-                {t('startTeaching')}
+                Set Your Availability
               </Button>
             </div>
           )}
@@ -695,7 +717,7 @@ export default function TeacherDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              {t('recentBookingRequests')}
+              Recent Booking Requests
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -713,24 +735,24 @@ export default function TeacherDashboard() {
                       />
                       <AvatarFallback>
                         {booking.student.name
-                          .split(' ')
+                          .split(" ")
                           .map((n) => n[0])
-                          .join('')}
+                          .join("")}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <div className="font-medium">{booking.student.name}</div>
                       <div className="text-sm text-gray-600">
-                        {new Date(booking.requestedDate).toLocaleDateString()}{' '}
+                        {new Date(booking.requestedDate).toLocaleDateString()}{" "}
                         at {booking.requestedTime}
                       </div>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline">
-                      {t('decline')}
+                      Decline
                     </Button>
-                    <Button size="sm">{t('accept')}</Button>
+                    <Button size="sm">Accept</Button>
                   </div>
                 </div>
               ))}
@@ -742,24 +764,24 @@ export default function TeacherDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              {t('performanceThisMonth')}
+              Performance This Month
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-gray-600">{t('completionRate')}</span>
+              <span className="text-gray-600">Completion Rate</span>
               <span className="font-semibold">96%</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">{t('responseTime')}</span>
+              <span className="text-gray-600">Response Time</span>
               <span className="font-semibold">2 hours</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">{t('newStudents')}</span>
+              <span className="text-gray-600">New Students</span>
               <span className="font-semibold">12</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">{t('monthlyEarnings')}</span>
+              <span className="text-gray-600">Monthly Earnings</span>
               <span className="font-semibold text-green-600">
                 {(earningsData.thisMonth / 1000000).toFixed(1)}M UZS
               </span>
@@ -768,37 +790,37 @@ export default function TeacherDashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 
   const renderProfileManagement = () => {
-    const profileCompletion = 85
+    const profileCompletion = 85;
     const subjects = [
-      'Mathematics',
-      'English',
-      'Programming',
-      'Physics',
-      'Chemistry',
-      'Biology',
-      'History',
-      'Geography',
-      'Literature',
-      'Music',
-      'Art',
-      'Economics',
-      'Psychology',
-    ]
+      "Mathematics",
+      "English",
+      "Programming",
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "History",
+      "Geography",
+      "Literature",
+      "Music",
+      "Art",
+      "Economics",
+      "Psychology",
+    ];
     const languages = [
-      'Uzbek',
-      'English',
-      'Russian',
-      'Arabic',
-      'Turkish',
-      'Korean',
-      'Chinese',
-      'French',
-      'German',
-      'Spanish',
-    ]
+      "Uzbek",
+      "English",
+      "Russian",
+      "Arabic",
+      "Turkish",
+      "Korean",
+      "Chinese",
+      "French",
+      "German",
+      "Spanish",
+    ];
 
     return (
       <div className="space-y-6">
@@ -806,35 +828,35 @@ export default function TeacherDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {t('profileManagement')}
+              Profile Management
             </h1>
-            <p className="text-gray-600">{t('manageTeachingProfile')}</p>
+            <p className="text-gray-600">
+              Manage your teaching profile, bio, subjects, and qualifications
+            </p>
           </div>
           <div className="flex gap-2">
             {!isEditing ? (
               <Button onClick={() => setIsEditing(true)}>
                 <Edit3 className="h-4 w-4 mr-2" />
-                {t('editProfile')}
+                Edit Profile
               </Button>
             ) : (
               <>
                 <Button variant="outline" onClick={() => setIsEditing(false)}>
-                  {t('profileCancel')}
+                  Cancel
                 </Button>
                 <Button
                   onClick={() => {
-                    setIsEditing(false)
-                    setHasUnsavedChanges(false)
+                    setIsEditing(false);
+                    setHasUnsavedChanges(false);
                     toast({
-                      title: t('profileUpdated'),
-                      description: t(
-                        'profileSubjectsPricingUpdatedSuccessfully'
-                      ),
-                    })
+                      title: "Profile Updated",
+                      description: "Subjects & pricing updated successfully.",
+                    });
                   }}
                 >
                   <CheckCircle className="h-4 w-4 mr-2" />
-                  {t('profileSaveChanges')}
+                  Save Changes
                 </Button>
               </>
             )}
@@ -847,18 +869,18 @@ export default function TeacherDashboard() {
             <div className="flex items-center justify-between mb-3">
               <div>
                 <div className="font-medium text-blue-900">
-                  {t('profileManagement')}
+                  Profile Completion
                 </div>
                 <div className="text-sm text-blue-700">
-                  {profileCompletion}% {t('profileComplete')}
+                  {profileCompletion}% complete
                 </div>
               </div>
               <Badge variant="outline" className="bg-white">
                 {profileCompletion >= 90
-                  ? t('profileExcellent')
+                  ? "Excellent"
                   : profileCompletion >= 70
-                    ? t('profileGood')
-                    : t('profileNeedsWork')}
+                    ? "Good"
+                    : "Needs Work"}
               </Badge>
             </div>
             <Progress value={profileCompletion} className="h-2" />
@@ -870,7 +892,7 @@ export default function TeacherDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              {t('profileBasicInformation')}
+              Basic Information
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -887,15 +909,13 @@ export default function TeacherDashboard() {
                 {isEditing && (
                   <Button variant="outline" size="sm">
                     <Camera className="h-4 w-4 mr-2" />
-                    {t('profileChangePhoto')}
+                    Change Photo
                   </Button>
                 )}
               </div>
               <div className="flex-1 grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('profileFirstName')} *
-                  </label>
+                  <label className="text-sm font-medium">First Name *</label>
                   <input
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     value={profileData.firstName}
@@ -904,15 +924,13 @@ export default function TeacherDashboard() {
                       setProfileData((prev) => ({
                         ...prev,
                         firstName: e.target.value,
-                      }))
-                      setHasUnsavedChanges(true)
+                      }));
+                      setHasUnsavedChanges(true);
                     }}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('profileLastName')} *
-                  </label>
+                  <label className="text-sm font-medium">Last Name *</label>
                   <input
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     value={profileData.lastName}
@@ -921,15 +939,13 @@ export default function TeacherDashboard() {
                       setProfileData((prev) => ({
                         ...prev,
                         lastName: e.target.value,
-                      }))
-                      setHasUnsavedChanges(true)
+                      }));
+                      setHasUnsavedChanges(true);
                     }}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('profileEmailAddress')}
-                  </label>
+                  <label className="text-sm font-medium">Email Address</label>
                   <input
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     value={profileData.email}
@@ -937,9 +953,7 @@ export default function TeacherDashboard() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('profilePhoneNumber')}
-                  </label>
+                  <label className="text-sm font-medium">Phone Number</label>
                   <input
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     value={profileData.phone}
@@ -948,8 +962,8 @@ export default function TeacherDashboard() {
                       setProfileData((prev) => ({
                         ...prev,
                         phone: e.target.value,
-                      }))
-                      setHasUnsavedChanges(true)
+                      }));
+                      setHasUnsavedChanges(true);
                     }}
                   />
                 </div>
@@ -959,7 +973,7 @@ export default function TeacherDashboard() {
             {/* Professional Title */}
             <div className="space-y-2">
               <label className="text-sm font-medium">
-                {t('profileProfessionalTitle')} *
+                Professional Title *
               </label>
               <input
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -970,8 +984,8 @@ export default function TeacherDashboard() {
                   setProfileData((prev) => ({
                     ...prev,
                     title: e.target.value,
-                  }))
-                  setHasUnsavedChanges(true)
+                  }));
+                  setHasUnsavedChanges(true);
                 }}
               />
             </div>
@@ -983,52 +997,48 @@ export default function TeacherDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              {t('profileProfessionalBioExperience')}
+              Professional Bio & Experience
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">
-                {t('profileProfessionalBio')} *
-              </label>
+              <label className="text-sm font-medium">Professional Bio *</label>
               <textarea
                 className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={profileData.bio}
                 disabled={!isEditing}
-                placeholder={t('profileTellStudentsAbout')}
+                placeholder="Tell students about your teaching experience, methodology, and what makes you a great teacher..."
                 onChange={(e) => {
-                  setProfileData((prev) => ({ ...prev, bio: e.target.value }))
-                  setHasUnsavedChanges(true)
+                  setProfileData((prev) => ({ ...prev, bio: e.target.value }));
+                  setHasUnsavedChanges(true);
                 }}
               />
               <div className="text-xs text-gray-500">
-                {profileData.bio.length}/500 {t('profileCharactersLimit')}
+                {profileData.bio.length}/500 characters
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium">
-                {t('profileEducationCertifications')} *
+                Education & Certifications *
               </label>
               <textarea
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={profileData.education}
                 disabled={!isEditing}
-                placeholder={t('profileListEducationBackground')}
+                placeholder="List your education background and certifications..."
                 onChange={(e) => {
                   setProfileData((prev) => ({
                     ...prev,
                     education: e.target.value,
-                  }))
-                  setHasUnsavedChanges(true)
+                  }));
+                  setHasUnsavedChanges(true);
                 }}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">
-                {t('profileTeachingExperience')}
-              </label>
+              <label className="text-sm font-medium">Teaching Experience</label>
               <select
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={profileData.experience}
@@ -1037,15 +1047,15 @@ export default function TeacherDashboard() {
                   setProfileData((prev) => ({
                     ...prev,
                     experience: e.target.value,
-                  }))
-                  setHasUnsavedChanges(true)
+                  }));
+                  setHasUnsavedChanges(true);
                 }}
               >
-                <option value="0-1">{t('profileLessThanYear')}</option>
-                <option value="1-2">{t('profileOneToTwoYears')}</option>
-                <option value="3-5">{t('profileThreeToFiveYears')}</option>
-                <option value="6-10">{t('profileSixToTenYears')}</option>
-                <option value="10+">{t('profileTenPlusYears')}</option>
+                <option value="0-1">Less than 1 year</option>
+                <option value="1-2">1-2 years</option>
+                <option value="3-5">3-5 years</option>
+                <option value="6-10">6-10 years</option>
+                <option value="10+">10+ years</option>
               </select>
             </div>
           </CardContent>
@@ -1056,31 +1066,32 @@ export default function TeacherDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Video className="h-5 w-5" />
-              {t('profileVideoIntroduction')}
+              Video Introduction
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
               <Video className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {t('profileUploadVideoIntroduction')}
+                Upload Video Introduction
               </h3>
               <p className="text-gray-600 mb-4">
-                {t('profileHelpStudentsKnowYou')}
+                Help students get to know you with a 2-3 minute introduction
+                video
               </p>
               {isEditing ? (
                 <Button>
                   <Upload className="h-4 w-4 mr-2" />
-                  {t('profileUploadVideo')}
+                  Upload Video
                 </Button>
               ) : (
                 <Button variant="outline" disabled>
-                  {t('profileNoVideoUploaded')}
+                  No video uploaded
                 </Button>
               )}
               <div className="text-xs text-gray-500 mt-3">
-                • {t('profileMaxFileSize')}: 50MB • {t('profileFormats')}: MP4,
-                MOV • {t('profileRecommended')}: 2-3 {t('profileMinutes')}
+                • Max file size: 50MB • Formats: MP4, MOV • Recommended: 2-3
+                minutes
               </div>
             </div>
           </CardContent>
@@ -1091,7 +1102,7 @@ export default function TeacherDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5" />
-              {t('profileSubjectsPricing')}
+              Subjects & Pricing
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -1099,17 +1110,15 @@ export default function TeacherDashboard() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">
-                    {t('profileSubjectOfferings')}
-                  </h4>
+                  <h4 className="font-medium">Subject Offerings</h4>
                   <p className="text-sm text-muted-foreground">
-                    {t('profileAddSubjectsWithPricing')}
+                    Add subjects you teach with individual pricing
                   </p>
                 </div>
                 {isEditing && (
                   <Button onClick={() => setShowAddSubject(true)} size="sm">
                     <Plus className="h-4 w-4 mr-2" />
-                    {t('profileAddSubject')}
+                    Add Subject
                   </Button>
                 )}
               </div>
@@ -1119,15 +1128,16 @@ export default function TeacherDashboard() {
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                   <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {t('profileNoSubjectsAdded')}
+                    No subjects added yet
                   </h3>
                   <p className="text-gray-600 mb-4">
-                    {t('profileAddFirstSubject')}
+                    Add your first subject to show students what you teach and
+                    your hourly rate.
                   </p>
                   {isEditing && (
                     <Button onClick={() => setShowAddSubject(true)}>
                       <Plus className="h-4 w-4 mr-2" />
-                      {t('profileAddSubject')}
+                      Add Subject
                     </Button>
                   )}
                 </div>
@@ -1143,10 +1153,10 @@ export default function TeacherDashboard() {
                       onDrop={() => {
                         if (draggedSubject && draggedSubject !== subject.id) {
                           const dragIndex = subjectCards.findIndex(
-                            (s) => s.id === draggedSubject
-                          )
-                          moveSubject(dragIndex, index)
-                          setDraggedSubject(null)
+                            (s) => s.id === draggedSubject,
+                          );
+                          moveSubject(dragIndex, index);
+                          setDraggedSubject(null);
                         }
                       }}
                     >
@@ -1169,7 +1179,7 @@ export default function TeacherDashboard() {
                                   }
                                   onBlur={() => setEditingSubjectId(null)}
                                   onKeyPress={(e) =>
-                                    e.key === 'Enter' &&
+                                    e.key === "Enter" &&
                                     setEditingSubjectId(null)
                                   }
                                   autoFocus
@@ -1205,10 +1215,10 @@ export default function TeacherDashboard() {
                                 onClick={() => {
                                   if (
                                     confirm(
-                                      `Remove "${subject.name}" from your offerings?`
+                                      `Remove "${subject.name}" from your offerings?`,
                                     )
                                   ) {
-                                    deleteSubject(subject.id)
+                                    deleteSubject(subject.id);
                                   }
                                 }}
                                 className="h-6 w-6 p-0 text-red-500 hover:text-red-600"
@@ -1239,7 +1249,7 @@ export default function TeacherDashboard() {
                             </div>
                           )}
                           <div className="text-xs text-muted-foreground">
-                            {t('profilePerHourSuffix')}
+                            per hour
                           </div>
                         </div>
 
@@ -1297,9 +1307,7 @@ export default function TeacherDashboard() {
                   <CardContent className="p-4">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-medium">
-                          {t('profileAddNewSubject')}
-                        </h4>
+                        <h4 className="font-medium">Add New Subject</h4>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1312,13 +1320,13 @@ export default function TeacherDashboard() {
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className="text-sm font-medium">
-                            {t('profileSubjectName')} *
+                            Subject Name *
                           </label>
                           <input
                             className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ${
                               !newSubject.name.trim()
-                                ? 'border-red-300 focus:border-red-500'
-                                : 'border-input'
+                                ? "border-red-300 focus:border-red-500"
+                                : "border-input"
                             } bg-background`}
                             placeholder="e.g., General English"
                             value={newSubject.name}
@@ -1331,14 +1339,12 @@ export default function TeacherDashboard() {
                           />
                           {!newSubject.name.trim() && (
                             <p className="text-xs text-red-500 mt-1">
-                              {t('profileSubjectNameRequired')}
+                              Subject name is required
                             </p>
                           )}
                         </div>
                         <div>
-                          <label className="text-sm font-medium">
-                            {t('profileLevel')} *
-                          </label>
+                          <label className="text-sm font-medium">Level *</label>
                           <select
                             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                             value={newSubject.level}
@@ -1358,7 +1364,7 @@ export default function TeacherDashboard() {
                         </div>
                         <div>
                           <label className="text-sm font-medium">
-                            {t('profilePricePerHour')} ({t('profileUzs')}) *
+                            Price per hour (UZS) *
                           </label>
                           <input
                             type="number"
@@ -1366,8 +1372,8 @@ export default function TeacherDashboard() {
                             max="1000000"
                             className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ${
                               newSubject.price <= 0
-                                ? 'border-red-300 focus:border-red-500'
-                                : 'border-input'
+                                ? "border-red-300 focus:border-red-500"
+                                : "border-input"
                             } bg-background`}
                             placeholder="50000"
                             value={newSubject.price}
@@ -1380,13 +1386,13 @@ export default function TeacherDashboard() {
                           />
                           {newSubject.price <= 0 && (
                             <p className="text-xs text-red-500 mt-1">
-                              {t('profilePriceMustBeGreater')}
+                              Price must be greater than 0
                             </p>
                           )}
                         </div>
                         <div>
                           <label className="text-sm font-medium">
-                            {t('profileDelivery')} *
+                            Delivery *
                           </label>
                           <select
                             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -1408,15 +1414,13 @@ export default function TeacherDashboard() {
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium">
-                          {t('profileIcon')}
-                        </label>
+                        <label className="text-sm font-medium">Icon</label>
                         <div className="flex gap-2 mt-2">
                           {iconOptions.map((option) => (
                             <button
                               key={option.value}
                               type="button"
-                              className={`p-2 border rounded ${newSubject.icon === option.value ? 'border-primary bg-primary/10' : 'border-gray-300'}`}
+                              className={`p-2 border rounded ${newSubject.icon === option.value ? "border-primary bg-primary/10" : "border-gray-300"}`}
                               onClick={() =>
                                 setNewSubject((prev) => ({
                                   ...prev,
@@ -1438,18 +1442,18 @@ export default function TeacherDashboard() {
                           }
                           className={
                             !newSubject.name.trim() || newSubject.price <= 0
-                              ? 'opacity-50 cursor-not-allowed'
-                              : ''
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
                           }
                         >
                           <Plus className="h-4 w-4 mr-2" />
-                          {t('profileAddSubject')}
+                          Add Subject
                         </Button>
                         <Button
                           variant="outline"
                           onClick={() => setShowAddSubject(false)}
                         >
-                          {t('profileCancel')}
+                          Cancel
                         </Button>
                       </div>
                     </div>
@@ -1464,11 +1468,10 @@ export default function TeacherDashboard() {
                 <div className="border-t pt-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-medium mb-3">
-                        {t('profileTeachingLevels')}
-                      </h4>
+                      <h4 className="font-medium mb-3">Teaching Levels</h4>
                       <p className="text-sm text-muted-foreground mb-3">
-                        {t('profileSelectAllLevels')}
+                        Select all levels you can teach (shown below subject
+                        grid)
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {allTeachingLevels.map((level) => (
@@ -1476,8 +1479,8 @@ export default function TeacherDashboard() {
                             key={level}
                             variant={
                               teachingLevels.includes(level)
-                                ? 'default'
-                                : 'outline'
+                                ? "default"
+                                : "outline"
                             }
                             className="cursor-pointer"
                             onClick={() => toggleTeachingLevel(level)}
@@ -1489,11 +1492,9 @@ export default function TeacherDashboard() {
                     </div>
 
                     <div>
-                      <h4 className="font-medium mb-3">
-                        {t('profileExamPreparation')}
-                      </h4>
+                      <h4 className="font-medium mb-3">Exam Preparation</h4>
                       <p className="text-sm text-muted-foreground mb-3">
-                        {t('profileSelectExamsPreparation')}
+                        Select exams you can prepare students for
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {allExamPreparations.map((exam) => (
@@ -1501,8 +1502,8 @@ export default function TeacherDashboard() {
                             key={exam}
                             variant={
                               examPreparation.includes(exam)
-                                ? 'default'
-                                : 'outline'
+                                ? "default"
+                                : "outline"
                             }
                             className="cursor-pointer"
                             onClick={() => toggleExamPreparation(exam)}
@@ -1519,9 +1520,7 @@ export default function TeacherDashboard() {
 
             {/* Live Preview */}
             <div className="border-t pt-6">
-              <h4 className="font-medium mb-4">
-                📍 {t('profilePublicProfilePreview')}
-              </h4>
+              <h4 className="font-medium mb-4">📍 Public Profile Preview</h4>
               <div className="bg-gray-50 p-4 rounded-lg">
                 {/* Preview Subject Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 mb-6">
@@ -1548,7 +1547,7 @@ export default function TeacherDashboard() {
                               {formatPrice(subject.price)}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {t('profilePerHourSuffix')}
+                              per hour
                             </div>
                           </div>
                         </div>
@@ -1565,9 +1564,7 @@ export default function TeacherDashboard() {
                   <div className="space-y-4">
                     {teachingLevels.length > 0 && (
                       <div>
-                        <h4 className="font-medium mb-2">
-                          {t('profileTeachingLevels')}
-                        </h4>
+                        <h4 className="font-medium mb-2">Teaching Levels</h4>
                         <div className="flex flex-wrap gap-2">
                           {teachingLevels.map((level) => (
                             <Badge key={level} variant="outline">
@@ -1580,9 +1577,7 @@ export default function TeacherDashboard() {
 
                     {examPreparation.length > 0 && (
                       <div>
-                        <h4 className="font-medium mb-2">
-                          {t('profileExamPreparation')}
-                        </h4>
+                        <h4 className="font-medium mb-2">Exam Preparation</h4>
                         <div className="flex flex-wrap gap-2">
                           {examPreparation.map((exam) => (
                             <Badge key={exam} variant="outline">
@@ -1604,7 +1599,7 @@ export default function TeacherDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="h-5 w-5" />
-              {t('profileQualificationsDocuments')}
+              Qualifications & Documents
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -1612,24 +1607,24 @@ export default function TeacherDashboard() {
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <Upload className="h-8 w-8 text-gray-400 mx-auto mb-3" />
                 <h4 className="font-medium text-gray-900 mb-2">
-                  {t('profileUploadCertificatesDocuments')}
+                  Upload Certificates & Documents
                 </h4>
                 <p className="text-sm text-gray-600 mb-4">
-                  {t('profileUploadTeachingCertificates')}
+                  Upload teaching certificates, degrees, and other
+                  qualifications
                 </p>
                 {isEditing ? (
                   <Button variant="outline">
                     <Upload className="h-4 w-4 mr-2" />
-                    {t('profileChooseFiles')}
+                    Choose Files
                   </Button>
                 ) : (
                   <div className="text-sm text-gray-500">
-                    {t('profileNoDocumentsUploaded')}
+                    No documents uploaded
                   </div>
                 )}
                 <div className="text-xs text-gray-500 mt-3">
-                  {t('profileSupportedFormats')}: PDF, JPG, PNG •{' '}
-                  {t('profileMaxSize')}: 10MB {t('profilePerFile')}
+                  Supported formats: PDF, JPG, PNG • Max size: 10MB per file
                 </div>
               </div>
             </div>
@@ -1642,229 +1637,227 @@ export default function TeacherDashboard() {
             <CardContent className="p-4">
               <div className="flex items-center text-amber-800">
                 <AlertCircle className="h-5 w-5 mr-2" />
-                <span className="font-medium">
-                  {t('profileYouHaveUnsavedChanges')}
-                </span>
+                <span className="font-medium">You have unsaved changes</span>
               </div>
             </CardContent>
           </Card>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   // Mock bookings data
   const pendingBookingRequests = [
     {
       id: 1,
       student: {
-        name: 'Maria Garcia',
-        image: '/placeholder.svg',
-        email: 'maria@example.com',
-        phone: '+998901234567',
+        name: "Maria Garcia",
+        image: "/placeholder.svg",
+        email: "maria@example.com",
+        phone: "+998901234567",
         rating: 4.8,
         totalLessons: 25,
-        memberSince: '2023-08-15',
+        memberSince: "2023-08-15",
       },
-      requestedDate: '2024-01-22',
-      requestedTime: '15:00',
+      requestedDate: "2024-01-22",
+      requestedTime: "15:00",
       duration: 60,
-      subject: 'English Conversation',
-      type: 'regular',
+      subject: "English Conversation",
+      type: "regular",
       rate: 50000,
       message:
         "Hello! I would like to continue improving my conversational English skills. I'm particularly interested in business communication.",
-      requestedAt: '2024-01-19T10:30:00',
+      requestedAt: "2024-01-19T10:30:00",
       paymentConfirmed: true,
-      specialRequirements: 'Prefers slower pace, beginner level',
+      specialRequirements: "Prefers slower pace, beginner level",
     },
     {
       id: 2,
       student: {
-        name: 'David Wilson',
-        image: '/placeholder.svg',
-        email: 'david@example.com',
-        phone: '+998901234568',
+        name: "David Wilson",
+        image: "/placeholder.svg",
+        email: "david@example.com",
+        phone: "+998901234568",
         rating: 4.9,
         totalLessons: 45,
-        memberSince: '2023-06-10',
+        memberSince: "2023-06-10",
       },
-      requestedDate: '2024-01-23',
-      requestedTime: '14:00',
+      requestedDate: "2024-01-23",
+      requestedTime: "14:00",
       duration: 90,
-      subject: 'IELTS Speaking',
-      type: 'intensive',
+      subject: "IELTS Speaking",
+      type: "intensive",
       rate: 75000,
       message:
-        'I need to prepare for IELTS speaking test next month. Can we focus on Part 2 and 3?',
-      requestedAt: '2024-01-19T09:15:00',
+        "I need to prepare for IELTS speaking test next month. Can we focus on Part 2 and 3?",
+      requestedAt: "2024-01-19T09:15:00",
       paymentConfirmed: true,
-      specialRequirements: 'IELTS preparation, advanced level',
+      specialRequirements: "IELTS preparation, advanced level",
     },
     {
       id: 3,
       student: {
-        name: 'Sophie Chen',
-        image: '/placeholder.svg',
-        email: 'sophie@example.com',
-        phone: '+998901234569',
+        name: "Sophie Chen",
+        image: "/placeholder.svg",
+        email: "sophie@example.com",
+        phone: "+998901234569",
         rating: 5.0,
         totalLessons: 5,
-        memberSince: '2024-01-05',
+        memberSince: "2024-01-05",
       },
-      requestedDate: '2024-01-24',
-      requestedTime: '16:30',
+      requestedDate: "2024-01-24",
+      requestedTime: "16:30",
       duration: 30,
-      subject: 'Trial Lesson',
-      type: 'trial',
+      subject: "Trial Lesson",
+      type: "trial",
       rate: 25000,
       message:
         "Hi! I'm new to the platform and would like to try a lesson to see if we're a good match.",
-      requestedAt: '2024-01-19T14:45:00',
+      requestedAt: "2024-01-19T14:45:00",
       paymentConfirmed: false,
-      specialRequirements: 'New student, needs assessment',
+      specialRequirements: "New student, needs assessment",
     },
-  ]
+  ];
 
   // Mock schedule data
   const mockBookings = [
     {
       id: 1,
-      date: '2024-01-20',
-      time: '14:00',
+      date: "2024-01-20",
+      time: "14:00",
       duration: 60,
       student: {
-        name: 'John Doe',
-        image: '/placeholder.svg',
-        phone: '+998901234567',
+        name: "John Doe",
+        image: "/placeholder.svg",
+        phone: "+998901234567",
       },
-      subject: 'IELTS Preparation',
-      status: 'confirmed',
-      type: 'regular',
+      subject: "IELTS Preparation",
+      status: "confirmed",
+      type: "regular",
       rate: 50000,
-      meetingLink: 'https://example.com/meeting/johndoe',
+      meetingLink: "https://example.com/meeting/johndoe",
     },
     {
       id: 2,
-      date: '2024-01-20',
-      time: '16:00',
+      date: "2024-01-20",
+      time: "16:00",
       duration: 30,
       student: {
-        name: 'Sarah Smith',
-        image: '/placeholder.svg',
-        phone: '+998901234568',
+        name: "Sarah Smith",
+        image: "/placeholder.svg",
+        phone: "+998901234568",
       },
-      subject: 'Trial Lesson',
-      status: 'pending',
-      type: 'trial',
+      subject: "Trial Lesson",
+      status: "pending",
+      type: "trial",
       rate: 25000,
     },
     {
       id: 3,
-      date: '2024-01-21',
-      time: '10:00',
+      date: "2024-01-21",
+      time: "10:00",
       duration: 90,
       student: {
-        name: 'Ahmad Karim',
-        image: '/placeholder.svg',
-        phone: '+998901234569',
+        name: "Ahmad Karim",
+        image: "/placeholder.svg",
+        phone: "+998901234569",
       },
-      subject: 'Business English',
-      status: 'confirmed',
-      type: 'regular',
+      subject: "Business English",
+      status: "confirmed",
+      type: "regular",
       rate: 75000,
     },
-  ]
+  ];
 
   const completedLessons = [
     {
       id: 101,
-      date: '2024-01-18',
-      time: '14:00',
+      date: "2024-01-18",
+      time: "14:00",
       duration: 60,
-      student: { name: 'John Doe', image: '/placeholder.svg', rating: 5 },
-      subject: 'IELTS Preparation',
-      status: 'completed',
+      student: { name: "John Doe", image: "/placeholder.svg", rating: 5 },
+      subject: "IELTS Preparation",
+      status: "completed",
       studentRating: 5,
       studentFeedback:
-        'Excellent lesson! Very clear explanations and helpful practice exercises.',
+        "Excellent lesson! Very clear explanations and helpful practice exercises.",
       teacherNotes:
-        'Student showed good progress in speaking. Focus on pronunciation next time.',
-      paymentStatus: 'paid',
+        "Student showed good progress in speaking. Focus on pronunciation next time.",
+      paymentStatus: "paid",
       earnings: 50000,
     },
     {
       id: 102,
-      date: '2024-01-17',
-      time: '16:00',
+      date: "2024-01-17",
+      time: "16:00",
       duration: 30,
-      student: { name: 'Sarah Smith', image: '/placeholder.svg', rating: 5 },
-      subject: 'Trial Lesson',
-      status: 'completed',
+      student: { name: "Sarah Smith", image: "/placeholder.svg", rating: 5 },
+      subject: "Trial Lesson",
+      status: "completed",
       studentRating: 5,
-      studentFeedback: 'Great first lesson! Looking forward to more sessions.',
+      studentFeedback: "Great first lesson! Looking forward to more sessions.",
       teacherNotes:
-        'Enthusiastic student, good foundation. Recommended regular package.',
-      paymentStatus: 'paid',
+        "Enthusiastic student, good foundation. Recommended regular package.",
+      paymentStatus: "paid",
       earnings: 25000,
     },
     {
       id: 103,
-      date: '2024-01-16',
-      time: '10:00',
+      date: "2024-01-16",
+      time: "10:00",
       duration: 90,
-      student: { name: 'Ahmad Karim', image: '/placeholder.svg', rating: 4 },
-      subject: 'Business English',
-      status: 'completed',
+      student: { name: "Ahmad Karim", image: "/placeholder.svg", rating: 4 },
+      subject: "Business English",
+      status: "completed",
       studentRating: 4,
-      studentFeedback: 'Good lesson, but would like more practical examples.',
+      studentFeedback: "Good lesson, but would like more practical examples.",
       teacherNotes:
-        'Student needs more real-world business scenarios. Prepare case studies.',
-      paymentStatus: 'paid',
+        "Student needs more real-world business scenarios. Prepare case studies.",
+      paymentStatus: "paid",
       earnings: 75000,
     },
-  ]
+  ];
 
   const todaysLessons = mockBookings.filter(
     (booking) =>
-      booking.date === new Date().toISOString().split('T')[0] &&
-      booking.status === 'confirmed'
-  )
+      booking.date === new Date().toISOString().split("T")[0] &&
+      booking.status === "confirmed",
+  );
 
   const upcomingLessons = mockBookings.filter(
     (booking) =>
-      new Date(booking.date) > new Date() && booking.status === 'confirmed'
-  )
+      new Date(booking.date) > new Date() && booking.status === "confirmed",
+  );
 
   const recentMessages = [
     {
       id: 1,
-      student: { name: 'John Doe', image: '/placeholder.svg' },
+      student: { name: "John Doe", image: "/placeholder.svg" },
       message:
-        'Thank you for the great lesson yesterday! When can we schedule the next one?',
-      timestamp: '2024-01-19T15:30:00',
+        "Thank you for the great lesson yesterday! When can we schedule the next one?",
+      timestamp: "2024-01-19T15:30:00",
       unread: true,
       lessonRelated: true,
     },
     {
       id: 2,
-      student: { name: 'Maria Garcia', image: '/placeholder.svg' },
+      student: { name: "Maria Garcia", image: "/placeholder.svg" },
       message:
-        'Hi! I have a question about the homework you assigned. Could you clarify the grammar exercise?',
-      timestamp: '2024-01-19T12:15:00',
+        "Hi! I have a question about the homework you assigned. Could you clarify the grammar exercise?",
+      timestamp: "2024-01-19T12:15:00",
       unread: true,
       lessonRelated: true,
     },
     {
       id: 3,
-      student: { name: 'David Wilson', image: '/placeholder.svg' },
+      student: { name: "David Wilson", image: "/placeholder.svg" },
       message:
         "I need to reschedule tomorrow's lesson. Is 4 PM available instead?",
-      timestamp: '2024-01-19T09:45:00',
+      timestamp: "2024-01-19T09:45:00",
       unread: false,
       lessonRelated: false,
     },
-  ]
+  ];
 
   const bookingStats = {
     todayLessons: todaysLessons.length,
@@ -1876,16 +1869,16 @@ export default function TeacherDashboard() {
     averageRating: 4.9,
     totalStudents: 89,
     completionRate: 97,
-  }
+  };
 
   const scheduleAnalytics = {
     bookingRate: 78,
-    peakHours: ['14:00-16:00', '19:00-21:00'],
+    peakHours: ["14:00-16:00", "19:00-21:00"],
     utilizationRate: 65,
-    avgBookingAdvance: '2.5 days',
+    avgBookingAdvance: "2.5 days",
     monthlyProjection: 2850000,
-    popularTimeSlots: ['10:00', '14:00', '16:00', '19:00'],
-  }
+    popularTimeSlots: ["10:00", "14:00", "16:00", "19:00"],
+  };
 
   // Earnings data
   const earningsData = {
@@ -1893,168 +1886,168 @@ export default function TeacherDashboard() {
     thisMonth: 2850000,
     lastMonth: 2450000,
     pendingPayments: 425000,
-    nextPayoutDate: '2024-01-25',
+    nextPayoutDate: "2024-01-25",
     nextPayoutAmount: 2100000,
     averageHourlyRate: 65000,
     platformFeeRate: 15,
     totalPlatformFees: 382500,
 
     monthlyTrend: [
-      { month: 'Jul', amount: 1800000 },
-      { month: 'Aug', amount: 2100000 },
-      { month: 'Sep', amount: 2300000 },
-      { month: 'Oct', amount: 2450000 },
-      { month: 'Nov', amount: 2650000 },
-      { month: 'Dec', amount: 2850000 },
+      { month: "Jul", amount: 1800000 },
+      { month: "Aug", amount: 2100000 },
+      { month: "Sep", amount: 2300000 },
+      { month: "Oct", amount: 2450000 },
+      { month: "Nov", amount: 2650000 },
+      { month: "Dec", amount: 2850000 },
     ],
 
     subjectBreakdown: [
       {
-        subject: 'English',
+        subject: "English",
         earnings: 1200000,
         percentage: 42,
-        color: '#3B82F6',
+        color: "#3B82F6",
       },
-      { subject: 'IELTS', earnings: 950000, percentage: 33, color: '#10B981' },
+      { subject: "IELTS", earnings: 950000, percentage: 33, color: "#10B981" },
       {
-        subject: 'Business English',
+        subject: "Business English",
         earnings: 500000,
         percentage: 18,
-        color: '#F59E0B',
+        color: "#F59E0B",
       },
       {
-        subject: 'Conversation',
+        subject: "Conversation",
         earnings: 200000,
         percentage: 7,
-        color: '#EF4444',
+        color: "#EF4444",
       },
     ],
 
     topStudents: [
-      { name: 'John Doe', earnings: 350000, lessons: 14 },
-      { name: 'Sarah Smith', earnings: 280000, lessons: 11 },
-      { name: 'Ahmad Karim', earnings: 245000, lessons: 9 },
-      { name: 'Maria Garcia', earnings: 210000, lessons: 8 },
+      { name: "John Doe", earnings: 350000, lessons: 14 },
+      { name: "Sarah Smith", earnings: 280000, lessons: 11 },
+      { name: "Ahmad Karim", earnings: 245000, lessons: 9 },
+      { name: "Maria Garcia", earnings: 210000, lessons: 8 },
     ],
-  }
+  };
 
   const paymentHistory = [
     {
       id: 1,
-      date: '2024-01-18',
-      student: { name: 'John Doe', image: '/placeholder.svg' },
-      subject: 'IELTS Preparation',
+      date: "2024-01-18",
+      student: { name: "John Doe", image: "/placeholder.svg" },
+      subject: "IELTS Preparation",
       amount: 50000,
       platformFee: 7500,
       netAmount: 42500,
-      status: 'completed',
-      paymentMethod: 'Credit Card',
-      transactionId: 'TXN-001234',
-      lessonId: 'LSN-5678',
+      status: "completed",
+      paymentMethod: "Credit Card",
+      transactionId: "TXN-001234",
+      lessonId: "LSN-5678",
     },
     {
       id: 2,
-      date: '2024-01-17',
-      student: { name: 'Sarah Smith', image: '/placeholder.svg' },
-      subject: 'Trial Lesson',
+      date: "2024-01-17",
+      student: { name: "Sarah Smith", image: "/placeholder.svg" },
+      subject: "Trial Lesson",
       amount: 25000,
       platformFee: 3750,
       netAmount: 21250,
-      status: 'completed',
-      paymentMethod: 'UzCard',
-      transactionId: 'TXN-001235',
-      lessonId: 'LSN-5679',
+      status: "completed",
+      paymentMethod: "UzCard",
+      transactionId: "TXN-001235",
+      lessonId: "LSN-5679",
     },
     {
       id: 3,
-      date: '2024-01-16',
-      student: { name: 'Ahmad Karim', image: '/placeholder.svg' },
-      subject: 'Business English',
+      date: "2024-01-16",
+      student: { name: "Ahmad Karim", image: "/placeholder.svg" },
+      subject: "Business English",
       amount: 75000,
       platformFee: 11250,
       netAmount: 63750,
-      status: 'pending',
-      paymentMethod: 'Bank Transfer',
-      transactionId: 'TXN-001236',
-      lessonId: 'LSN-5680',
+      status: "pending",
+      paymentMethod: "Bank Transfer",
+      transactionId: "TXN-001236",
+      lessonId: "LSN-5680",
     },
     {
       id: 4,
-      date: '2024-01-15',
-      student: { name: 'Maria Garcia', image: '/placeholder.svg' },
-      subject: 'English Conversation',
+      date: "2024-01-15",
+      student: { name: "Maria Garcia", image: "/placeholder.svg" },
+      subject: "English Conversation",
       amount: 40000,
       platformFee: 6000,
       netAmount: 34000,
-      status: 'completed',
-      paymentMethod: 'PayPal',
-      transactionId: 'TXN-001237',
-      lessonId: 'LSN-5681',
+      status: "completed",
+      paymentMethod: "PayPal",
+      transactionId: "TXN-001237",
+      lessonId: "LSN-5681",
     },
     {
       id: 5,
-      date: '2024-01-14',
-      student: { name: 'David Wilson', image: '/placeholder.svg' },
-      subject: 'IELTS Speaking',
+      date: "2024-01-14",
+      student: { name: "David Wilson", image: "/placeholder.svg" },
+      subject: "IELTS Speaking",
       amount: 65000,
       platformFee: 9750,
       netAmount: 55250,
-      status: 'failed',
-      paymentMethod: 'Credit Card',
-      transactionId: 'TXN-001238',
-      lessonId: 'LSN-5682',
+      status: "failed",
+      paymentMethod: "Credit Card",
+      transactionId: "TXN-001238",
+      lessonId: "LSN-5682",
     },
-  ]
+  ];
 
   const payoutHistory = [
     {
       id: 1,
-      date: '2024-01-15',
+      date: "2024-01-15",
       amount: 1850000,
-      status: 'completed',
-      method: 'Bank Transfer',
-      reference: 'PAY-2024-001',
+      status: "completed",
+      method: "Bank Transfer",
+      reference: "PAY-2024-001",
       processingFee: 15000,
     },
     {
       id: 2,
-      date: '2023-12-15',
+      date: "2023-12-15",
       amount: 1650000,
-      status: 'completed',
-      method: 'Bank Transfer',
-      reference: 'PAY-2023-012',
+      status: "completed",
+      method: "Bank Transfer",
+      reference: "PAY-2023-012",
       processingFee: 15000,
     },
     {
       id: 3,
-      date: '2023-11-15',
+      date: "2023-11-15",
       amount: 1450000,
-      status: 'completed',
-      method: 'Bank Transfer',
-      reference: 'PAY-2023-011',
+      status: "completed",
+      method: "Bank Transfer",
+      reference: "PAY-2023-011",
       processingFee: 15000,
     },
-  ]
+  ];
 
   const calculateGrowthPercentage = (current: number, previous: number) => {
-    if (previous === 0) return 0
-    return (((current - previous) / previous) * 100).toFixed(1)
-  }
+    if (previous === 0) return 0;
+    return (((current - previous) / previous) * 100).toFixed(1);
+  };
 
   const monthlyGrowth = calculateGrowthPercentage(
     earningsData.thisMonth,
-    earningsData.lastMonth
-  )
+    earningsData.lastMonth,
+  );
   const goalProgress = ((earningsData.thisMonth / earningsGoal) * 100).toFixed(
-    1
-  )
+    1,
+  );
 
   // Reviews and ratings data
   const reviewsData = {
     overallRating: 4.8,
     totalReviews: 287,
     recentRating: 4.9, // last 30 days
-    ratingTrend: '+0.2', // improvement
+    ratingTrend: "+0.2", // improvement
     ranking: 12, // position among teachers
     responseRate: 89,
 
@@ -2067,44 +2060,44 @@ export default function TeacherDashboard() {
     ],
 
     monthlyTrend: [
-      { month: 'Jul', rating: 4.6 },
-      { month: 'Aug', rating: 4.7 },
-      { month: 'Sep', rating: 4.7 },
-      { month: 'Oct', rating: 4.8 },
-      { month: 'Nov', rating: 4.8 },
-      { month: 'Dec', rating: 4.9 },
+      { month: "Jul", rating: 4.6 },
+      { month: "Aug", rating: 4.7 },
+      { month: "Sep", rating: 4.7 },
+      { month: "Oct", rating: 4.8 },
+      { month: "Nov", rating: 4.8 },
+      { month: "Dec", rating: 4.9 },
     ],
 
     subjectRatings: [
-      { subject: 'English', rating: 4.9, reviews: 120 },
-      { subject: 'IELTS', rating: 4.8, reviews: 95 },
-      { subject: 'Business English', rating: 4.7, reviews: 45 },
-      { subject: 'Conversation', rating: 4.9, reviews: 27 },
+      { subject: "English", rating: 4.9, reviews: 120 },
+      { subject: "IELTS", rating: 4.8, reviews: 95 },
+      { subject: "Business English", rating: 4.7, reviews: 45 },
+      { subject: "Conversation", rating: 4.9, reviews: 27 },
     ],
 
     commonKeywords: [
-      { word: 'patient', count: 89 },
-      { word: 'helpful', count: 76 },
-      { word: 'clear', count: 71 },
-      { word: 'professional', count: 65 },
-      { word: 'encouraging', count: 52 },
+      { word: "patient", count: 89 },
+      { word: "helpful", count: 76 },
+      { word: "clear", count: 71 },
+      { word: "professional", count: 65 },
+      { word: "encouraging", count: 52 },
     ],
-  }
+  };
 
   const recentReviews = [
     {
       id: 1,
       student: {
-        name: 'John Doe',
-        image: '/placeholder.svg',
-        level: 'Intermediate',
+        name: "John Doe",
+        image: "/placeholder.svg",
+        level: "Intermediate",
         verified: true,
       },
       rating: 5,
-      date: '2024-01-18',
+      date: "2024-01-18",
       lesson: {
-        subject: 'IELTS Preparation',
-        date: '2024-01-17',
+        subject: "IELTS Preparation",
+        date: "2024-01-17",
         duration: 60,
       },
       review:
@@ -2117,20 +2110,20 @@ export default function TeacherDashboard() {
     {
       id: 2,
       student: {
-        name: 'Sarah Smith',
-        image: '/placeholder.svg',
-        level: 'Beginner',
+        name: "Sarah Smith",
+        image: "/placeholder.svg",
+        level: "Beginner",
         verified: true,
       },
       rating: 5,
-      date: '2024-01-17',
+      date: "2024-01-17",
       lesson: {
-        subject: 'Trial Lesson',
-        date: '2024-01-16',
+        subject: "Trial Lesson",
+        date: "2024-01-16",
         duration: 30,
       },
       review:
-        'Amazing first lesson! Aziza was very patient with me as a beginner and made me feel comfortable speaking English. She quickly identified my learning needs and created a personalized plan. Looking forward to more lessons!',
+        "Amazing first lesson! Aziza was very patient with me as a beginner and made me feel comfortable speaking English. She quickly identified my learning needs and created a personalized plan. Looking forward to more lessons!",
       helpful: 8,
       replied: false,
       response: null,
@@ -2138,20 +2131,20 @@ export default function TeacherDashboard() {
     {
       id: 3,
       student: {
-        name: 'Ahmad Karim',
-        image: '/placeholder.svg',
-        level: 'Advanced',
+        name: "Ahmad Karim",
+        image: "/placeholder.svg",
+        level: "Advanced",
         verified: true,
       },
       rating: 4,
-      date: '2024-01-16',
+      date: "2024-01-16",
       lesson: {
-        subject: 'Business English',
-        date: '2024-01-15',
+        subject: "Business English",
+        date: "2024-01-15",
         duration: 90,
       },
       review:
-        'Good lesson with practical business scenarios. Aziza has strong knowledge of business English terminology. However, I would appreciate more real-world case studies and interactive exercises during the lesson.',
+        "Good lesson with practical business scenarios. Aziza has strong knowledge of business English terminology. However, I would appreciate more real-world case studies and interactive exercises during the lesson.",
       helpful: 5,
       replied: true,
       response:
@@ -2160,20 +2153,20 @@ export default function TeacherDashboard() {
     {
       id: 4,
       student: {
-        name: 'Maria Garcia',
-        image: '/placeholder.svg',
-        level: 'Intermediate',
+        name: "Maria Garcia",
+        image: "/placeholder.svg",
+        level: "Intermediate",
         verified: false,
       },
       rating: 5,
-      date: '2024-01-15',
+      date: "2024-01-15",
       lesson: {
-        subject: 'English Conversation',
-        date: '2024-01-14',
+        subject: "English Conversation",
+        date: "2024-01-14",
         duration: 60,
       },
       review:
-        'Perfect conversation practice! Aziza creates a relaxed environment where I feel confident to speak. She corrects my mistakes gently and provides useful phrases for everyday situations.',
+        "Perfect conversation practice! Aziza creates a relaxed environment where I feel confident to speak. She corrects my mistakes gently and provides useful phrases for everyday situations.",
       helpful: 15,
       replied: false,
       response: null,
@@ -2181,46 +2174,46 @@ export default function TeacherDashboard() {
     {
       id: 5,
       student: {
-        name: 'David Wilson',
-        image: '/placeholder.svg',
-        level: 'Intermediate',
+        name: "David Wilson",
+        image: "/placeholder.svg",
+        level: "Intermediate",
         verified: true,
       },
       rating: 5,
-      date: '2024-01-14',
+      date: "2024-01-14",
       lesson: {
-        subject: 'IELTS Speaking',
-        date: '2024-01-13',
+        subject: "IELTS Speaking",
+        date: "2024-01-13",
         duration: 60,
       },
       review:
-        'Outstanding IELTS speaking preparation! Aziza simulates real exam conditions and provides detailed feedback on pronunciation, fluency, and vocabulary. Her tips are invaluable for exam success.',
+        "Outstanding IELTS speaking preparation! Aziza simulates real exam conditions and provides detailed feedback on pronunciation, fluency, and vocabulary. Her tips are invaluable for exam success.",
       helpful: 9,
       replied: true,
       response:
         "I'm so happy to help you prepare for IELTS, David! Your dedication to practice is impressive. You're going to do great on the exam!",
     },
-  ]
+  ];
 
   const allReviews = [
     ...recentReviews,
     {
       id: 6,
       student: {
-        name: 'Lisa Chen',
-        image: '/placeholder.svg',
-        level: 'Beginner',
+        name: "Lisa Chen",
+        image: "/placeholder.svg",
+        level: "Beginner",
         verified: true,
       },
       rating: 4,
-      date: '2024-01-12',
+      date: "2024-01-12",
       lesson: {
-        subject: 'English Basics',
-        date: '2024-01-11',
+        subject: "English Basics",
+        date: "2024-01-11",
         duration: 45,
       },
       review:
-        'Great teacher for beginners. Very patient and encouraging. Sometimes the pace is a bit fast for me, but overall very helpful.',
+        "Great teacher for beginners. Very patient and encouraging. Sometimes the pace is a bit fast for me, but overall very helpful.",
       helpful: 7,
       replied: false,
       response: null,
@@ -2228,34 +2221,34 @@ export default function TeacherDashboard() {
     {
       id: 7,
       student: {
-        name: 'Robert Johnson',
-        image: '/placeholder.svg',
-        level: 'Advanced',
+        name: "Robert Johnson",
+        image: "/placeholder.svg",
+        level: "Advanced",
         verified: true,
       },
       rating: 5,
-      date: '2024-01-10',
+      date: "2024-01-10",
       lesson: {
-        subject: 'Business English',
-        date: '2024-01-09',
+        subject: "Business English",
+        date: "2024-01-09",
         duration: 90,
       },
       review:
-        'Exceptional business English training. Aziza understands corporate communication needs and provides relevant examples. Highly recommend for professionals.',
+        "Exceptional business English training. Aziza understands corporate communication needs and provides relevant examples. Highly recommend for professionals.",
       helpful: 11,
       replied: true,
       response:
         "Thank you, Robert! It's wonderful working with professionals like you who are committed to excellence in communication.",
     },
-  ]
+  ];
 
   const filterReviews = (reviews: any[]) => {
-    let filtered = reviews
+    let filtered = reviews;
 
-    if (reviewFilter !== 'all') {
+    if (reviewFilter !== "all") {
       filtered = filtered.filter(
-        (review) => review.rating === parseInt(reviewFilter)
-      )
+        (review) => review.rating === parseInt(reviewFilter),
+      );
     }
 
     if (searchReviews) {
@@ -2267,35 +2260,35 @@ export default function TeacherDashboard() {
           review.review.toLowerCase().includes(searchReviews.toLowerCase()) ||
           review.lesson.subject
             .toLowerCase()
-            .includes(searchReviews.toLowerCase())
-      )
+            .includes(searchReviews.toLowerCase()),
+      );
     }
 
     // Sort reviews
     filtered.sort((a, b) => {
       switch (reviewSort) {
-        case 'newest':
-          return new Date(b.date).getTime() - new Date(a.date).getTime()
-        case 'oldest':
-          return new Date(a.date).getTime() - new Date(b.date).getTime()
-        case 'highest':
-          return b.rating - a.rating
-        case 'lowest':
-          return a.rating - b.rating
+        case "newest":
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        case "oldest":
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        case "highest":
+          return b.rating - a.rating;
+        case "lowest":
+          return a.rating - b.rating;
         default:
-          return 0
+          return 0;
       }
-    })
+    });
 
-    return filtered
-  }
+    return filtered;
+  };
 
-  const renderStars = (rating: number, size: 'sm' | 'md' | 'lg' = 'md') => {
+  const renderStars = (rating: number, size: "sm" | "md" | "lg" = "md") => {
     const sizeClasses = {
-      sm: 'h-3 w-3',
-      md: 'h-4 w-4',
-      lg: 'h-5 w-5',
-    }
+      sm: "h-3 w-3",
+      md: "h-4 w-4",
+      lg: "h-5 w-5",
+    };
 
     return (
       <div className="flex items-center gap-1">
@@ -2303,89 +2296,89 @@ export default function TeacherDashboard() {
           <Star
             key={i}
             className={`${sizeClasses[size]} ${
-              i < rating ? 'text-yellow-500 fill-current' : 'text-gray-300'
+              i < rating ? "text-yellow-500 fill-current" : "text-gray-300"
             }`}
           />
         ))}
       </div>
-    )
-  }
+    );
+  };
 
   const generateTimeSlots = () => {
-    const slots = []
+    const slots = [];
     for (let hour = 8; hour <= 22; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
-        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
-        slots.push(time)
+        const time = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+        slots.push(time);
       }
     }
-    return slots
-  }
+    return slots;
+  };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
-    const daysInMonth = lastDay.getDate()
-    const startingDayOfWeek = firstDay.getDay()
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
 
-    const days = []
+    const days = [];
 
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null)
+      days.push(null);
     }
 
     // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
-      days.push(new Date(year, month, day))
+      days.push(new Date(year, month, day));
     }
 
-    return days
-  }
+    return days;
+  };
 
   const getBookingForSlot = (date: Date, time: string) => {
-    const dateStr = date.toISOString().split('T')[0]
+    const dateStr = date.toISOString().split("T")[0];
     return mockBookings.find(
-      (booking) => booking.date === dateStr && booking.time === time
-    )
-  }
+      (booking) => booking.date === dateStr && booking.time === time,
+    );
+  };
 
   const isTimeSlotAvailable = (date: Date, time: string) => {
     const dayName = date
-      .toLocaleDateString('en-US', { weekday: 'long' })
-      .toLowerCase()
+      .toLocaleDateString("en-US", { weekday: "long" })
+      .toLowerCase();
     const dayAvailability =
-      weeklyAvailability[dayName as keyof typeof weeklyAvailability]
+      weeklyAvailability[dayName as keyof typeof weeklyAvailability];
 
-    if (!dayAvailability?.enabled) return false
+    if (!dayAvailability?.enabled) return false;
 
-    const [hours, minutes] = time.split(':').map(Number)
-    const timeInMinutes = hours * 60 + minutes
+    const [hours, minutes] = time.split(":").map(Number);
+    const timeInMinutes = hours * 60 + minutes;
     const [startHours, startMinutes] = dayAvailability.start
-      .split(':')
-      .map(Number)
-    const [endHours, endMinutes] = dayAvailability.end.split(':').map(Number)
-    const startInMinutes = startHours * 60 + startMinutes
-    const endInMinutes = endHours * 60 + endMinutes
+      .split(":")
+      .map(Number);
+    const [endHours, endMinutes] = dayAvailability.end.split(":").map(Number);
+    const startInMinutes = startHours * 60 + startMinutes;
+    const endInMinutes = endHours * 60 + endMinutes;
 
-    return timeInMinutes >= startInMinutes && timeInMinutes <= endInMinutes
-  }
+    return timeInMinutes >= startInMinutes && timeInMinutes <= endInMinutes;
+  };
 
   const renderScheduleManagement = () => {
-    const timeSlots = generateTimeSlots()
-    const daysInMonth = getDaysInMonth(currentDate)
-    const today = new Date()
+    const timeSlots = generateTimeSlots();
+    const daysInMonth = getDaysInMonth(currentDate);
+    const today = new Date();
 
     return (
       <div className="space-y-6">
@@ -2393,9 +2386,11 @@ export default function TeacherDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {t('scheduleAndAvailability')}
+              Schedule & Availability
             </h1>
-            <p className="text-gray-600">{t('setAvailabilitySchedule')}</p>
+            <p className="text-gray-600">
+              Set your availability and manage your teaching schedule
+            </p>
           </div>
           <div className="flex gap-3">
             <Button
@@ -2403,15 +2398,15 @@ export default function TeacherDashboard() {
               onClick={() => setShowAvailabilityModal(true)}
             >
               <Settings className="h-4 w-4 mr-2" />
-              {t('scheduleSetAvailability')}
+              Set Availability
             </Button>
             <Button variant="outline">
               <Plus className="h-4 w-4 mr-2" />
-              {t('scheduleAddBreak')}
+              Add Break
             </Button>
             <Button>
               <Eye className="h-4 w-4 mr-2" />
-              {t('scheduleViewBookings')}
+              View Bookings
             </Button>
           </div>
         </div>
@@ -2425,9 +2420,7 @@ export default function TeacherDashboard() {
                   <div className="text-2xl font-bold text-primary">
                     {scheduleAnalytics.bookingRate}%
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {t('scheduleBookingRate')}
-                  </div>
+                  <div className="text-sm text-gray-600">Booking Rate</div>
                 </div>
                 <TrendingUp className="h-8 w-8 text-green-500" />
               </div>
@@ -2440,9 +2433,7 @@ export default function TeacherDashboard() {
                   <div className="text-2xl font-bold text-primary">
                     {scheduleAnalytics.utilizationRate}%
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {t('scheduleUtilization')}
-                  </div>
+                  <div className="text-sm text-gray-600">Utilization</div>
                 </div>
                 <BarChart3 className="h-8 w-8 text-blue-500" />
               </div>
@@ -2453,11 +2444,9 @@ export default function TeacherDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-2xl font-bold text-primary">
-                    {mockBookings.filter((b) => b.status === 'pending').length}
+                    {mockBookings.filter((b) => b.status === "pending").length}
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {t('schedulePendingBookings')}
-                  </div>
+                  <div className="text-sm text-gray-600">Pending Bookings</div>
                 </div>
                 <Clock className="h-8 w-8 text-orange-500" />
               </div>
@@ -2472,7 +2461,7 @@ export default function TeacherDashboard() {
                     M
                   </div>
                   <div className="text-sm text-gray-600">
-                    {t('scheduleMonthlyProjection')}
+                    Monthly Projection
                   </div>
                 </div>
                 <DollarSign className="h-8 w-8 text-green-500" />
@@ -2491,15 +2480,15 @@ export default function TeacherDashboard() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      const newDate = new Date(currentDate)
-                      if (calendarView === 'month') {
-                        newDate.setMonth(newDate.getMonth() - 1)
-                      } else if (calendarView === 'week') {
-                        newDate.setDate(newDate.getDate() - 7)
+                      const newDate = new Date(currentDate);
+                      if (calendarView === "month") {
+                        newDate.setMonth(newDate.getMonth() - 1);
+                      } else if (calendarView === "week") {
+                        newDate.setDate(newDate.getDate() - 7);
                       } else {
-                        newDate.setDate(newDate.getDate() - 1)
+                        newDate.setDate(newDate.getDate() - 1);
                       }
-                      setCurrentDate(newDate)
+                      setCurrentDate(newDate);
                     }}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -2508,24 +2497,24 @@ export default function TeacherDashboard() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      const newDate = new Date(currentDate)
-                      if (calendarView === 'month') {
-                        newDate.setMonth(newDate.getMonth() + 1)
-                      } else if (calendarView === 'week') {
-                        newDate.setDate(newDate.getDate() + 7)
+                      const newDate = new Date(currentDate);
+                      if (calendarView === "month") {
+                        newDate.setMonth(newDate.getMonth() + 1);
+                      } else if (calendarView === "week") {
+                        newDate.setDate(newDate.getDate() + 7);
                       } else {
-                        newDate.setDate(newDate.getDate() + 1)
+                        newDate.setDate(newDate.getDate() + 1);
                       }
-                      setCurrentDate(newDate)
+                      setCurrentDate(newDate);
                     }}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                   <h3 className="text-lg font-semibold">
-                    {currentDate.toLocaleDateString('en-US', {
-                      month: 'long',
-                      year: 'numeric',
-                      ...(calendarView !== 'month' && { day: 'numeric' }),
+                    {currentDate.toLocaleDateString("en-US", {
+                      month: "long",
+                      year: "numeric",
+                      ...(calendarView !== "month" && { day: "numeric" }),
                     })}
                   </h3>
                 </div>
@@ -2534,30 +2523,28 @@ export default function TeacherDashboard() {
                   size="sm"
                   onClick={() => setCurrentDate(new Date())}
                 >
-                  {t('scheduleToday')}
+                  Today
                 </Button>
               </div>
 
               <div className="flex items-center gap-3">
                 <div className="flex border rounded-lg p-1">
-                  {(['month', 'week', 'day'] as const).map((view) => (
+                  {(["month", "week", "day"] as const).map((view) => (
                     <Button
                       key={view}
-                      variant={calendarView === view ? 'default' : 'ghost'}
+                      variant={calendarView === view ? "default" : "ghost"}
                       size="sm"
                       onClick={() => setCalendarView(view)}
                       className="capitalize"
                     >
-                      {t(
-                        `schedule${view.charAt(0).toUpperCase() + view.slice(1)}`
-                      )}
+                      {view}
                     </Button>
                   ))}
                 </div>
 
                 <Button variant="outline" size="sm">
                   <Printer className="h-4 w-4 mr-2" />
-                  {t('schedulePrint')}
+                  Print
                 </Button>
               </div>
             </div>
@@ -2565,53 +2552,47 @@ export default function TeacherDashboard() {
         </Card>
 
         {/* Calendar Display */}
-        {calendarView === 'month' && (
+        {calendarView === "month" && (
           <Card>
             <CardContent className="p-0">
               {/* Calendar Header */}
               <div className="grid grid-cols-7 border-b">
-                {[
-                  t('scheduleSun'),
-                  t('scheduleMon'),
-                  t('scheduleTue'),
-                  t('scheduleWed'),
-                  t('scheduleThu'),
-                  t('scheduleFri'),
-                  t('scheduleSat'),
-                ].map((day) => (
-                  <div
-                    key={day}
-                    className="p-4 text-center font-medium text-gray-600 bg-gray-50"
-                  >
-                    {day}
-                  </div>
-                ))}
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                  (day) => (
+                    <div
+                      key={day}
+                      className="p-4 text-center font-medium text-gray-600 bg-gray-50"
+                    >
+                      {day}
+                    </div>
+                  ),
+                )}
               </div>
 
               {/* Calendar Body */}
               <div className="grid grid-cols-7">
                 {daysInMonth.map((day, index) => {
                   const isToday =
-                    day && day.toDateString() === today.toDateString()
+                    day && day.toDateString() === today.toDateString();
                   const dayBookings = day
                     ? mockBookings.filter(
                         (booking) =>
-                          booking.date === day.toISOString().split('T')[0]
+                          booking.date === day.toISOString().split("T")[0],
                       )
-                    : []
+                    : [];
 
                   return (
                     <div
                       key={index}
                       className={`min-h-[120px] border-r border-b p-2 ${
-                        !day ? 'bg-gray-50' : 'hover:bg-gray-50 cursor-pointer'
-                      } ${isToday ? 'bg-blue-50 border-blue-200' : ''}`}
+                        !day ? "bg-gray-50" : "hover:bg-gray-50 cursor-pointer"
+                      } ${isToday ? "bg-blue-50 border-blue-200" : ""}`}
                     >
                       {day && (
                         <>
                           <div
                             className={`text-sm font-medium mb-2 ${
-                              isToday ? 'text-blue-600' : 'text-gray-900'
+                              isToday ? "text-blue-600" : "text-gray-900"
                             }`}
                           >
                             {day.getDate()}
@@ -2621,11 +2602,11 @@ export default function TeacherDashboard() {
                               <div
                                 key={booking.id}
                                 className={`text-xs p-1 rounded truncate ${
-                                  booking.status === 'confirmed'
-                                    ? 'bg-green-100 text-green-800'
-                                    : booking.status === 'pending'
-                                      ? 'bg-yellow-100 text-yellow-800'
-                                      : 'bg-red-100 text-red-800'
+                                  booking.status === "confirmed"
+                                    ? "bg-green-100 text-green-800"
+                                    : booking.status === "pending"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-red-100 text-red-800"
                                 }`}
                               >
                                 {booking.time} - {booking.student.name}
@@ -2633,14 +2614,14 @@ export default function TeacherDashboard() {
                             ))}
                             {dayBookings.length > 3 && (
                               <div className="text-xs text-gray-500 font-medium">
-                                +{dayBookings.length - 3} {t('scheduleMore')}
+                                +{dayBookings.length - 3} more
                               </div>
                             )}
                           </div>
                         </>
                       )}
                     </div>
-                  )
+                  );
                 })}
               </div>
             </CardContent>
@@ -2648,7 +2629,7 @@ export default function TeacherDashboard() {
         )}
 
         {/* Day/Week View */}
-        {(calendarView === 'day' || calendarView === 'week') && (
+        {(calendarView === "day" || calendarView === "week") && (
           <Card>
             <CardContent className="p-0">
               <div className="flex">
@@ -2679,23 +2660,23 @@ export default function TeacherDashboard() {
                     {timeSlots
                       .filter((_, index) => index % 2 === 0)
                       .map((time, index) => {
-                        const booking = getBookingForSlot(currentDate, time)
+                        const booking = getBookingForSlot(currentDate, time);
                         const isAvailable = isTimeSlotAvailable(
                           currentDate,
-                          time
-                        )
+                          time,
+                        );
 
                         return (
                           <div
                             key={time}
                             className={`h-16 border-b flex items-center px-4 cursor-pointer ${
                               booking
-                                ? booking.status === 'confirmed'
-                                  ? 'bg-blue-100 hover:bg-blue-200'
-                                  : 'bg-yellow-100 hover:bg-yellow-200'
+                                ? booking.status === "confirmed"
+                                  ? "bg-blue-100 hover:bg-blue-200"
+                                  : "bg-yellow-100 hover:bg-yellow-200"
                                 : isAvailable
-                                  ? 'hover:bg-green-50'
-                                  : 'bg-gray-50'
+                                  ? "hover:bg-green-50"
+                                  : "bg-gray-50"
                             }`}
                           >
                             {booking ? (
@@ -2708,26 +2689,26 @@ export default function TeacherDashboard() {
                                 </div>
                                 <Badge
                                   variant={
-                                    booking.status === 'confirmed'
-                                      ? 'default'
-                                      : 'secondary'
+                                    booking.status === "confirmed"
+                                      ? "default"
+                                      : "secondary"
                                   }
                                   className="text-xs"
                                 >
-                                  {t(booking.status)}
+                                  {booking.status}
                                 </Badge>
                               </div>
                             ) : isAvailable ? (
                               <div className="text-sm text-gray-500">
-                                {t('scheduleAvailable')}
+                                Available
                               </div>
                             ) : (
                               <div className="text-sm text-gray-400">
-                                {t('scheduleUnavailable')}
+                                Unavailable
                               </div>
                             )}
                           </div>
-                        )
+                        );
                       })}
                   </div>
                 </div>
@@ -2742,16 +2723,16 @@ export default function TeacherDashboard() {
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                {t('scheduleCurrentBookings')}
+                Current Bookings
               </span>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm">
                   <Filter className="h-4 w-4 mr-2" />
-                  {t('scheduleFilter')}
+                  Filter
                 </Button>
                 <Button variant="outline" size="sm">
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  {t('scheduleRefresh')}
+                  Refresh
                 </Button>
               </div>
             </CardTitle>
@@ -2769,9 +2750,9 @@ export default function TeacherDashboard() {
                         />
                         <AvatarFallback>
                           {booking.student.name
-                            .split(' ')
+                            .split(" ")
                             .map((n) => n[0])
-                            .join('')}
+                            .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
@@ -2800,30 +2781,30 @@ export default function TeacherDashboard() {
                     <div className="flex items-center gap-3">
                       <Badge
                         className={`${
-                          booking.status === 'confirmed'
-                            ? 'bg-green-100 text-green-800'
-                            : booking.status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
+                          booking.status === "confirmed"
+                            ? "bg-green-100 text-green-800"
+                            : booking.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {t(booking.status)}
+                        {booking.status}
                       </Badge>
 
-                      {booking.status === 'pending' && (
+                      {booking.status === "pending" && (
                         <div className="flex gap-2">
                           <Button size="sm" variant="outline">
                             <X className="h-4 w-4 mr-1" />
-                            {t('scheduleDecline')}
+                            Decline
                           </Button>
                           <Button size="sm">
                             <Check className="h-4 w-4 mr-1" />
-                            {t('scheduleAccept')}
+                            Accept
                           </Button>
                         </div>
                       )}
 
-                      {booking.status === 'confirmed' && (
+                      {booking.status === "confirmed" && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">
@@ -2833,19 +2814,19 @@ export default function TeacherDashboard() {
                           <DropdownMenuContent>
                             <DropdownMenuItem>
                               <Phone className="h-4 w-4 mr-2" />
-                              {t('scheduleCallStudent')}
+                              Call Student
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                               <MessageCircle className="h-4 w-4 mr-2" />
-                              {t('scheduleSendMessage')}
+                              Send Message
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                               <Calendar className="h-4 w-4 mr-2" />
-                              {t('scheduleReschedule')}
+                              Reschedule
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-600">
                               <X className="h-4 w-4 mr-2" />
-                              {t('cancel')}
+                              Cancel
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -2864,12 +2845,12 @@ export default function TeacherDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5" />
-                {t('schedulePerformance')}
+                Schedule Performance
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t('schedulePeakHours')}</span>
+                <span className="text-gray-600">Peak Hours</span>
                 <div className="flex gap-2">
                   {scheduleAnalytics.peakHours.map((hour) => (
                     <Badge key={hour} variant="outline">
@@ -2879,25 +2860,19 @@ export default function TeacherDashboard() {
                 </div>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">
-                  {t('scheduleAvgBookingAdvance')}
-                </span>
+                <span className="text-gray-600">Avg Booking Advance</span>
                 <span className="font-semibold">
                   {scheduleAnalytics.avgBookingAdvance}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">
-                  {t('scheduleUtilizationRate')}
-                </span>
+                <span className="text-gray-600">Utilization Rate</span>
                 <span className="font-semibold text-green-600">
                   {scheduleAnalytics.utilizationRate}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">
-                  {t('schedulePopularTimeSlots')}
-                </span>
+                <span className="text-gray-600">Popular Time Slots</span>
                 <div className="flex gap-1">
                   {scheduleAnalytics.popularTimeSlots
                     .slice(0, 3)
@@ -2915,31 +2890,29 @@ export default function TeacherDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Settings className="h-5 w-5" />
-                {t('scheduleQuickSettings')}
+                Quick Settings
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium">
-                    {t('scheduleAutoApproveBookings')}
-                  </div>
+                  <div className="font-medium">Auto-approve bookings</div>
                   <div className="text-sm text-gray-600">
-                    {t('scheduleAutoApproveRegularStudents')}
+                    Automatically accept bookings from regular students
                   </div>
                 </div>
                 <Button
-                  variant={autoApproval ? 'default' : 'outline'}
+                  variant={autoApproval ? "default" : "outline"}
                   size="sm"
                   onClick={() => setAutoApproval(!autoApproval)}
                 >
-                  {autoApproval ? t('scheduleOn') : t('scheduleOff')}
+                  {autoApproval ? "On" : "Off"}
                 </Button>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  {t('scheduleMinAdvanceBooking')}
+                  Minimum advance booking
                 </label>
                 <select
                   value={minAdvanceBooking}
@@ -2955,7 +2928,7 @@ export default function TeacherDashboard() {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  {t('scheduleBufferTimeBetweenLessons')}
+                  Buffer time between lessons
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -2968,7 +2941,7 @@ export default function TeacherDashboard() {
                     className="flex-1"
                   />
                   <span className="text-sm font-medium w-12">
-                    {bufferTime} {t('scheduleMin')}
+                    {bufferTime} min
                   </span>
                 </div>
               </div>
@@ -2982,7 +2955,7 @@ export default function TeacherDashboard() {
             <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold">
-                  {t('scheduleSetWeeklyAvailability')}
+                  Set Weekly Availability
                 </h2>
                 <Button
                   variant="outline"
@@ -3008,7 +2981,7 @@ export default function TeacherDashboard() {
                                 ...prev[day as keyof typeof prev],
                                 enabled: e.target.checked,
                               },
-                            }))
+                            }));
                           }}
                           className="w-4 h-4"
                         />
@@ -3020,7 +2993,7 @@ export default function TeacherDashboard() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            {t('scheduleStartTime')}
+                            Start Time
                           </label>
                           <input
                             type="time"
@@ -3032,14 +3005,14 @@ export default function TeacherDashboard() {
                                   ...prev[day as keyof typeof prev],
                                   start: e.target.value,
                                 },
-                              }))
+                              }));
                             }}
                             className="w-full p-2 border rounded-md"
                           />
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            {t('scheduleEndTime')}
+                            End Time
                           </label>
                           <input
                             type="time"
@@ -3051,7 +3024,7 @@ export default function TeacherDashboard() {
                                   ...prev[day as keyof typeof prev],
                                   end: e.target.value,
                                 },
-                              }))
+                              }));
                             }}
                             className="w-full p-2 border rounded-md"
                           />
@@ -3067,11 +3040,11 @@ export default function TeacherDashboard() {
                   variant="outline"
                   onClick={() => setShowAvailabilityModal(false)}
                 >
-                  {t('cancel')}
+                  Cancel
                 </Button>
                 <Button onClick={() => setShowAvailabilityModal(false)}>
                   <Save className="h-4 w-4 mr-2" />
-                  {t('scheduleSaveAvailability')}
+                  Save Availability
                 </Button>
               </div>
             </div>
@@ -3083,9 +3056,7 @@ export default function TeacherDashboard() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">
-                  {t('scheduleSendMessageModal')}
-                </h2>
+                <h2 className="text-lg font-semibold">Send Message</h2>
                 <Button
                   variant="outline"
                   size="sm"
@@ -3104,9 +3075,9 @@ export default function TeacherDashboard() {
                     />
                     <AvatarFallback>
                       {selectedStudent.name
-                        .split(' ')
+                        .split(" ")
                         .map((n: string) => n[0])
-                        .join('')}
+                        .join("")}
                     </AvatarFallback>
                   </Avatar>
                   <div>
@@ -3118,11 +3089,11 @@ export default function TeacherDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('message')}</label>
+                  <label className="text-sm font-medium">Message</label>
                   <textarea
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
-                    placeholder={t('scheduleTypeMessage')}
+                    placeholder="Type your message here..."
                     className="w-full p-3 border rounded-md min-h-[100px] resize-none"
                   />
                 </div>
@@ -3133,16 +3104,16 @@ export default function TeacherDashboard() {
                   variant="outline"
                   onClick={() => setShowMessageModal(false)}
                 >
-                  {t('cancel')}
+                  Cancel
                 </Button>
                 <Button
                   onClick={() => {
-                    setShowMessageModal(false)
-                    setMessageText('')
+                    setShowMessageModal(false);
+                    setMessageText("");
                   }}
                 >
                   <MessageCircle className="h-4 w-4 mr-2" />
-                  {t('scheduleSendMessage')}
+                  Send Message
                 </Button>
               </div>
             </div>
@@ -3154,9 +3125,7 @@ export default function TeacherDashboard() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">
-                  {t('scheduleRescheduleLesson')}
-                </h2>
+                <h2 className="text-lg font-semibold">Reschedule Lesson</h2>
                 <Button
                   variant="outline"
                   size="sm"
@@ -3172,27 +3141,23 @@ export default function TeacherDashboard() {
                     {selectedBooking.student.name}
                   </div>
                   <div className="text-sm text-gray-600">
-                    {t('scheduleCurrent')}:{' '}
-                    {new Date(selectedBooking.date).toLocaleDateString()} at{' '}
+                    Current:{" "}
+                    {new Date(selectedBooking.date).toLocaleDateString()} at{" "}
                     {selectedBooking.time}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('scheduleNewDate')}
-                  </label>
+                  <label className="text-sm font-medium">New Date</label>
                   <input
                     type="date"
                     className="w-full p-2 border rounded-md"
-                    min={new Date().toISOString().split('T')[0]}
+                    min={new Date().toISOString().split("T")[0]}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('scheduleNewTime')}
-                  </label>
+                  <label className="text-sm font-medium">New Time</label>
                   <select className="w-full p-2 border rounded-md">
                     <option value="09:00">09:00 AM</option>
                     <option value="10:00">10:00 AM</option>
@@ -3205,10 +3170,10 @@ export default function TeacherDashboard() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    {t('scheduleReasonOptional')}
+                    Reason (Optional)
                   </label>
                   <textarea
-                    placeholder={t('scheduleRescheduleReason')}
+                    placeholder="Let the student know why you're rescheduling..."
                     className="w-full p-2 border rounded-md min-h-[60px] resize-none"
                   />
                 </div>
@@ -3219,52 +3184,52 @@ export default function TeacherDashboard() {
                   variant="outline"
                   onClick={() => setShowRescheduleModal(false)}
                 >
-                  {t('cancel')}
+                  Cancel
                 </Button>
                 <Button onClick={() => setShowRescheduleModal(false)}>
                   <Calendar className="h-4 w-4 mr-2" />
-                  {t('scheduleConfirmReschedule')}
+                  Confirm Reschedule
                 </Button>
               </div>
             </div>
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   const handleAcceptBooking = (bookingId: number) => {
     // Handle accepting booking
-    console.log('Accepting booking:', bookingId)
-  }
+    console.log("Accepting booking:", bookingId);
+  };
 
   const handleDeclineBooking = (bookingId: number) => {
     // Handle declining booking
-    console.log('Declining booking:', bookingId)
-  }
+    console.log("Declining booking:", bookingId);
+  };
 
-  const handleBulkAction = (action: 'accept' | 'decline') => {
-    console.log(`Bulk ${action} for bookings:`, selectedBookings)
-    setSelectedBookings([])
-  }
+  const handleBulkAction = (action: "accept" | "decline") => {
+    console.log(`Bulk ${action} for bookings:`, selectedBookings);
+    setSelectedBookings([]);
+  };
 
   const renderBookingsManagement = () => {
     const filteredLessons = (() => {
-      let lessons: any[] = []
+      let lessons: any[] = [];
 
       switch (activeBookingTab) {
-        case 'pending':
-          return pendingBookingRequests
-        case 'today':
-          return todaysLessons
-        case 'upcoming':
-          return upcomingLessons
-        case 'history':
-          return completedLessons
+        case "pending":
+          return pendingBookingRequests;
+        case "today":
+          return todaysLessons;
+        case "upcoming":
+          return upcomingLessons;
+        case "history":
+          return completedLessons;
         default:
-          return []
+          return [];
       }
-    })()
+    })();
 
     return (
       <div className="space-y-6">
@@ -3272,22 +3237,24 @@ export default function TeacherDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {t('bookingsAndLessons')}
+              Bookings & Lessons
             </h1>
-            <p className="text-gray-600">{t('manageStudentBookings')}</p>
+            <p className="text-gray-600">
+              Manage student bookings and upcoming lessons
+            </p>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" onClick={() => setShowMessageModal(true)}>
               <MessageCircle className="h-4 w-4 mr-2" />
-              {t('bookingSendMessage')}
+              Send Message
             </Button>
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
-              {t('bookingExportData')}
+              Export Data
             </Button>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
-              {t('bookingManualBooking')}
+              Manual Booking
             </Button>
           </div>
         </div>
@@ -3301,9 +3268,7 @@ export default function TeacherDashboard() {
                   <div className="text-2xl font-bold text-primary">
                     {bookingStats.todayLessons}
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {t('bookingTodaysLessons')}
-                  </div>
+                  <div className="text-sm text-gray-600">Today's Lessons</div>
                 </div>
                 <Sun className="h-8 w-8 text-yellow-500" />
               </div>
@@ -3316,9 +3281,7 @@ export default function TeacherDashboard() {
                   <div className="text-2xl font-bold text-primary">
                     {bookingStats.pendingRequests}
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {t('bookingPendingRequests')}
-                  </div>
+                  <div className="text-sm text-gray-600">Pending Requests</div>
                 </div>
                 <Clock className="h-8 w-8 text-orange-500" />
               </div>
@@ -3331,9 +3294,7 @@ export default function TeacherDashboard() {
                   <div className="text-2xl font-bold text-primary">
                     {(bookingStats.weeklyEarnings / 1000000).toFixed(1)}M
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {t('bookingThisWeek')}
-                  </div>
+                  <div className="text-sm text-gray-600">This Week</div>
                 </div>
                 <DollarSign className="h-8 w-8 text-green-500" />
               </div>
@@ -3346,9 +3307,7 @@ export default function TeacherDashboard() {
                   <div className="text-2xl font-bold text-primary">
                     {bookingStats.acceptanceRate}%
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {t('bookingAcceptanceRate')}
-                  </div>
+                  <div className="text-sm text-gray-600">Acceptance Rate</div>
                 </div>
                 <TrendingUp className="h-8 w-8 text-blue-500" />
               </div>
@@ -3363,23 +3322,23 @@ export default function TeacherDashboard() {
               {(
                 [
                   {
-                    id: 'pending',
-                    label: t('bookingPendingRequestsTab'),
+                    id: "pending",
+                    label: "Pending Requests",
                     count: pendingBookingRequests.length,
                   },
                   {
-                    id: 'today',
-                    label: t('bookingTodaysLessonsTab'),
+                    id: "today",
+                    label: "Today's Lessons",
                     count: todaysLessons.length,
                   },
                   {
-                    id: 'upcoming',
-                    label: t('bookingUpcoming'),
+                    id: "upcoming",
+                    label: "Upcoming",
                     count: upcomingLessons.length,
                   },
                   {
-                    id: 'history',
-                    label: t('bookingHistory'),
+                    id: "history",
+                    label: "History",
                     count: completedLessons.length,
                   },
                 ] as const
@@ -3389,8 +3348,8 @@ export default function TeacherDashboard() {
                   onClick={() => setActiveBookingTab(tab.id)}
                   className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
                     activeBookingTab === tab.id
-                      ? 'border-b-2 border-primary text-primary bg-primary/5'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? "border-b-2 border-primary text-primary bg-primary/5"
+                      : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
                   {tab.label}
@@ -3411,7 +3370,7 @@ export default function TeacherDashboard() {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
                       type="text"
-                      placeholder={t('bookingSearchPlaceholder')}
+                      placeholder="Search students, subjects, or notes..."
                       value={searchFilter}
                       onChange={(e) => setSearchFilter(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border rounded-md"
@@ -3423,15 +3382,15 @@ export default function TeacherDashboard() {
                   onChange={(e) => setStatusFilter(e.target.value as any)}
                   className="p-2 border rounded-md"
                 >
-                  <option value="all">{t('bookingAllStatus')}</option>
-                  <option value="confirmed">{t('bookingConfirmed')}</option>
-                  <option value="pending">{t('bookingPending')}</option>
-                  <option value="cancelled">{t('bookingCancelled')}</option>
-                  <option value="completed">{t('bookingCompleted')}</option>
+                  <option value="all">All Status</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="pending">Pending</option>
+                  <option value="cancelled">Cancelled</option>
+                  <option value="completed">Completed</option>
                 </select>
                 <Button variant="outline" size="sm">
                   <Filter className="h-4 w-4 mr-2" />
-                  {t('bookingMoreFilters')}
+                  More Filters
                 </Button>
               </div>
 
@@ -3439,24 +3398,24 @@ export default function TeacherDashboard() {
               {selectedBookings.length > 0 && (
                 <div className="flex items-center gap-3 mt-3 p-3 bg-blue-50 rounded-lg">
                   <span className="text-sm font-medium">
-                    {selectedBookings.length} {t('bookingSelectedCount')}
+                    {selectedBookings.length} selected
                   </span>
-                  {activeBookingTab === 'pending' && (
+                  {activeBookingTab === "pending" && (
                     <>
                       <Button
                         size="sm"
-                        onClick={() => handleBulkAction('accept')}
+                        onClick={() => handleBulkAction("accept")}
                       >
                         <Check className="h-4 w-4 mr-1" />
-                        {t('bookingAcceptAll')}
+                        Accept All
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleBulkAction('decline')}
+                        onClick={() => handleBulkAction("decline")}
                       >
                         <X className="h-4 w-4 mr-1" />
-                        {t('bookingDeclineAll')}
+                        Decline All
                       </Button>
                     </>
                   )}
@@ -3465,7 +3424,7 @@ export default function TeacherDashboard() {
                     variant="outline"
                     onClick={() => setSelectedBookings([])}
                   >
-                    {t('bookingClearSelection')}
+                    Clear Selection
                   </Button>
                 </div>
               )}
@@ -3475,7 +3434,7 @@ export default function TeacherDashboard() {
 
         {/* Content Based on Active Tab */}
         <div className="space-y-4">
-          {activeBookingTab === 'pending' && (
+          {activeBookingTab === "pending" && (
             <div className="space-y-4">
               {pendingBookingRequests.map((request) => (
                 <Card key={request.id}>
@@ -3490,13 +3449,13 @@ export default function TeacherDashboard() {
                               setSelectedBookings([
                                 ...selectedBookings,
                                 request.id,
-                              ])
+                              ]);
                             } else {
                               setSelectedBookings(
                                 selectedBookings.filter(
-                                  (id) => id !== request.id
-                                )
-                              )
+                                  (id) => id !== request.id,
+                                ),
+                              );
                             }
                           }}
                           className="mt-1"
@@ -3508,9 +3467,9 @@ export default function TeacherDashboard() {
                           />
                           <AvatarFallback>
                             {request.student.name
-                              .split(' ')
+                              .split(" ")
                               .map((n) => n[0])
-                              .join('')}
+                              .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
@@ -3519,8 +3478,7 @@ export default function TeacherDashboard() {
                               {request.student.name}
                             </h3>
                             <Badge variant="outline">
-                              {request.student.totalLessons}{' '}
-                              {t('bookingLessonsCount')}
+                              {request.student.totalLessons} lessons
                             </Badge>
                             <div className="flex items-center gap-1">
                               <Star className="h-4 w-4 text-yellow-500 fill-current" />
@@ -3533,18 +3491,18 @@ export default function TeacherDashboard() {
                           <div className="grid grid-cols-2 gap-4 mb-3">
                             <div className="space-y-1">
                               <div className="text-sm text-gray-600">
-                                {t('bookingRequestedDateTime')}
+                                Requested Date & Time
                               </div>
                               <div className="font-medium">
                                 {new Date(
-                                  request.requestedDate
-                                ).toLocaleDateString()}{' '}
+                                  request.requestedDate,
+                                ).toLocaleDateString()}{" "}
                                 at {request.requestedTime}
                               </div>
                             </div>
                             <div className="space-y-1">
                               <div className="text-sm text-gray-600">
-                                {t('bookingSubjectDuration')}
+                                Subject & Duration
                               </div>
                               <div className="font-medium">
                                 {request.subject} ({request.duration} min)
@@ -3554,7 +3512,7 @@ export default function TeacherDashboard() {
 
                           <div className="space-y-2 mb-3">
                             <div className="text-sm text-gray-600">
-                              {t('bookingMessageFromStudent')}
+                              Message from student:
                             </div>
                             <div className="text-sm bg-gray-50 p-3 rounded-lg">
                               {request.message}
@@ -3564,7 +3522,7 @@ export default function TeacherDashboard() {
                           {request.specialRequirements && (
                             <div className="space-y-1 mb-3">
                               <div className="text-sm text-gray-600">
-                                {t('bookingSpecialRequirements')}
+                                Special Requirements:
                               </div>
                               <Badge variant="secondary">
                                 {request.specialRequirements}
@@ -3575,7 +3533,7 @@ export default function TeacherDashboard() {
                           <div className="flex items-center gap-4 text-sm text-gray-600">
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {t('bookingRequested')}{' '}
+                              Requested{" "}
                               {new Date(request.requestedAt).toLocaleString()}
                             </span>
                             <span className="flex items-center gap-1">
@@ -3585,13 +3543,13 @@ export default function TeacherDashboard() {
                             <span className="flex items-center gap-1">
                               {request.paymentConfirmed ? (
                                 <>
-                                  <CheckCircle className="h-3 w-3 text-green-500" />{' '}
-                                  {t('bookingPaymentConfirmed')}
+                                  <CheckCircle className="h-3 w-3 text-green-500" />{" "}
+                                  Payment Confirmed
                                 </>
                               ) : (
                                 <>
-                                  <AlertTriangle className="h-3 w-3 text-yellow-500" />{' '}
-                                  {t('bookingPaymentPending')}
+                                  <AlertTriangle className="h-3 w-3 text-yellow-500" />{" "}
+                                  Payment Pending
                                 </>
                               )}
                             </span>
@@ -3604,8 +3562,8 @@ export default function TeacherDashboard() {
                           size="sm"
                           variant="outline"
                           onClick={() => {
-                            setSelectedStudent(request.student)
-                            setShowMessageModal(true)
+                            setSelectedStudent(request.student);
+                            setShowMessageModal(true);
                           }}
                         >
                           <MessageCircle className="h-4 w-4" />
@@ -3616,14 +3574,14 @@ export default function TeacherDashboard() {
                           onClick={() => handleDeclineBooking(request.id)}
                         >
                           <X className="h-4 w-4 mr-1" />
-                          {t('bookingDecline')}
+                          Decline
                         </Button>
                         <Button
                           size="sm"
                           onClick={() => handleAcceptBooking(request.id)}
                         >
                           <Check className="h-4 w-4 mr-1" />
-                          {t('bookingAccept')}
+                          Accept
                         </Button>
                       </div>
                     </div>
@@ -3633,7 +3591,7 @@ export default function TeacherDashboard() {
             </div>
           )}
 
-          {activeBookingTab === 'today' && (
+          {activeBookingTab === "today" && (
             <div className="space-y-4">
               {todaysLessons.length > 0 ? (
                 todaysLessons.map((lesson) => (
@@ -3648,9 +3606,9 @@ export default function TeacherDashboard() {
                             />
                             <AvatarFallback>
                               {lesson.student.name
-                                .split(' ')
+                                .split(" ")
                                 .map((n) => n[0])
-                                .join('')}
+                                .join("")}
                             </AvatarFallback>
                           </Avatar>
                           <div>
@@ -3674,15 +3632,15 @@ export default function TeacherDashboard() {
                         <div className="flex items-center gap-3">
                           <Button variant="outline" size="sm">
                             <Phone className="h-4 w-4 mr-2" />
-                            {t('bookingCall')}
+                            Call
                           </Button>
                           <Button variant="outline" size="sm">
                             <MessageCircle className="h-4 w-4 mr-2" />
-                            {t('bookingMessage')}
+                            Message
                           </Button>
                           <Button size="sm">
                             <Video className="h-4 w-4 mr-2" />
-                            {t('bookingStartLesson')}
+                            Start Lesson
                           </Button>
                         </div>
                       </div>
@@ -3694,16 +3652,18 @@ export default function TeacherDashboard() {
                   <CardContent className="p-12 text-center">
                     <Sun className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {t('bookingNoLessonsToday')}
+                      No lessons today
                     </h3>
-                    <p className="text-gray-600">{t('bookingEnjoyFreeDay')}</p>
+                    <p className="text-gray-600">
+                      Enjoy your free day or set your availability for tomorrow!
+                    </p>
                   </CardContent>
                 </Card>
               )}
             </div>
           )}
 
-          {activeBookingTab === 'upcoming' && (
+          {activeBookingTab === "upcoming" && (
             <div className="space-y-4">
               {upcomingLessons.map((lesson) => (
                 <Card key={lesson.id}>
@@ -3717,9 +3677,9 @@ export default function TeacherDashboard() {
                           />
                           <AvatarFallback>
                             {lesson.student.name
-                              .split(' ')
+                              .split(" ")
                               .map((n) => n[0])
-                              .join('')}
+                              .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div>
@@ -3752,8 +3712,8 @@ export default function TeacherDashboard() {
                           <DropdownMenuContent>
                             <DropdownMenuItem
                               onClick={() => {
-                                setSelectedStudent(lesson.student)
-                                setShowMessageModal(true)
+                                setSelectedStudent(lesson.student);
+                                setShowMessageModal(true);
                               }}
                             >
                               <MessageCircle className="h-4 w-4 mr-2" />
@@ -3761,8 +3721,8 @@ export default function TeacherDashboard() {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
-                                setSelectedBooking(lesson)
-                                setShowRescheduleModal(true)
+                                setSelectedBooking(lesson);
+                                setShowRescheduleModal(true);
                               }}
                             >
                               <Calendar className="h-4 w-4 mr-2" />
@@ -3770,7 +3730,7 @@ export default function TeacherDashboard() {
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-600">
                               <X className="h-4 w-4 mr-2" />
-                              {t('bookingCancelLesson')}
+                              Cancel Lesson
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -3782,7 +3742,7 @@ export default function TeacherDashboard() {
             </div>
           )}
 
-          {activeBookingTab === 'history' && (
+          {activeBookingTab === "history" && (
             <div className="space-y-4">
               {completedLessons.map((lesson) => (
                 <Card key={lesson.id}>
@@ -3796,9 +3756,9 @@ export default function TeacherDashboard() {
                           />
                           <AvatarFallback>
                             {lesson.student.name
-                              .split(' ')
+                              .split(" ")
                               .map((n) => n[0])
-                              .join('')}
+                              .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
@@ -3812,8 +3772,8 @@ export default function TeacherDashboard() {
                                   key={i}
                                   className={`h-4 w-4 ${
                                     i < lesson.studentRating
-                                      ? 'text-yellow-500 fill-current'
-                                      : 'text-gray-300'
+                                      ? "text-yellow-500 fill-current"
+                                      : "text-gray-300"
                                   }`}
                                 />
                               ))}
@@ -3823,16 +3783,16 @@ export default function TeacherDashboard() {
                           <div className="grid grid-cols-3 gap-4 mb-3">
                             <div className="space-y-1">
                               <div className="text-sm text-gray-600">
-                                {t('bookingDateTime')}
+                                Date & Time
                               </div>
                               <div className="text-sm font-medium">
-                                {new Date(lesson.date).toLocaleDateString()} at{' '}
+                                {new Date(lesson.date).toLocaleDateString()} at{" "}
                                 {lesson.time}
                               </div>
                             </div>
                             <div className="space-y-1">
                               <div className="text-sm text-gray-600">
-                                {t('bookingSubject')}
+                                Subject
                               </div>
                               <div className="text-sm font-medium">
                                 {lesson.subject}
@@ -3840,7 +3800,7 @@ export default function TeacherDashboard() {
                             </div>
                             <div className="space-y-1">
                               <div className="text-sm text-gray-600">
-                                {t('bookingEarnings')}
+                                Earnings
                               </div>
                               <div className="text-sm font-medium text-green-600">
                                 {lesson.earnings.toLocaleString()} UZS
@@ -3851,7 +3811,7 @@ export default function TeacherDashboard() {
                           <div className="space-y-2">
                             <div>
                               <div className="text-sm text-gray-600 mb-1">
-                                {t('bookingStudentFeedback')}
+                                Student Feedback:
                               </div>
                               <div className="text-sm bg-blue-50 p-3 rounded-lg">
                                 {lesson.studentFeedback}
@@ -3861,7 +3821,7 @@ export default function TeacherDashboard() {
                             {lesson.teacherNotes && (
                               <div>
                                 <div className="text-sm text-gray-600 mb-1">
-                                  {t('bookingYourNotes')}
+                                  Your Notes:
                                 </div>
                                 <div className="text-sm bg-gray-50 p-3 rounded-lg">
                                   {lesson.teacherNotes}
@@ -3875,18 +3835,16 @@ export default function TeacherDashboard() {
                       <div className="flex flex-col items-end gap-2">
                         <Badge
                           className={`${
-                            lesson.paymentStatus === 'paid'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-yellow-100 text-yellow-800'
+                            lesson.paymentStatus === "paid"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
                           }`}
                         >
-                          {t(
-                            `booking${lesson.paymentStatus.charAt(0).toUpperCase() + lesson.paymentStatus.slice(1)}`
-                          )}
+                          {lesson.paymentStatus}
                         </Badge>
                         <Button variant="outline" size="sm">
                           <Download className="h-4 w-4 mr-2" />
-                          {t('bookingExport')}
+                          Export
                         </Button>
                       </div>
                     </div>
@@ -3903,10 +3861,10 @@ export default function TeacherDashboard() {
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <MessageCircle className="h-5 w-5" />
-                {t('bookingRecentMessages')}
+                Recent Messages
               </span>
               <Button variant="outline" size="sm">
-                {t('bookingViewAllMessages')}
+                View All Messages
               </Button>
             </CardTitle>
           </CardHeader>
@@ -3924,9 +3882,9 @@ export default function TeacherDashboard() {
                     />
                     <AvatarFallback>
                       {message.student.name
-                        .split(' ')
+                        .split(" ")
                         .map((n) => n[0])
-                        .join('')}
+                        .join("")}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
@@ -3944,7 +3902,7 @@ export default function TeacherDashboard() {
                     <p className="text-sm text-gray-600">{message.message}</p>
                   </div>
                   <Button variant="outline" size="sm">
-                    {t('bookingReply')}
+                    Reply
                   </Button>
                 </div>
               ))}
@@ -3958,36 +3916,30 @@ export default function TeacherDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5" />
-                {t('bookingPerformanceMetrics')}
+                Performance Metrics
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-gray-600">
-                  {t('bookingAcceptanceRate')}
-                </span>
+                <span className="text-gray-600">Acceptance Rate</span>
                 <span className="font-semibold text-green-600">
                   {bookingStats.acceptanceRate}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">{t('bookingNoShowRate')}</span>
+                <span className="text-gray-600">No-Show Rate</span>
                 <span className="font-semibold">
                   {bookingStats.noShowRate}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">
-                  {t('bookingCompletionRate')}
-                </span>
+                <span className="text-gray-600">Completion Rate</span>
                 <span className="font-semibold text-green-600">
                   {bookingStats.completionRate}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">
-                  {t('bookingAverageRating')}
-                </span>
+                <span className="text-gray-600">Average Rating</span>
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-yellow-500 fill-current" />
                   <span className="font-semibold">
@@ -4002,34 +3954,28 @@ export default function TeacherDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <PieChart className="h-5 w-5" />
-                {t('bookingMonthlyOverview')}
+                Monthly Overview
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-gray-600">
-                  {t('bookingTotalLessons')}
-                </span>
+                <span className="text-gray-600">Total Lessons</span>
                 <span className="font-semibold">
                   {bookingStats.monthlyLessons}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">
-                  {t('bookingActiveStudents')}
-                </span>
+                <span className="text-gray-600">Active Students</span>
                 <span className="font-semibold">
                   {bookingStats.totalStudents}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">{t('bookingNewBookings')}</span>
+                <span className="text-gray-600">New Bookings</span>
                 <span className="font-semibold text-blue-600">+15</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">
-                  {t('bookingTotalEarnings')}
-                </span>
+                <span className="text-gray-600">Total Earnings</span>
                 <span className="font-semibold text-green-600">
                   {((bookingStats.weeklyEarnings * 4) / 1000000).toFixed(1)}M
                   UZS
@@ -4039,13 +3985,13 @@ export default function TeacherDashboard() {
           </Card>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderEarningsManagement = () => {
     const filteredPayments = paymentHistory.filter(
-      (payment) => paymentFilter === 'all' || payment.status === paymentFilter
-    )
+      (payment) => paymentFilter === "all" || payment.status === paymentFilter,
+    );
 
     return (
       <div className="space-y-6">
@@ -4053,22 +3999,24 @@ export default function TeacherDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {t('earningsPaymentsTitle')}
+              Earnings & Payments
             </h1>
-            <p className="text-gray-600">{t('trackEarningsPaymentHistory')}</p>
+            <p className="text-gray-600">
+              Track your earnings and payment history
+            </p>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" onClick={() => setShowTaxModal(true)}>
               <FileText className="h-4 w-4 mr-2" />
-              {t('taxDocuments')}
+              Tax Documents
             </Button>
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
-              {t('exportData')}
+              Export Data
             </Button>
             <Button onClick={() => setShowPayoutModal(true)}>
               <Wallet className="h-4 w-4 mr-2" />
-              {t('requestPayout')}
+              Request Payout
             </Button>
           </div>
         </div>
@@ -4080,14 +4028,14 @@ export default function TeacherDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-gray-600 mb-1">
-                    {t('totalLifetimeEarnings')}
+                    Total Lifetime Earnings
                   </div>
                   <div className="text-2xl font-bold text-primary">
                     {(earningsData.totalLifetime / 1000000).toFixed(1)}M UZS
                   </div>
                   <div className="flex items-center text-sm text-green-600 mt-1">
                     <TrendingUp className="h-3 w-3 mr-1" />
-                    {t('overallGrowth')}
+                    Overall growth
                   </div>
                 </div>
                 <Coins className="h-10 w-10 text-primary opacity-20" />
@@ -4099,15 +4047,13 @@ export default function TeacherDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">
-                    {t('thisMonth')}
-                  </div>
+                  <div className="text-sm text-gray-600 mb-1">This Month</div>
                   <div className="text-2xl font-bold text-primary">
                     {(earningsData.thisMonth / 1000000).toFixed(1)}M UZS
                   </div>
                   <div className="flex items-center text-sm text-green-600 mt-1">
                     <ArrowUpRight className="h-3 w-3 mr-1" />+{monthlyGrowth}%
-                    {t('vsLastMonth')}
+                    vs last month
                   </div>
                 </div>
                 <BarChart3 className="h-10 w-10 text-green-500 opacity-20" />
@@ -4120,13 +4066,13 @@ export default function TeacherDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-gray-600 mb-1">
-                    {t('pendingPayments')}
+                    Pending Payments
                   </div>
                   <div className="text-2xl font-bold text-primary">
                     {(earningsData.pendingPayments / 1000).toFixed(0)}K UZS
                   </div>
                   <div className="text-sm text-gray-500 mt-1">
-                    {t('availableForPayout')}
+                    Available for payout
                   </div>
                 </div>
                 <Clock className="h-10 w-10 text-orange-500 opacity-20" />
@@ -4138,15 +4084,13 @@ export default function TeacherDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">
-                    {t('nextPayout')}
-                  </div>
+                  <div className="text-sm text-gray-600 mb-1">Next Payout</div>
                   <div className="text-2xl font-bold text-primary">
                     {new Date(earningsData.nextPayoutDate).toLocaleDateString()}
                   </div>
                   <div className="text-sm text-gray-500 mt-1">
                     {(earningsData.nextPayoutAmount / 1000000).toFixed(1)}M UZS
-                    {t('expected')}
+                    expected
                   </div>
                 </div>
                 <CalendarIcon className="h-10 w-10 text-blue-500 opacity-20" />
@@ -4162,20 +4106,20 @@ export default function TeacherDashboard() {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <ChartLine className="h-5 w-5" />
-                  {t('earningsTrend')}
+                  Earnings Trend
                 </CardTitle>
                 <div className="flex border rounded-lg p-1">
-                  {(['week', 'month', 'year'] as const).map((period) => (
+                  {(["week", "month", "year"] as const).map((period) => (
                     <Button
                       key={period}
                       variant={
-                        earningsTimeframe === period ? 'default' : 'ghost'
+                        earningsTimeframe === period ? "default" : "ghost"
                       }
                       size="sm"
                       onClick={() => setEarningsTimeframe(period)}
                       className="capitalize"
                     >
-                      {t(period)}
+                      {period}
                     </Button>
                   ))}
                 </div>
@@ -4188,9 +4132,9 @@ export default function TeacherDashboard() {
                     const height =
                       (data.amount /
                         Math.max(
-                          ...earningsData.monthlyTrend.map((d) => d.amount)
+                          ...earningsData.monthlyTrend.map((d) => d.amount),
                         )) *
-                      100
+                      100;
                     return (
                       <div
                         key={data.month}
@@ -4201,13 +4145,13 @@ export default function TeacherDashboard() {
                         </div>
                         <div
                           className="w-full bg-primary rounded-t transition-all duration-500 hover:bg-primary/80"
-                          style={{ height: `${height}%`, minHeight: '20px' }}
+                          style={{ height: `${height}%`, minHeight: "20px" }}
                         ></div>
                         <div className="text-xs font-medium mt-2">
                           {data.month}
                         </div>
                       </div>
-                    )
+                    );
                   })}
                 </div>
 
@@ -4217,24 +4161,20 @@ export default function TeacherDashboard() {
                       {earningsData.averageHourlyRate.toLocaleString()}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {t('avgHourlyRate')}
+                      Avg. Hourly Rate
                     </div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
                       {earningsData.platformFeeRate}%
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {t('platformFee')}
-                    </div>
+                    <div className="text-sm text-gray-600">Platform Fee</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-600">
                       {goalProgress}%
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {t('goalProgress')}
-                    </div>
+                    <div className="text-sm text-gray-600">Goal Progress</div>
                   </div>
                 </div>
               </div>
@@ -4245,7 +4185,7 @@ export default function TeacherDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <PieChart className="h-5 w-5" />
-                {t('subjectBreakdown')}
+                Subject Breakdown
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -4284,23 +4224,20 @@ export default function TeacherDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5" />
-              {t('monthlyGoalTracking')}
+              Monthly Goal Tracking
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-gray-600">
-                    {t('currentGoal')}
-                  </div>
+                  <div className="text-sm text-gray-600">Current Goal</div>
                   <div className="text-xl font-bold">
-                    {(earningsGoal / 1000000).toFixed(1)}M UZS /{' '}
-                    {t('month').toLowerCase()}
+                    {(earningsGoal / 1000000).toFixed(1)}M UZS / month
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-gray-600">{t('progress')}</div>
+                  <div className="text-sm text-gray-600">Progress</div>
                   <div className="text-xl font-bold text-primary">
                     {goalProgress}%
                   </div>
@@ -4318,13 +4255,12 @@ export default function TeacherDashboard() {
 
               <div className="flex justify-between text-sm text-gray-600">
                 <span>
-                  {t('current')}:{' '}
-                  {(earningsData.thisMonth / 1000000).toFixed(1)}M UZS
+                  Current: {(earningsData.thisMonth / 1000000).toFixed(1)}M UZS
                 </span>
                 <span>
-                  {t('remaining')}:{' '}
+                  Remaining:{" "}
                   {((earningsGoal - earningsData.thisMonth) / 1000000).toFixed(
-                    1
+                    1,
                   )}
                   M UZS
                 </span>
@@ -4339,7 +4275,7 @@ export default function TeacherDashboard() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Receipt className="h-5 w-5" />
-                {t('paymentHistory')}
+                Payment History
               </CardTitle>
               <div className="flex gap-3">
                 <select
@@ -4347,14 +4283,14 @@ export default function TeacherDashboard() {
                   onChange={(e) => setPaymentFilter(e.target.value as any)}
                   className="p-2 border rounded-md text-sm"
                 >
-                  <option value="all">{t('allPayments')}</option>
-                  <option value="completed">{t('completed')}</option>
-                  <option value="pending">{t('pending')}</option>
-                  <option value="failed">{t('failed')}</option>
+                  <option value="all">All Payments</option>
+                  <option value="completed">Completed</option>
+                  <option value="pending">Pending</option>
+                  <option value="failed">Failed</option>
                 </select>
                 <Button variant="outline" size="sm">
                   <Filter className="h-4 w-4 mr-2" />
-                  {t('moreFilters')}
+                  More Filters
                 </Button>
               </div>
             </div>
@@ -4375,9 +4311,9 @@ export default function TeacherDashboard() {
                         />
                         <AvatarFallback>
                           {payment.student.name
-                            .split(' ')
+                            .split(" ")
                             .map((n) => n[0])
-                            .join('')}
+                            .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
@@ -4404,22 +4340,22 @@ export default function TeacherDashboard() {
                             {payment.netAmount.toLocaleString()} UZS
                           </div>
                           <div className="text-xs text-gray-500">
-                            {t('gross')}: {payment.amount.toLocaleString()}
+                            Gross: {payment.amount.toLocaleString()}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {t('fee')}: -{payment.platformFee.toLocaleString()}
+                            Fee: -{payment.platformFee.toLocaleString()}
                           </div>
                         </div>
                         <Badge
                           className={`${
-                            payment.status === 'completed'
-                              ? 'bg-green-100 text-green-800'
-                              : payment.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-red-100 text-red-800'
+                            payment.status === "completed"
+                              ? "bg-green-100 text-green-800"
+                              : payment.status === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-red-100 text-red-800"
                           }`}
                         >
-                          {t(payment.status)}
+                          {payment.status}
                         </Badge>
                       </div>
                     </div>
@@ -4436,7 +4372,7 @@ export default function TeacherDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                {t('topEarningStudents')}
+                Top Earning Students
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -4455,7 +4391,7 @@ export default function TeacherDashboard() {
                       <div>
                         <div className="font-medium">{student.name}</div>
                         <div className="text-sm text-gray-600">
-                          {student.lessons} {t('earningsLessons')}
+                          {student.lessons} lessons
                         </div>
                       </div>
                     </div>
@@ -4474,7 +4410,7 @@ export default function TeacherDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Banknote className="h-5 w-5" />
-                {t('recentPayouts')}
+                Recent Payouts
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -4503,7 +4439,7 @@ export default function TeacherDashboard() {
                         {(payout.amount / 1000000).toFixed(1)}M UZS
                       </div>
                       <Badge className="bg-green-100 text-green-800 text-xs">
-                        {t(payout.status)}
+                        {payout.status}
                       </Badge>
                     </div>
                   </div>
@@ -4518,7 +4454,7 @@ export default function TeacherDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calculator className="h-5 w-5" />
-              {t('financialInsightsTips')}
+              Financial Insights & Tips
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -4526,22 +4462,24 @@ export default function TeacherDashboard() {
               <div className="p-4 bg-blue-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingUp className="h-5 w-5 text-blue-600" />
-                  <span className="font-medium text-blue-900">
-                    {t('growthTip')}
-                  </span>
+                  <span className="font-medium text-blue-900">Growth Tip</span>
                 </div>
-                <p className="text-sm text-blue-700">{t('growthTipMessage')}</p>
+                <p className="text-sm text-blue-700">
+                  Your IELTS lessons earn 23% more than average. Consider
+                  promoting this specialty.
+                </p>
               </div>
 
               <div className="p-4 bg-green-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <PiggyBank className="h-5 w-5 text-green-600" />
                   <span className="font-medium text-green-900">
-                    {t('savingsGoal')}
+                    Savings Goal
                   </span>
                 </div>
                 <p className="text-sm text-green-700">
-                  {t('savingsGoalMessage')}
+                  You're on track to save 25% of earnings this month. Great
+                  financial discipline!
                 </p>
               </div>
 
@@ -4549,11 +4487,12 @@ export default function TeacherDashboard() {
                 <div className="flex items-center gap-2 mb-2">
                   <ShieldCheck className="h-5 w-5 text-purple-600" />
                   <span className="font-medium text-purple-900">
-                    {t('taxReminder')}
+                    Tax Reminder
                   </span>
                 </div>
                 <p className="text-sm text-purple-700">
-                  {t('taxReminderMessage')}
+                  Q1 tax documents will be available March 1st. Set aside 20%
+                  for taxes.
                 </p>
               </div>
             </div>
@@ -4565,7 +4504,7 @@ export default function TeacherDashboard() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">{t('requestPayout')}</h2>
+                <h2 className="text-lg font-semibold">Request Payout</h2>
                 <Button
                   variant="outline"
                   size="sm"
@@ -4578,7 +4517,7 @@ export default function TeacherDashboard() {
               <div className="space-y-4">
                 <div className="p-3 bg-green-50 rounded-lg">
                   <div className="text-sm text-green-600">
-                    {t('availableBalance')}
+                    Available Balance
                   </div>
                   <div className="text-2xl font-bold text-green-700">
                     {earningsData.pendingPayments.toLocaleString()} UZS
@@ -4586,22 +4525,20 @@ export default function TeacherDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('payoutMethod')}
-                  </label>
+                  <label className="text-sm font-medium">Payout Method</label>
                   <select
                     value={selectedPaymentMethod}
                     onChange={(e) => setSelectedPaymentMethod(e.target.value)}
                     className="w-full p-2 border rounded-md"
                   >
-                    <option value="bank">{t('bankTransferFree')}</option>
-                    <option value="paypal">{t('paypalFee')}</option>
-                    <option value="wise">{t('wiseFee')}</option>
+                    <option value="bank">Bank Transfer (Free)</option>
+                    <option value="paypal">PayPal (2% fee)</option>
+                    <option value="wise">Wise (1.5% fee)</option>
                   </select>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('amount')}</label>
+                  <label className="text-sm font-medium">Amount</label>
                   <input
                     type="number"
                     max={earningsData.pendingPayments}
@@ -4610,7 +4547,12 @@ export default function TeacherDashboard() {
                   />
                 </div>
 
-                <div className="text-xs text-gray-500">{t('payoutTerms')}</div>
+                <div className="text-xs text-gray-500">
+                  • Minimum payout: 100,000 UZS
+                  <br />
+                  • Processing time: 1-3 business days
+                  <br />• You'll receive a confirmation email
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 mt-6">
@@ -4618,11 +4560,11 @@ export default function TeacherDashboard() {
                   variant="outline"
                   onClick={() => setShowPayoutModal(false)}
                 >
-                  {t('cancel')}
+                  Cancel
                 </Button>
                 <Button onClick={() => setShowPayoutModal(false)}>
                   <Wallet className="h-4 w-4 mr-2" />
-                  {t('requestPayout')}
+                  Request Payout
                 </Button>
               </div>
             </div>
@@ -4634,7 +4576,7 @@ export default function TeacherDashboard() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-lg">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">{t('taxInformation')}</h2>
+                <h2 className="text-lg font-semibold">Tax Information</h2>
                 <Button
                   variant="outline"
                   size="sm"
@@ -4648,7 +4590,7 @@ export default function TeacherDashboard() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-blue-50 rounded-lg">
                     <div className="text-sm text-blue-600">
-                      {t('thisYear2024')}
+                      This Year (2024)
                     </div>
                     <div className="text-xl font-bold text-blue-700">
                       {((earningsData.thisMonth * 12) / 1000000).toFixed(1)}M
@@ -4656,9 +4598,7 @@ export default function TeacherDashboard() {
                     </div>
                   </div>
                   <div className="p-3 bg-purple-50 rounded-lg">
-                    <div className="text-sm text-purple-600">
-                      {t('platformFees')}
-                    </div>
+                    <div className="text-sm text-purple-600">Platform Fees</div>
                     <div className="text-xl font-bold text-purple-700">
                       {earningsData.totalPlatformFees.toLocaleString()} UZS
                     </div>
@@ -4666,23 +4606,21 @@ export default function TeacherDashboard() {
                 </div>
 
                 <div className="space-y-3">
-                  <h3 className="font-medium">{t('availableDocuments')}</h3>
+                  <h3 className="font-medium">Available Documents</h3>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex items-center gap-3">
                         <FileText className="h-5 w-5 text-gray-500" />
                         <div>
-                          <div className="font-medium">
-                            {t('taxSummary2024')}
-                          </div>
+                          <div className="font-medium">2024 Tax Summary</div>
                           <div className="text-sm text-gray-600">
-                            {t('januaryCurrent')}
+                            January - Current
                           </div>
                         </div>
                       </div>
                       <Button size="sm" variant="outline">
                         <Download className="h-4 w-4 mr-1" />
-                        {t('download')}
+                        Download
                       </Button>
                     </div>
 
@@ -4690,17 +4628,15 @@ export default function TeacherDashboard() {
                       <div className="flex items-center gap-3">
                         <Receipt className="h-5 w-5 text-gray-500" />
                         <div>
-                          <div className="font-medium">
-                            {t('monthlyStatements')}
-                          </div>
+                          <div className="font-medium">Monthly Statements</div>
                           <div className="text-sm text-gray-600">
-                            {t('allMonthsAvailable')}
+                            All months available
                           </div>
                         </div>
                       </div>
                       <Button size="sm" variant="outline">
                         <Download className="h-4 w-4 mr-1" />
-                        {t('download')}
+                        Download
                       </Button>
                     </div>
                   </div>
@@ -4708,7 +4644,9 @@ export default function TeacherDashboard() {
 
                 <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
                   <div className="text-sm text-amber-800">
-                    <strong>{t('taxNote')}:</strong> {t('taxNoteMessage')}
+                    <strong>Tax Note:</strong> These documents are for reference
+                    only. Please consult with a tax professional for official
+                    tax filing requirements in Uzbekistan.
                   </div>
                 </div>
               </div>
@@ -4718,19 +4656,19 @@ export default function TeacherDashboard() {
                   variant="outline"
                   onClick={() => setShowTaxModal(false)}
                 >
-                  {t('close')}
+                  Close
                 </Button>
               </div>
             </div>
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   const renderReviewsManagement = () => {
     const displayReviews =
-      reviewsTab === 'recent' ? recentReviews : filterReviews(allReviews)
+      reviewsTab === "recent" ? recentReviews : filterReviews(allReviews);
 
     return (
       <div className="space-y-6">
@@ -4738,22 +4676,22 @@ export default function TeacherDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {t('reviewsAndRatings')}
+              Reviews & Ratings
             </h1>
-            <p className="text-gray-600">{t('reviewMonitorStudentReviews')}</p>
+            <p className="text-gray-600">Monitor student reviews and ratings</p>
           </div>
           <div className="flex gap-3">
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
-              {t('reviewExportReviews')}
+              Export Reviews
             </Button>
             <Button variant="outline">
               <MessageSquare className="h-4 w-4 mr-2" />
-              {t('reviewQuickResponse')}
+              Quick Response
             </Button>
             <Button>
               <TrendingUpIcon className="h-4 w-4 mr-2" />
-              {t('reviewImproveRating')}
+              Improve Rating
             </Button>
           </div>
         </div>
@@ -4763,16 +4701,14 @@ export default function TeacherDashboard() {
           <Card>
             <CardContent className="p-6 text-center">
               <div className="flex items-center justify-center mb-2">
-                {renderStars(Math.floor(reviewsData.overallRating), 'lg')}
+                {renderStars(Math.floor(reviewsData.overallRating), "lg")}
               </div>
               <div className="text-3xl font-bold text-primary mb-1">
                 {reviewsData.overallRating}
               </div>
-              <div className="text-sm text-gray-600">
-                {t('reviewOverallRating')}
-              </div>
+              <div className="text-sm text-gray-600">Overall Rating</div>
               <div className="text-xs text-green-600 mt-1">
-                {reviewsData.ratingTrend} {t('reviewThisMonth')}
+                {reviewsData.ratingTrend} this month
               </div>
             </CardContent>
           </Card>
@@ -4782,12 +4718,10 @@ export default function TeacherDashboard() {
               <div className="text-3xl font-bold text-primary mb-2">
                 {reviewsData.totalReviews}
               </div>
-              <div className="text-sm text-gray-600">
-                {t('reviewTotalReviews')}
-              </div>
+              <div className="text-sm text-gray-600">Total Reviews</div>
               <div className="flex items-center justify-center text-xs text-gray-500 mt-1">
                 <ArrowUpRight className="h-3 w-3 mr-1" />
-                +12 {t('reviewThisMonth')}
+                +12 this month
               </div>
             </CardContent>
           </Card>
@@ -4797,12 +4731,8 @@ export default function TeacherDashboard() {
               <div className="text-3xl font-bold text-primary mb-2">
                 {reviewsData.recentRating}
               </div>
-              <div className="text-sm text-gray-600">
-                {t('reviewRecentRating')}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {t('reviewLast30Days')}
-              </div>
+              <div className="text-sm text-gray-600">Recent Rating</div>
+              <div className="text-xs text-gray-500 mt-1">Last 30 days</div>
             </CardContent>
           </Card>
 
@@ -4811,11 +4741,9 @@ export default function TeacherDashboard() {
               <div className="text-3xl font-bold text-primary mb-2">
                 #{reviewsData.ranking}
               </div>
-              <div className="text-sm text-gray-600">
-                {t('reviewSubjectRanking')}
-              </div>
+              <div className="text-sm text-gray-600">Subject Ranking</div>
               <div className="text-xs text-green-600 mt-1">
-                {t('reviewTopInEnglish')}
+                Top 5% in English
               </div>
             </CardContent>
           </Card>
@@ -4827,14 +4755,14 @@ export default function TeacherDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5" />
-                {t('reviewRatingTrends')}
+                Rating Trends
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="h-48 flex items-end justify-between gap-2">
                   {reviewsData.monthlyTrend.map((data, index) => {
-                    const height = (data.rating / 5) * 100
+                    const height = (data.rating / 5) * 100;
                     return (
                       <div
                         key={data.month}
@@ -4845,13 +4773,13 @@ export default function TeacherDashboard() {
                         </div>
                         <div
                           className="w-full bg-primary rounded-t transition-all duration-500 hover:bg-primary/80"
-                          style={{ height: `${height}%`, minHeight: '20px' }}
+                          style={{ height: `${height}%`, minHeight: "20px" }}
                         ></div>
                         <div className="text-xs font-medium mt-2">
                           {data.month}
                         </div>
                       </div>
-                    )
+                    );
                   })}
                 </div>
 
@@ -4860,23 +4788,17 @@ export default function TeacherDashboard() {
                     <div className="text-lg font-bold text-green-600">
                       {reviewsData.responseRate}%
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {t('reviewResponseRate')}
-                    </div>
+                    <div className="text-sm text-gray-600">Response Rate</div>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-bold text-blue-600">4.2</div>
-                    <div className="text-sm text-gray-600">
-                      {t('reviewAvgPlatform')}
-                    </div>
+                    <div className="text-sm text-gray-600">Avg. Platform</div>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-bold text-purple-600">
                       +15%
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {t('reviewAboveAverage')}
-                    </div>
+                    <div className="text-sm text-gray-600">Above Average</div>
                   </div>
                 </div>
               </div>
@@ -4887,7 +4809,7 @@ export default function TeacherDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Star className="h-5 w-5" />
-                {t('reviewRatingDistribution')}
+                Rating Distribution
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -4926,7 +4848,7 @@ export default function TeacherDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              {t('reviewSubjectPerformance')}
+              Subject Performance
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -4942,7 +4864,7 @@ export default function TeacherDashboard() {
                       {subject.rating}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {subject.reviews} {t('reviews')}
+                      {subject.reviews} reviews
                     </div>
                   </div>
                 </div>
@@ -4958,16 +4880,12 @@ export default function TeacherDashboard() {
               {(
                 [
                   {
-                    id: 'recent',
-                    label: t('reviewRecentReviews'),
+                    id: "recent",
+                    label: "Recent Reviews",
                     count: recentReviews.length,
                   },
-                  {
-                    id: 'all',
-                    label: t('reviewAllReviews'),
-                    count: allReviews.length,
-                  },
-                  { id: 'analytics', label: t('reviewAnalytics'), count: 0 },
+                  { id: "all", label: "All Reviews", count: allReviews.length },
+                  { id: "analytics", label: "Analytics", count: 0 },
                 ] as const
               ).map((tab) => (
                 <button
@@ -4975,8 +4893,8 @@ export default function TeacherDashboard() {
                   onClick={() => setReviewsTab(tab.id)}
                   className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
                     reviewsTab === tab.id
-                      ? 'border-b-2 border-primary text-primary bg-primary/5'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? "border-b-2 border-primary text-primary bg-primary/5"
+                      : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
                   {tab.label}
@@ -4990,7 +4908,7 @@ export default function TeacherDashboard() {
             </div>
 
             {/* Filters and Search */}
-            {reviewsTab !== 'analytics' && (
+            {reviewsTab !== "analytics" && (
               <div className="p-4 border-b bg-gray-50">
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
@@ -4998,7 +4916,7 @@ export default function TeacherDashboard() {
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <input
                         type="text"
-                        placeholder={t('reviewSearchPlaceholder')}
+                        placeholder="Search reviews by student, content, or subject..."
                         value={searchReviews}
                         onChange={(e) => setSearchReviews(e.target.value)}
                         className="w-full pl-10 pr-4 py-2 border rounded-md"
@@ -5010,22 +4928,22 @@ export default function TeacherDashboard() {
                     onChange={(e) => setReviewFilter(e.target.value as any)}
                     className="p-2 border rounded-md"
                   >
-                    <option value="all">{t('reviewAllRatings')}</option>
-                    <option value="5">{t('reviewStars5')}</option>
-                    <option value="4">{t('reviewStars4')}</option>
-                    <option value="3">{t('reviewStars3')}</option>
-                    <option value="2">{t('reviewStars2')}</option>
-                    <option value="1">{t('reviewStars1')}</option>
+                    <option value="all">All Ratings</option>
+                    <option value="5">5 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="2">2 Stars</option>
+                    <option value="1">1 Star</option>
                   </select>
                   <select
                     value={reviewSort}
                     onChange={(e) => setReviewSort(e.target.value as any)}
                     className="p-2 border rounded-md"
                   >
-                    <option value="newest">{t('reviewNewestFirst')}</option>
-                    <option value="oldest">{t('reviewOldestFirst')}</option>
-                    <option value="highest">{t('reviewHighestRated')}</option>
-                    <option value="lowest">{t('reviewLowestRated')}</option>
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="highest">Highest Rated</option>
+                    <option value="lowest">Lowest Rated</option>
                   </select>
                 </div>
               </div>
@@ -5034,13 +4952,13 @@ export default function TeacherDashboard() {
         </Card>
 
         {/* Reviews Content */}
-        {reviewsTab === 'analytics' ? (
+        {reviewsTab === "analytics" ? (
           <div className="grid lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Quote className="h-5 w-5" />
-                  {t('reviewCommonKeywords')}
+                  Common Keywords
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -5060,9 +4978,7 @@ export default function TeacherDashboard() {
                           {keyword.word}
                         </span>
                       </div>
-                      <Badge variant="outline">
-                        {keyword.count} {t('reviewMentions')}
-                      </Badge>
+                      <Badge variant="outline">{keyword.count} mentions</Badge>
                     </div>
                   ))}
                 </div>
@@ -5073,35 +4989,27 @@ export default function TeacherDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="h-5 w-5" />
-                  {t('reviewQuality')}
+                  Review Quality
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">
-                    {t('reviewVerifiedReviews')}
-                  </span>
+                  <span className="text-gray-600">Verified Reviews</span>
                   <span className="font-semibold text-green-600">94%</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">
-                    {t('reviewAverageLength')}
-                  </span>
-                  <span className="font-semibold">127 {t('reviewWords')}</span>
+                  <span className="text-gray-600">Average Review Length</span>
+                  <span className="font-semibold">127 words</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">
-                    {t('reviewResponseRate')}
-                  </span>
+                  <span className="text-gray-600">Response Rate</span>
                   <span className="font-semibold text-blue-600">
                     {reviewsData.responseRate}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">
-                    {t('reviewHelpfulVotes')}
-                  </span>
-                  <span className="font-semibold">156 {t('reviewTotal')}</span>
+                  <span className="text-gray-600">Helpful Votes</span>
+                  <span className="font-semibold">156 total</span>
                 </div>
               </CardContent>
             </Card>
@@ -5121,9 +5029,9 @@ export default function TeacherDashboard() {
                           />
                           <AvatarFallback>
                             {review.student.name
-                              .split(' ')
+                              .split(" ")
                               .map((n) => n[0])
-                              .join('')}
+                              .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
@@ -5145,8 +5053,8 @@ export default function TeacherDashboard() {
                               {new Date(review.date).toLocaleDateString()}
                             </span>
                             <span className="text-sm text-gray-600">
-                              {review.lesson.subject} • {review.lesson.duration}{' '}
-                              {t('reviewMin')}
+                              {review.lesson.subject} • {review.lesson.duration}{" "}
+                              min
                             </span>
                           </div>
 
@@ -5157,15 +5065,13 @@ export default function TeacherDashboard() {
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <button className="flex items-center gap-1 hover:text-blue-600">
                               <ThumbsUp className="h-3 w-3" />
-                              <span>
-                                {review.helpful} {t('reviewHelpful')}
-                              </span>
+                              <span>{review.helpful} helpful</span>
                             </button>
                             <span>•</span>
                             <span>
-                              {t('reviewLesson')}:{' '}
+                              Lesson:{" "}
                               {new Date(
-                                review.lesson.date
+                                review.lesson.date,
                               ).toLocaleDateString()}
                             </span>
                           </div>
@@ -5175,7 +5081,7 @@ export default function TeacherDashboard() {
                               <div className="flex items-center gap-2 mb-2">
                                 <Reply className="h-4 w-4 text-blue-600" />
                                 <span className="text-sm font-medium text-blue-900">
-                                  {t('reviewYourResponse')}
+                                  Your Response
                                 </span>
                               </div>
                               <p className="text-sm text-blue-800">
@@ -5192,12 +5098,12 @@ export default function TeacherDashboard() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              setSelectedReview(review)
-                              setShowReplyModal(true)
+                              setSelectedReview(review);
+                              setShowReplyModal(true);
                             }}
                           >
                             <Reply className="h-4 w-4 mr-1" />
-                            {t('reviewReply')}
+                            Reply
                           </Button>
                         )}
                         <DropdownMenu>
@@ -5209,15 +5115,15 @@ export default function TeacherDashboard() {
                           <DropdownMenuContent>
                             <DropdownMenuItem>
                               <Flag className="h-4 w-4 mr-2" />
-                              {t('reviewReportReview')}
+                              Report Review
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                               <MessageCircle className="h-4 w-4 mr-2" />
-                              {t('reviewMessageStudent')}
+                              Message Student
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                               <Share className="h-4 w-4 mr-2" />
-                              {t('reviewShareReview')}
+                              Share Review
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -5235,9 +5141,7 @@ export default function TeacherDashboard() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-lg">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">
-                  {t('reviewReplyToReview')}
-                </h2>
+                <h2 className="text-lg font-semibold">Reply to Review</h2>
                 <Button
                   variant="outline"
                   size="sm"
@@ -5253,7 +5157,7 @@ export default function TeacherDashboard() {
                     <span className="font-medium">
                       {selectedReview.student.name}
                     </span>
-                    {renderStars(selectedReview.rating, 'sm')}
+                    {renderStars(selectedReview.rating, "sm")}
                   </div>
                   <p className="text-sm text-gray-700">
                     {selectedReview.review}
@@ -5261,17 +5165,16 @@ export default function TeacherDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('reviewYourResponseLabel')}
-                  </label>
+                  <label className="text-sm font-medium">Your Response</label>
                   <textarea
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    placeholder={t('reviewReplyPlaceholder')}
+                    placeholder="Thank the student for their feedback and address any points they mentioned..."
                     className="w-full p-3 border rounded-md min-h-[100px] resize-none"
                   />
                   <div className="text-xs text-gray-500">
-                    {t('reviewResponseGuideline')}
+                    Keep your response professional, positive, and helpful.
+                    Students can see all replies.
                   </div>
                 </div>
               </div>
@@ -5281,103 +5184,103 @@ export default function TeacherDashboard() {
                   variant="outline"
                   onClick={() => setShowReplyModal(false)}
                 >
-                  {t('reviewCancel')}
+                  Cancel
                 </Button>
                 <Button
                   onClick={() => {
-                    setShowReplyModal(false)
-                    setReplyText('')
+                    setShowReplyModal(false);
+                    setReplyText("");
                   }}
                 >
                   <Send className="h-4 w-4 mr-2" />
-                  {t('reviewSendReply')}
+                  Send Reply
                 </Button>
               </div>
             </div>
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   const renderSettingsManagement = () => {
     const settingsTabs = [
       {
-        id: 'account',
-        label: t('settingsAccount'),
+        id: "account",
+        label: "Account",
         icon: User,
-        description: t('settingsAccountDesc'),
+        description: "Personal information and security",
       },
       {
-        id: 'professional',
-        label: t('settingsProfessional'),
+        id: "professional",
+        label: "Professional",
         icon: GraduationCap,
-        description: t('settingsProfessionalDesc'),
+        description: "Teaching profile and preferences",
       },
       {
-        id: 'notifications',
-        label: t('settingsNotifications'),
+        id: "notifications",
+        label: "Notifications",
         icon: Bell,
-        description: t('settingsNotificationsDesc'),
+        description: "Email, SMS, and push notifications",
       },
       {
-        id: 'privacy',
-        label: t('settingsPrivacy'),
+        id: "privacy",
+        label: "Privacy",
         icon: Shield,
-        description: t('settingsPrivacyDesc'),
+        description: "Visibility and data sharing",
       },
       {
-        id: 'billing',
-        label: t('settingsBilling'),
+        id: "billing",
+        label: "Billing",
         icon: CreditCard,
-        description: t('settingsBillingDesc'),
+        description: "Payment methods and billing",
       },
       {
-        id: 'calendar',
-        label: t('settingsCalendar'),
+        id: "calendar",
+        label: "Calendar",
         icon: CalendarIcon,
-        description: t('settingsCalendarDesc'),
+        description: "Schedule integration and sync",
       },
       {
-        id: 'communication',
-        label: t('settingsCommunication'),
+        id: "communication",
+        label: "Communication",
         icon: MessageCircle,
-        description: t('settingsCommunicationDesc'),
+        description: "Language and communication tools",
       },
       {
-        id: 'integrations',
-        label: t('settingsIntegrations'),
+        id: "integrations",
+        label: "Integrations",
         icon: Link2,
-        description: t('settingsIntegrationsDesc'),
+        description: "Third-party apps and services",
       },
       {
-        id: 'data',
-        label: t('settingsData'),
+        id: "data",
+        label: "Data",
         icon: Database,
-        description: t('settingsDataDesc'),
+        description: "Account data and management",
       },
-    ]
+    ];
 
     return (
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {t('settingsTitle')}
-            </h1>
-            <p className="text-gray-600">{t('settingsManageAccount')}</p>
+            <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+            <p className="text-gray-600">
+              Manage your account settings and preferences
+            </p>
           </div>
           <div className="flex gap-3">
             {settingsChanged && (
               <Button onClick={() => setSettingsChanged(false)}>
                 <Save className="h-4 w-4 mr-2" />
-                {t('settingsSaveChanges')}
+                Save Changes
               </Button>
             )}
             <Button variant="outline">
               <RotateCcw className="h-4 w-4 mr-2" />
-              {t('settingsResetDefaults')}
+              Reset to Defaults
             </Button>
           </div>
         </div>
@@ -5388,15 +5291,15 @@ export default function TeacherDashboard() {
             <CardContent className="p-0">
               <div className="space-y-1 p-4">
                 {settingsTabs.map((tab) => {
-                  const Icon = tab.icon
+                  const Icon = tab.icon;
                   return (
                     <button
                       key={tab.id}
                       onClick={() => setActiveSettingsTab(tab.id as any)}
                       className={`w-full flex items-start gap-3 p-3 rounded-lg text-left transition-colors ${
                         activeSettingsTab === tab.id
-                          ? 'bg-primary text-white'
-                          : 'hover:bg-gray-100'
+                          ? "bg-primary text-white"
+                          : "hover:bg-gray-100"
                       }`}
                     >
                       <Icon className="h-5 w-5 mt-0.5" />
@@ -5405,15 +5308,15 @@ export default function TeacherDashboard() {
                         <div
                           className={`text-xs mt-1 ${
                             activeSettingsTab === tab.id
-                              ? 'text-white/80'
-                              : 'text-gray-500'
+                              ? "text-white/80"
+                              : "text-gray-500"
                           }`}
                         >
                           {tab.description}
                         </div>
                       </div>
                     </button>
-                  )
+                  );
                 })}
               </div>
             </CardContent>
@@ -5421,13 +5324,13 @@ export default function TeacherDashboard() {
 
           {/* Settings Content */}
           <div className="lg:col-span-3 space-y-6">
-            {activeSettingsTab === 'account' && (
+            {activeSettingsTab === "account" && (
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <User className="h-5 w-5" />
-                      {t('settingsPersonalInfo')}
+                      Personal Information
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -5442,13 +5345,13 @@ export default function TeacherDashboard() {
                         </Avatar>
                         <Button variant="outline" size="sm">
                           <Camera className="h-4 w-4 mr-2" />
-                          {t('settingsChangePhoto')}
+                          Change Photo
                         </Button>
                       </div>
                       <div className="flex-1 grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            {t('settingsFirstName')}
+                            First Name
                           </label>
                           <input
                             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -5458,7 +5361,7 @@ export default function TeacherDashboard() {
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            {t('settingsLastName')}
+                            Last Name
                           </label>
                           <input
                             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -5468,7 +5371,7 @@ export default function TeacherDashboard() {
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            {t('settingsEmailAddress')}
+                            Email Address
                           </label>
                           <div className="flex gap-2">
                             <input
@@ -5478,13 +5381,13 @@ export default function TeacherDashboard() {
                             />
                             <Button variant="outline" size="sm">
                               <Verified className="h-4 w-4 mr-1" />
-                              {t('settingsVerify')}
+                              Verify
                             </Button>
                           </div>
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            {t('settingsPhoneNumber')}
+                            Phone Number
                           </label>
                           <div className="flex gap-2">
                             <input
@@ -5494,7 +5397,7 @@ export default function TeacherDashboard() {
                             />
                             <Button variant="outline" size="sm">
                               <Phone className="h-4 w-4 mr-1" />
-                              {t('settingsVerify')}
+                              Verify
                             </Button>
                           </div>
                         </div>
@@ -5507,28 +5410,28 @@ export default function TeacherDashboard() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Lock className="h-5 w-5" />
-                      {t('settingsSecurity')}
+                      Security Settings
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
-                        {t('settingsChangePassword')}
+                        Change Password
                       </label>
                       <div className="grid grid-cols-3 gap-3">
                         <input
                           type="password"
-                          placeholder={t('settingsCurrentPassword')}
+                          placeholder="Current password"
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         />
                         <input
                           type="password"
-                          placeholder={t('settingsNewPassword')}
+                          placeholder="New password"
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         />
                         <input
                           type="password"
-                          placeholder={t('settingsConfirmPassword')}
+                          placeholder="Confirm password"
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         />
                       </div>
@@ -5537,43 +5440,39 @@ export default function TeacherDashboard() {
                     <div className="flex items-center justify-between p-4 border rounded-lg">
                       <div>
                         <div className="font-medium">
-                          {t('settingsTwoFactor')}
+                          Two-Factor Authentication
                         </div>
                         <div className="text-sm text-gray-600">
-                          {t('settingsTwoFactorDesc')}
+                          Add an extra layer of security to your account
                         </div>
                       </div>
                       <button
                         onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
                         className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                          twoFactorEnabled ? 'bg-primary' : 'bg-gray-200'
+                          twoFactorEnabled ? "bg-primary" : "bg-gray-200"
                         }`}
                       >
                         <span
                           className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                            twoFactorEnabled ? 'translate-x-5' : 'translate-x-0'
+                            twoFactorEnabled ? "translate-x-5" : "translate-x-0"
                           }`}
                         />
                       </button>
                     </div>
 
                     <div className="space-y-2">
-                      <div className="font-medium">
-                        {t('settingsLoginHistory')}
-                      </div>
+                      <div className="font-medium">Login History</div>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                          <span>
-                            {t('settingsCurrentSession')} - Tashkent, Uzbekistan
-                          </span>
+                          <span>Current session - Tashkent, Uzbekistan</span>
                           <Badge className="bg-green-100 text-green-800">
-                            {t('settingsActive')}
+                            Active
                           </Badge>
                         </div>
                         <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
                           <span>2 days ago - Tashkent, Uzbekistan</span>
                           <Button variant="outline" size="sm">
-                            {t('settingsRevoke')}
+                            Revoke
                           </Button>
                         </div>
                       </div>
@@ -5583,19 +5482,19 @@ export default function TeacherDashboard() {
               </div>
             )}
 
-            {activeSettingsTab === 'professional' && (
+            {activeSettingsTab === "professional" && (
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <GraduationCap className="h-5 w-5" />
-                      {t('settingsTeachingProfile')}
+                      Teaching Profile
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
-                        {t('settingsProfessionalTitle')}
+                        Professional Title
                       </label>
                       <input
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -5606,33 +5505,23 @@ export default function TeacherDashboard() {
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
-                        {t('settingsExperience')}
+                        Years of Experience
                       </label>
                       <select
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         defaultValue={profileData.experience}
                       >
-                        <option value="0-1">
-                          {t('settingsExperienceLess1')}
-                        </option>
-                        <option value="1-2">
-                          {t('settingsExperience1to2')}
-                        </option>
-                        <option value="3-5">
-                          {t('settingsExperience3to5')}
-                        </option>
-                        <option value="6-10">
-                          {t('settingsExperience6to10')}
-                        </option>
-                        <option value="10+">
-                          {t('settingsExperience10plus')}
-                        </option>
+                        <option value="0-1">Less than 1 year</option>
+                        <option value="1-2">1-2 years</option>
+                        <option value="3-5">3-5 years</option>
+                        <option value="6-10">6-10 years</option>
+                        <option value="10+">10+ years</option>
                       </select>
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
-                        {t('settingsSpecializations')}
+                        Teaching Specializations
                       </label>
                       <div className="flex flex-wrap gap-2">
                         {profileData.subjects.map((subject) => (
@@ -5654,7 +5543,7 @@ export default function TeacherDashboard() {
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
-                        {t('settingsHourlyRate')}
+                        Hourly Rate (UZS)
                       </label>
                       <input
                         type="number"
@@ -5668,20 +5557,20 @@ export default function TeacherDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>{t('settingsTeachingPreferences')}</CardTitle>
+                    <CardTitle>Teaching Preferences</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">
-                          {t('settingsStudentAgeGroups')}
+                          Preferred Student Age Groups
                         </label>
                         <div className="space-y-2">
                           {[
-                            t('settingsChildren'),
-                            t('settingsTeenagers'),
-                            t('settingsAdults'),
-                            t('settingsSeniors'),
+                            "Children (6-12)",
+                            "Teenagers (13-17)",
+                            "Adults (18-65)",
+                            "Seniors (65+)",
                           ].map((age) => (
                             <label
                               key={age}
@@ -5700,14 +5589,14 @@ export default function TeacherDashboard() {
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium">
-                          {t('settingsMaxStudents')}
+                          Maximum Students per Lesson
                         </label>
                         <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                          <option value="1">{t('settingsIndividual')}</option>
+                          <option value="1">1 student (Individual)</option>
                           <option value="2">2 students</option>
                           <option value="3">3 students</option>
-                          <option value="5">{t('settingsSmallGroup')}</option>
-                          <option value="10">{t('settingsLargeGroup')}</option>
+                          <option value="5">5 students (Small group)</option>
+                          <option value="10">10+ students (Large group)</option>
                         </select>
                       </div>
                     </div>
@@ -5716,22 +5605,22 @@ export default function TeacherDashboard() {
               </div>
             )}
 
-            {activeSettingsTab === 'notifications' && (
+            {activeSettingsTab === "notifications" && (
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Mail className="h-5 w-5" />
-                      {t('settingsEmailNotifications')}
+                      Email Notifications
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {Object.entries({
-                      bookingRequests: t('settingsNewBookings'),
-                      paymentConfirmations: t('settingsPaymentConfirmations'),
-                      studentMessages: t('settingsStudentMessages'),
-                      scheduleReminders: t('settingsScheduleReminders'),
-                      marketing: t('settingsMarketing'),
+                      bookingRequests: "New booking requests",
+                      paymentConfirmations: "Payment confirmations",
+                      studentMessages: "Student messages",
+                      scheduleReminders: "Schedule reminders",
+                      marketing: "Marketing and promotional emails",
                     }).map(([key, label]) => (
                       <div
                         key={key}
@@ -5740,7 +5629,7 @@ export default function TeacherDashboard() {
                         <div>
                           <div className="font-medium">{label}</div>
                           <div className="text-sm text-gray-600">
-                            {t('settingsReceiveEmail')}
+                            Receive notifications via email
                           </div>
                         </div>
                         <button
@@ -5748,15 +5637,15 @@ export default function TeacherDashboard() {
                             setEmailNotifications((prev) => ({
                               ...prev,
                               [key]: !prev[key as keyof typeof prev],
-                            }))
-                            setSettingsChanged(true)
+                            }));
+                            setSettingsChanged(true);
                           }}
                           className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                             emailNotifications[
                               key as keyof typeof emailNotifications
                             ]
-                              ? 'bg-primary'
-                              : 'bg-gray-200'
+                              ? "bg-primary"
+                              : "bg-gray-200"
                           }`}
                         >
                           <span
@@ -5764,8 +5653,8 @@ export default function TeacherDashboard() {
                               emailNotifications[
                                 key as keyof typeof emailNotifications
                               ]
-                                ? 'translate-x-5'
-                                : 'translate-x-0'
+                                ? "translate-x-5"
+                                : "translate-x-0"
                             }`}
                           />
                         </button>
@@ -5778,15 +5667,15 @@ export default function TeacherDashboard() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Smartphone className="h-5 w-5" />
-                      {t('settingsSmsNotifications')}
+                      SMS Notifications
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {Object.entries({
-                      urgentBookings: t('settingsUrgentBookings'),
-                      lessonReminders: t('settingsLessonReminders'),
-                      payments: t('settingsPaymentNotifications'),
-                      emergency: t('settingsEmergencyAlerts'),
+                      urgentBookings: "Urgent booking requests",
+                      lessonReminders: "Lesson reminders (30 min before)",
+                      payments: "Payment notifications",
+                      emergency: "Emergency and important alerts",
                     }).map(([key, label]) => (
                       <div
                         key={key}
@@ -5795,7 +5684,7 @@ export default function TeacherDashboard() {
                         <div>
                           <div className="font-medium">{label}</div>
                           <div className="text-sm text-gray-600">
-                            {t('settingsReceiveSms')}
+                            Receive notifications via SMS
                           </div>
                         </div>
                         <button
@@ -5803,15 +5692,15 @@ export default function TeacherDashboard() {
                             setSmsNotifications((prev) => ({
                               ...prev,
                               [key]: !prev[key as keyof typeof prev],
-                            }))
-                            setSettingsChanged(true)
+                            }));
+                            setSettingsChanged(true);
                           }}
                           className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                             smsNotifications[
                               key as keyof typeof smsNotifications
                             ]
-                              ? 'bg-primary'
-                              : 'bg-gray-200'
+                              ? "bg-primary"
+                              : "bg-gray-200"
                           }`}
                         >
                           <span
@@ -5819,8 +5708,8 @@ export default function TeacherDashboard() {
                               smsNotifications[
                                 key as keyof typeof smsNotifications
                               ]
-                                ? 'translate-x-5'
-                                : 'translate-x-0'
+                                ? "translate-x-5"
+                                : "translate-x-0"
                             }`}
                           />
                         </button>
@@ -5833,15 +5722,15 @@ export default function TeacherDashboard() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Monitor className="h-5 w-5" />
-                      {t('settingsPushNotifications')}
+                      Push Notifications
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {Object.entries({
-                      mobile: t('settingsMobileApp'),
-                      browser: t('settingsBrowserNotifications'),
-                      sounds: t('settingsNotificationSounds'),
-                      quietHours: t('settingsQuietHours'),
+                      mobile: "Mobile app notifications",
+                      browser: "Browser notifications",
+                      sounds: "Notification sounds",
+                      quietHours: "Quiet hours (10 PM - 8 AM)",
                     }).map(([key, label]) => (
                       <div
                         key={key}
@@ -5850,7 +5739,7 @@ export default function TeacherDashboard() {
                         <div>
                           <div className="font-medium">{label}</div>
                           <div className="text-sm text-gray-600">
-                            {t('settingsEnablePush')}
+                            Enable push notifications
                           </div>
                         </div>
                         <button
@@ -5858,15 +5747,15 @@ export default function TeacherDashboard() {
                             setPushNotifications((prev) => ({
                               ...prev,
                               [key]: !prev[key as keyof typeof prev],
-                            }))
-                            setSettingsChanged(true)
+                            }));
+                            setSettingsChanged(true);
                           }}
                           className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                             pushNotifications[
                               key as keyof typeof pushNotifications
                             ]
-                              ? 'bg-primary'
-                              : 'bg-gray-200'
+                              ? "bg-primary"
+                              : "bg-gray-200"
                           }`}
                         >
                           <span
@@ -5874,8 +5763,8 @@ export default function TeacherDashboard() {
                               pushNotifications[
                                 key as keyof typeof pushNotifications
                               ]
-                                ? 'translate-x-5'
-                                : 'translate-x-0'
+                                ? "translate-x-5"
+                                : "translate-x-0"
                             }`}
                           />
                         </button>
@@ -5886,20 +5775,20 @@ export default function TeacherDashboard() {
               </div>
             )}
 
-            {activeSettingsTab === 'privacy' && (
+            {activeSettingsTab === "privacy" && (
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Eye className="h-5 w-5" />
-                      {t('settingsProfileVisibility')}
+                      Profile Visibility
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
                       <div>
                         <label className="text-sm font-medium mb-2 block">
-                          {t('settingsProfileVisibility')}
+                          Profile Visibility
                         </label>
                         <select
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -5908,16 +5797,18 @@ export default function TeacherDashboard() {
                             setPrivacySettings((prev) => ({
                               ...prev,
                               profileVisibility: e.target.value,
-                            }))
-                            setSettingsChanged(true)
+                            }));
+                            setSettingsChanged(true);
                           }}
                         >
-                          <option value="public">{t('settingsPublic')}</option>
+                          <option value="public">
+                            Public - Visible to all users
+                          </option>
                           <option value="verified">
-                            {t('settingsVerifiedOnly')}
+                            Verified students only
                           </option>
                           <option value="private">
-                            {t('settingsPrivate')}
+                            Private - Direct bookings only
                           </option>
                         </select>
                       </div>
@@ -5925,10 +5816,10 @@ export default function TeacherDashboard() {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="font-medium">
-                            {t('settingsSearchVisible')}
+                            Show in search results
                           </div>
                           <div className="text-sm text-gray-600">
-                            {t('settingsSearchVisibleDesc')}
+                            Allow students to find you through search
                           </div>
                         </div>
                         <button
@@ -5936,20 +5827,20 @@ export default function TeacherDashboard() {
                             setPrivacySettings((prev) => ({
                               ...prev,
                               searchVisible: !prev.searchVisible,
-                            }))
-                            setSettingsChanged(true)
+                            }));
+                            setSettingsChanged(true);
                           }}
                           className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                             privacySettings.searchVisible
-                              ? 'bg-primary'
-                              : 'bg-gray-200'
+                              ? "bg-primary"
+                              : "bg-gray-200"
                           }`}
                         >
                           <span
                             className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
                               privacySettings.searchVisible
-                                ? 'translate-x-5'
-                                : 'translate-x-0'
+                                ? "translate-x-5"
+                                : "translate-x-0"
                             }`}
                           />
                         </button>
@@ -5957,11 +5848,9 @@ export default function TeacherDashboard() {
 
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium">
-                            {t('settingsOnlineStatus')}
-                          </div>
+                          <div className="font-medium">Show online status</div>
                           <div className="text-sm text-gray-600">
-                            {t('settingsOnlineStatusDesc')}
+                            Display when you're online and available
                           </div>
                         </div>
                         <button
@@ -5969,20 +5858,20 @@ export default function TeacherDashboard() {
                             setPrivacySettings((prev) => ({
                               ...prev,
                               activityStatus: !prev.activityStatus,
-                            }))
-                            setSettingsChanged(true)
+                            }));
+                            setSettingsChanged(true);
                           }}
                           className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                             privacySettings.activityStatus
-                              ? 'bg-primary'
-                              : 'bg-gray-200'
+                              ? "bg-primary"
+                              : "bg-gray-200"
                           }`}
                         >
                           <span
                             className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
                               privacySettings.activityStatus
-                                ? 'translate-x-5'
-                                : 'translate-x-0'
+                                ? "translate-x-5"
+                                : "translate-x-0"
                             }`}
                           />
                         </button>
@@ -5995,7 +5884,7 @@ export default function TeacherDashboard() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Database className="h-5 w-5" />
-                      {t('settingsDataPrivacy')}
+                      Data Privacy
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -6003,11 +5892,12 @@ export default function TeacherDashboard() {
                       <div className="flex items-center gap-2 mb-2">
                         <Shield className="h-5 w-5 text-blue-600" />
                         <span className="font-medium text-blue-900">
-                          {t('settingsGdprCompliance')}
+                          GDPR Compliance
                         </span>
                       </div>
                       <p className="text-sm text-blue-700">
-                        {t('settingsGdprDesc')}
+                        We comply with GDPR regulations. You have the right to
+                        access, modify, or delete your personal data.
                       </p>
                     </div>
 
@@ -6017,21 +5907,21 @@ export default function TeacherDashboard() {
                         className="w-full justify-start"
                       >
                         <Download className="h-4 w-4 mr-2" />
-                        {t('settingsDownloadData')}
+                        Download My Data
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full justify-start"
                       >
                         <FileText className="h-4 w-4 mr-2" />
-                        {t('settingsPrivacyPolicy')}
+                        Privacy Policy
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full justify-start"
                       >
                         <Shield className="h-4 w-4 mr-2" />
-                        {t('settingsCookiePreferences')}
+                        Cookie Preferences
                       </Button>
                     </div>
                   </CardContent>
@@ -6039,13 +5929,13 @@ export default function TeacherDashboard() {
               </div>
             )}
 
-            {activeSettingsTab === 'billing' && (
+            {activeSettingsTab === "billing" && (
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <CreditCard className="h-5 w-5" />
-                      {t('settingsPaymentMethods')}
+                      Payment Methods
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -6054,9 +5944,7 @@ export default function TeacherDashboard() {
                         <div className="flex items-center gap-3">
                           <Building className="h-8 w-8 text-blue-600" />
                           <div>
-                            <div className="font-medium">
-                              {t('settingsBankTransfer')}
-                            </div>
+                            <div className="font-medium">Bank Transfer</div>
                             <div className="text-sm text-gray-600">
                               **** **** **** 1234
                             </div>
@@ -6064,10 +5952,10 @@ export default function TeacherDashboard() {
                         </div>
                         <div className="flex gap-2">
                           <Badge className="bg-green-100 text-green-800">
-                            {t('settingsPrimary')}
+                            Primary
                           </Badge>
                           <Button variant="outline" size="sm">
-                            {t('settingsEdit')}
+                            Edit
                           </Button>
                         </div>
                       </div>
@@ -6083,13 +5971,13 @@ export default function TeacherDashboard() {
                           </div>
                         </div>
                         <Button variant="outline" size="sm">
-                          {t('settingsEdit')}
+                          Edit
                         </Button>
                       </div>
 
                       <Button variant="outline" className="w-full">
                         <Plus className="h-4 w-4 mr-2" />
-                        {t('settingsAddPayment')}
+                        Add Payment Method
                       </Button>
                     </div>
                   </CardContent>
@@ -6097,28 +5985,28 @@ export default function TeacherDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>{t('settingsPayoutSettings')}</CardTitle>
+                    <CardTitle>Payout Settings</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">
-                          {t('settingsPayoutSchedule')}
+                          Payout Schedule
                         </label>
                         <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                          <option value="weekly">{t('settingsWeekly')}</option>
+                          <option value="weekly">Weekly (Fridays)</option>
                           <option value="biweekly">
-                            {t('settingsBiweekly')}
+                            Bi-weekly (1st & 15th)
                           </option>
                           <option value="monthly">
-                            {t('settingsMonthly')}
+                            Monthly (1st of month)
                           </option>
                         </select>
                       </div>
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium">
-                          {t('settingsMinimumPayout')}
+                          Minimum Payout (UZS)
                         </label>
                         <input
                           type="number"
@@ -6132,31 +6020,22 @@ export default function TeacherDashboard() {
               </div>
             )}
 
-            {activeSettingsTab === 'calendar' && (
+            {activeSettingsTab === "calendar" && (
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <CalendarIcon className="h-5 w-5" />
-                      {t('settingsCalendarIntegration')}
+                      Calendar Integration
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {Object.entries({
-                      google: {
-                        name: t('settingsGoogleCalendar'),
-                        icon: Globe,
-                      },
-                      outlook: {
-                        name: t('settingsOutlookCalendar'),
-                        icon: Mail,
-                      },
-                      apple: {
-                        name: t('settingsAppleCalendar'),
-                        icon: Monitor,
-                      },
+                      google: { name: "Google Calendar", icon: Globe },
+                      outlook: { name: "Outlook Calendar", icon: Mail },
+                      apple: { name: "Apple Calendar", icon: Monitor },
                     }).map(([key, calendar]) => {
-                      const Icon = calendar.icon
+                      const Icon = calendar.icon;
                       return (
                         <div
                           key={key}
@@ -6168,46 +6047,44 @@ export default function TeacherDashboard() {
                               <div className="font-medium">{calendar.name}</div>
                               <div className="text-sm text-gray-600">
                                 {calendarSync[key as keyof typeof calendarSync]
-                                  ? t('settingsConnected')
-                                  : t('settingsNotConnected')}
+                                  ? "Connected"
+                                  : "Not connected"}
                               </div>
                             </div>
                           </div>
                           <Button
                             variant={
                               calendarSync[key as keyof typeof calendarSync]
-                                ? 'outline'
-                                : 'default'
+                                ? "outline"
+                                : "default"
                             }
                             size="sm"
                             onClick={() => {
                               setCalendarSync((prev) => ({
                                 ...prev,
                                 [key]: !prev[key as keyof typeof prev],
-                              }))
-                              setSettingsChanged(true)
+                              }));
+                              setSettingsChanged(true);
                             }}
                           >
                             {calendarSync[key as keyof typeof calendarSync]
-                              ? t('settingsDisconnect')
-                              : t('settingsConnect')}
+                              ? "Disconnect"
+                              : "Connect"}
                           </Button>
                         </div>
-                      )
+                      );
                     })}
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>{t('settingsSchedulePreferences')}</CardTitle>
+                    <CardTitle>Schedule Preferences</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t('settingsTimeZone')}
-                        </label>
+                        <label className="text-sm font-medium">Time Zone</label>
                         <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
                           <option value="Asia/Tashkent">
                             Tashkent (UTC+5)
@@ -6219,7 +6096,7 @@ export default function TeacherDashboard() {
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium">
-                          {t('settingsBufferTime')}
+                          Buffer Time (minutes)
                         </label>
                         <input
                           type="number"
@@ -6235,20 +6112,20 @@ export default function TeacherDashboard() {
               </div>
             )}
 
-            {activeSettingsTab === 'communication' && (
+            {activeSettingsTab === "communication" && (
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Globe className="h-5 w-5" />
-                      {t('settingsLanguageSettings')}
+                      Language Settings
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">
-                          {t('settingsPrimaryLanguage')}
+                          Primary Teaching Language
                         </label>
                         <select
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -6257,8 +6134,8 @@ export default function TeacherDashboard() {
                             setLanguageSettings((prev) => ({
                               ...prev,
                               primary: e.target.value,
-                            }))
-                            setSettingsChanged(true)
+                            }));
+                            setSettingsChanged(true);
                           }}
                         >
                           <option value="English">English</option>
@@ -6269,7 +6146,7 @@ export default function TeacherDashboard() {
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium">
-                          {t('settingsPlatformInterface')}
+                          Platform Interface
                         </label>
                         <select
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -6278,8 +6155,8 @@ export default function TeacherDashboard() {
                             setLanguageSettings((prev) => ({
                               ...prev,
                               interface: e.target.value,
-                            }))
-                            setSettingsChanged(true)
+                            }));
+                            setSettingsChanged(true);
                           }}
                         >
                           <option value="English">English</option>
@@ -6292,10 +6169,10 @@ export default function TeacherDashboard() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">
-                          {t('settingsAutoTranslate')}
+                          Auto-translate messages
                         </div>
                         <div className="text-sm text-gray-600">
-                          {t('settingsAutoTranslateDesc')}
+                          Automatically translate student messages
                         </div>
                       </div>
                       <button
@@ -6303,20 +6180,20 @@ export default function TeacherDashboard() {
                           setLanguageSettings((prev) => ({
                             ...prev,
                             autoTranslate: !prev.autoTranslate,
-                          }))
-                          setSettingsChanged(true)
+                          }));
+                          setSettingsChanged(true);
                         }}
                         className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                           languageSettings.autoTranslate
-                            ? 'bg-primary'
-                            : 'bg-gray-200'
+                            ? "bg-primary"
+                            : "bg-gray-200"
                         }`}
                       >
                         <span
                           className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
                             languageSettings.autoTranslate
-                              ? 'translate-x-5'
-                              : 'translate-x-0'
+                              ? "translate-x-5"
+                              : "translate-x-0"
                           }`}
                         />
                       </button>
@@ -6328,7 +6205,7 @@ export default function TeacherDashboard() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Video className="h-5 w-5" />
-                      {t('settingsCommunicationTools')}
+                      Communication Tools
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -6337,16 +6214,14 @@ export default function TeacherDashboard() {
                         <div className="flex items-center gap-3">
                           <Video className="h-8 w-8 text-blue-600" />
                           <div>
-                            <div className="font-medium">
-                              {t('settingsVideoLessons')}
-                            </div>
+                            <div className="font-medium">Video Lessons</div>
                             <div className="text-sm text-gray-600">
-                              {t('settingsZoomIntegration')}
+                              Zoom integration active
                             </div>
                           </div>
                         </div>
                         <Badge className="bg-green-100 text-green-800">
-                          {t('settingsConnected')}
+                          Connected
                         </Badge>
                       </div>
 
@@ -6354,16 +6229,14 @@ export default function TeacherDashboard() {
                         <div className="flex items-center gap-3">
                           <MessageCircle className="h-8 w-8 text-blue-600" />
                           <div>
-                            <div className="font-medium">
-                              {t('settingsMessaging')}
-                            </div>
+                            <div className="font-medium">Messaging</div>
                             <div className="text-sm text-gray-600">
-                              {t('settingsPlatformMessaging')}
+                              Platform messaging enabled
                             </div>
                           </div>
                         </div>
                         <Badge className="bg-green-100 text-green-800">
-                          {t('settingsActive')}
+                          Active
                         </Badge>
                       </div>
                     </div>
@@ -6372,43 +6245,43 @@ export default function TeacherDashboard() {
               </div>
             )}
 
-            {activeSettingsTab === 'integrations' && (
+            {activeSettingsTab === "integrations" && (
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Link2 className="h-5 w-5" />
-                      {t('settingsConnectedApps')}
+                      Connected Apps
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {[
                       {
-                        name: 'Zoom',
-                        description: t('settingsVideoConferencing'),
+                        name: "Zoom",
+                        description: "Video conferencing",
                         connected: true,
                         icon: Video,
                       },
                       {
-                        name: 'Google Drive',
-                        description: t('settingsFileStorage'),
+                        name: "Google Drive",
+                        description: "File storage and sharing",
                         connected: true,
                         icon: Cloud,
                       },
                       {
-                        name: 'Calendly',
-                        description: t('settingsAppointmentScheduling'),
+                        name: "Calendly",
+                        description: "Appointment scheduling",
                         connected: false,
                         icon: CalendarIcon,
                       },
                       {
-                        name: 'Slack',
-                        description: t('settingsTeamCommunication'),
+                        name: "Slack",
+                        description: "Team communication",
                         connected: false,
                         icon: MessageCircle,
                       },
                     ].map((app) => {
-                      const Icon = app.icon
+                      const Icon = app.icon;
                       return (
                         <div
                           key={app.name}
@@ -6424,28 +6297,26 @@ export default function TeacherDashboard() {
                             </div>
                           </div>
                           <Button
-                            variant={app.connected ? 'outline' : 'default'}
+                            variant={app.connected ? "outline" : "default"}
                             size="sm"
                           >
-                            {app.connected
-                              ? t('settingsDisconnect')
-                              : t('settingsConnect')}
+                            {app.connected ? "Disconnect" : "Connect"}
                           </Button>
                         </div>
-                      )
+                      );
                     })}
                   </CardContent>
                 </Card>
               </div>
             )}
 
-            {activeSettingsTab === 'data' && (
+            {activeSettingsTab === "data" && (
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Database className="h-5 w-5" />
-                      {t('settingsAccountData')}
+                      Account Data
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -6455,21 +6326,21 @@ export default function TeacherDashboard() {
                         className="w-full justify-start"
                       >
                         <Download className="h-4 w-4 mr-2" />
-                        {t('settingsDownloadAllData')}
+                        Download All My Data
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full justify-start"
                       >
                         <FileText className="h-4 w-4 mr-2" />
-                        {t('settingsExportHistory')}
+                        Export Learning History
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full justify-start"
                       >
                         <Receipt className="h-4 w-4 mr-2" />
-                        {t('settingsDownloadFinancial')}
+                        Download Financial Records
                       </Button>
                     </div>
                   </CardContent>
@@ -6479,16 +6350,17 @@ export default function TeacherDashboard() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-red-600">
                       <Trash2 className="h-5 w-5" />
-                      {t('settingsDangerZone')}
+                      Danger Zone
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="p-4 bg-red-50 rounded-lg">
                       <div className="font-medium text-red-900 mb-2">
-                        {t('settingsDeleteAccount')}
+                        Delete Account
                       </div>
                       <p className="text-sm text-red-700 mb-4">
-                        {t('settingsDeleteAccountDesc')}
+                        Permanently delete your account and all associated data.
+                        This action cannot be undone.
                       </p>
                       <Button
                         variant="outline"
@@ -6496,7 +6368,7 @@ export default function TeacherDashboard() {
                         onClick={() => setShowDeleteModal(true)}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
-                        {t('settingsDeleteAccountButton')}
+                        Delete Account
                       </Button>
                     </div>
                   </CardContent>
@@ -6516,28 +6388,29 @@ export default function TeacherDashboard() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-red-600">
-                    {t('settingsDeleteConfirmTitle')}
+                    Delete Account
                   </h2>
                   <p className="text-sm text-gray-600">
-                    {t('settingsDeleteCannotUndo')}
+                    This action cannot be undone
                   </p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <p className="text-sm text-gray-700">
-                  {t('settingsDeleteConfirmDesc')}
+                  Are you sure you want to delete your account? This will
+                  permanently remove:
                 </p>
                 <ul className="text-sm text-gray-600 space-y-1 ml-4">
-                  <li>{t('settingsDeleteProfile')}</li>
-                  <li>{t('settingsDeleteReviews')}</li>
-                  <li>{t('settingsDeleteLessons')}</li>
-                  <li>{t('settingsDeleteFinancialData')}</li>
+                  <li>• Your profile and teaching information</li>
+                  <li>• All student reviews and ratings</li>
+                  <li>• Lesson history and records</li>
+                  <li>• Financial and payment data</li>
                 </ul>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    {t('settingsDeleteTypeConfirm')}
+                    Type "DELETE" to confirm
                   </label>
                   <input
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -6551,95 +6424,97 @@ export default function TeacherDashboard() {
                   variant="outline"
                   onClick={() => setShowDeleteModal(false)}
                 >
-                  {t('settingsCancel')}
+                  Cancel
                 </Button>
                 <Button className="bg-red-600 hover:bg-red-700">
                   <Trash2 className="h-4 w-4 mr-2" />
-                  {t('settingsDeleteAccountButton')}
+                  Delete Account
                 </Button>
               </div>
             </div>
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
+
+  const renderPlaceholderSection = (title: string, description: string) => (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
+        <p className="text-gray-600">{description}</p>
+      </div>
+      <Card>
+        <CardContent className="p-12 text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Settings className="h-8 w-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Coming Soon
+          </h3>
+          <p className="text-gray-600 mb-4">
+            This feature is under development and will be available soon.
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => setActiveSection("overview")}
+          >
+            Back to Dashboard
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'overview':
-        return renderOverview()
-      case 'profile':
-        return renderProfileManagement()
-      case 'schedule':
-        return renderScheduleManagement()
-      case 'bookings':
-        return renderBookingsManagement()
-      case 'earnings':
-        return renderEarningsManagement()
-      case 'reviews':
-        return renderReviewsManagement()
-      case 'settings':
-        return renderSettingsManagement()
+      case "overview":
+        return renderOverview();
+      case "profile":
+        return renderProfileManagement();
+      case "schedule":
+        return renderScheduleManagement();
+      case "bookings":
+        return renderBookingsManagement();
+      case "earnings":
+        return renderEarningsManagement();
+      case "reviews":
+        return renderReviewsManagement();
+      case "settings":
+        return renderSettingsManagement();
       default:
-        return renderOverview()
+        return renderOverview();
     }
-  }
+  };
 
   return (
-    <div className="h-screen bg-gray-50 flex">
-      {/* Mobile Sidebar Overlay */}
-      {isMobileSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setIsMobileSidebarOpen(false)}
-        />
-      )}
-
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div
-        className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-sm border-r flex flex-col transform transition-transform duration-300 ease-in-out
-        lg:relative lg:transform-none lg:transition-none
-        ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}
-      >
+      <div className="w-64 bg-white shadow-sm border-r flex flex-col">
         {/* Header */}
         <div className="p-6 border-b">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 relative">
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={teacher.image} alt={teacher.name} />
-                <AvatarFallback>
-                  {teacher.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="font-medium text-gray-900">
-                  {teacher.name.split(' ')[0]}
-                </div>
-              </div>
-              <div
-                className={`w-2 h-2 z-10 rounded-full absolute left-1 top-1 ${teacher.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}
-              />
+          <div className="flex items-center gap-3">
+            <Avatar className="w-12 h-12">
+              <AvatarImage src={teacher.image} alt={teacher.name} />
+              <AvatarFallback>
+                {teacher.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="font-medium text-gray-900">{teacher.name}</div>
+              <div className="text-sm text-gray-600">{teacher.title}</div>
             </div>
-            {/* Close button for mobile */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="lg:hidden"
-              onClick={() => setIsMobileSidebarOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
           <div className="flex items-center gap-2 mt-3">
-            {/* <span className="text-sm text-gray-600">
-              {teacher.isOnline ? 'Online' : 'Offline'}
-            </span> */}
+            <div
+              className={`w-2 h-2 rounded-full ${teacher.isOnline ? "bg-green-500" : "bg-gray-400"}`}
+            ></div>
+            <span className="text-sm text-gray-600">
+              {teacher.isOnline ? "Online" : "Offline"}
+            </span>
           </div>
         </div>
 
@@ -6647,28 +6522,24 @@ export default function TeacherDashboard() {
         <nav className="flex-1 p-4">
           <ul className="space-y-2">
             {sidebarItems.map((item) => {
-              const Icon = item.icon
-              const isActive = activeSection === item.id
+              const Icon = item.icon;
+              const isActive = activeSection === item.id;
 
               return (
                 <li key={item.id}>
                   <button
-                    onClick={() => {
-                      setActiveSection(item.id)
-                      // Close mobile sidebar when item is selected
-                      setIsMobileSidebarOpen(false)
-                    }}
+                    onClick={() => setActiveSection(item.id)}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-primary text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? "bg-primary text-white"
+                        : "text-gray-700 hover:bg-gray-100"
                     }`}
                   >
                     <Icon className="h-5 w-5" />
                     <span className="flex-1">{item.label}</span>
                     {item.count && (
                       <Badge
-                        variant={isActive ? 'secondary' : 'default'}
+                        variant={isActive ? "secondary" : "default"}
                         className="ml-auto"
                       >
                         {item.count}
@@ -6676,46 +6547,60 @@ export default function TeacherDashboard() {
                     )}
                   </button>
                 </li>
-              )
+              );
             })}
           </ul>
         </nav>
 
         {/* Footer */}
         <div className="p-4 border-t">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => setShowLogoutModal(true)}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            {t('logout')}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Account
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={() => setActiveSection("profile")}>
+                <User className="h-4 w-4 mr-2" />
+                View Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveSection("settings")}>
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  localStorage.removeItem("userAuth");
+                  navigate("/");
+                }}
+                className="text-red-600"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:ml-0">
+      <div className="flex-1 flex flex-col">
         {/* Top Bar */}
-        <header className="bg-white border-b px-4 lg:px-6 py-4">
+        <header className="bg-white border-b px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {/* Mobile hamburger menu */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="lg:hidden"
-                onClick={() => setIsMobileSidebarOpen(true)}
-              >
-                <Menu className="h-4 w-4" />
-              </Button>
               <h2 className="text-xl font-semibold text-gray-900">
                 {sidebarItems.find((item) => item.id === activeSection)
-                  ?.label || 'Dashboard'}
+                  ?.label || "Dashboard"}
               </h2>
             </div>
-            <div className="flex items-center gap-2 lg:gap-4">
-              <LanguageSwitcher />
+            <div className="flex items-center gap-4">
               <Button variant="ghost" size="sm" className="relative">
                 <Bell className="h-4 w-4" />
                 {teacher.unreadMessages > 0 && (
@@ -6724,11 +6609,11 @@ export default function TeacherDashboard() {
                   </Badge>
                 )}
               </Button>
-              <Button variant="ghost" size="sm" className="hidden sm:flex">
+              <Button variant="ghost" size="sm">
                 <MessageCircle className="h-4 w-4" />
               </Button>
               <Link to="/">
-                <Button variant="outline" size="sm" className="hidden sm:flex">
+                <Button variant="outline" size="sm">
                   Back to Home
                 </Button>
               </Link>
@@ -6737,46 +6622,8 @@ export default function TeacherDashboard() {
         </header>
 
         {/* Content Area */}
-        <main className="flex-1 p-4 lg:p-6 overflow-auto">
-          {renderContent()}
-        </main>
+        <main className="flex-1 p-6 overflow-auto">{renderContent()}</main>
       </div>
-
-      {/* Logout Confirmation Modal */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <LogOut className="h-6 w-6 text-red-600" />
-              </div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                {t('confirmLogout')}
-              </h2>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <Button
-                variant="outline"
-                onClick={() => setShowLogoutModal(false)}
-              >
-                {t('cancel')}
-              </Button>
-              <Button
-                className="bg-red-600 hover:bg-red-700 text-white"
-                onClick={() => {
-                  localStorage.removeItem('userAuth')
-                  setShowLogoutModal(false)
-                  navigate('/')
-                }}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                {t('logout')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
-  )
+  );
 }
