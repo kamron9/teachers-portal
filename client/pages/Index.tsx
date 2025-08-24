@@ -13,52 +13,11 @@ import { useSubjects, useTeacherSearch } from '@/hooks/useMockApi'
 import { formatPrice } from '@/lib/mockData'
 import { ArrowRight, BookOpen, Search, Star, Users, Video } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 
-const features = [
-  {
-    icon: Search,
-    title: 'Find Perfect Teachers',
-    description:
-      'Search by subject, price, rating, and language to find the ideal tutor for your needs',
-  },
-  {
-    icon: Video,
-    title: 'Live Video Lessons',
-    description:
-      'High-quality video calls with integrated whiteboard and screen sharing tools',
-  },
-  {
-    icon: Users,
-    title: 'Local & International',
-    description:
-      'Connect with both local Uzbek teachers and international experts worldwide',
-  },
-  {
-    icon: BookOpen,
-    title: 'All Subjects Covered',
-    description:
-      'From languages to sciences, find expert tutors for any subject you want to learn',
-  },
-]
-
-const topics = [
-  { subject: 'Dasturlash', count: 1400 },
-  { subject: 'Ingliz tili', count: 1000 },
-  { subject: 'Matematika', count: 850 },
-  { subject: 'Rus tili', count: 680 },
-  { subject: 'Arab tili', count: 540 },
-  { subject: 'Fizika', count: 420 },
-  { subject: 'Kimyo', count: 390 },
-  { subject: 'Biologiya', count: 370 },
-  { subject: 'Xitoy tili', count: 320 },
-  { subject: 'Huquq', count: 260 },
-  { subject: 'Psixologiya', count: 190 },
-  { subject: 'Tarix', count: 300 },
-]
-
 // TutorCard component
-const TutorCard = ({ tutor }: { tutor: any }) => (
+const TutorCard = ({ tutor, t }: { tutor: any; t: any }) => (
   <Card className="hover:shadow-lg transition-shadow duration-300">
     <CardContent className="p-6">
       <div className="flex items-start gap-4">
@@ -85,7 +44,8 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
             {tutor.firstName} {tutor.lastName}
           </h3>
           <p className="text-primary font-medium">
-            {tutor.subjectOfferings?.[0]?.subjectName || 'Fan belgilanmagan'}
+            {tutor.subjectOfferings?.[0]?.subjectName ||
+              t('subjectNotSpecified')}
           </p>
 
           <div className="flex items-center gap-2 mt-2">
@@ -97,7 +57,7 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
             </div>
             <span className="text-gray-400">•</span>
             <span className="text-sm text-gray-600">
-              {tutor.totalStudents || 0} o'quvchi
+              {tutor.totalStudents || 0} {t('students')}
             </span>
           </div>
 
@@ -108,7 +68,7 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
               </Badge>
             )) || (
               <Badge variant="secondary" className="text-xs">
-                O'zbek
+                {t('uzbek')}
               </Badge>
             )}
           </div>
@@ -118,10 +78,10 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
               <span className="text-xl font-bold text-gray-900">
                 {formatPrice(tutor.subjectOfferings?.[0]?.pricePerHour || 0)}
               </span>
-              <span className="text-gray-600 text-sm ml-1">so'm/soat</span>
+              <span className="text-gray-600 text-sm ml-1">{t('perHour')}</span>
             </div>
             <Link to={`/tutor/${tutor.id}`}>
-              <Button size="sm">Ko'rish</Button>
+              <Button size="sm">{t('view')}</Button>
             </Link>
           </div>
         </div>
@@ -132,6 +92,45 @@ const TutorCard = ({ tutor }: { tutor: any }) => (
 
 export default function Index() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
+
+  const features = [
+    {
+      icon: Search,
+      title: t('findPerfectTeachers'),
+      description: t('findPerfectTeachersDesc'),
+    },
+    {
+      icon: Video,
+      title: t('liveVideoLessons'),
+      description: t('liveVideoLessonsDesc'),
+    },
+    {
+      icon: Users,
+      title: t('localInternational'),
+      description: t('localInternationalDesc'),
+    },
+    {
+      icon: BookOpen,
+      title: t('allSubjectsCovered'),
+      description: t('allSubjectsCoveredDesc'),
+    },
+  ]
+
+  const topics = [
+    { subject: t('subjectProgramming'), count: 1400 },
+    { subject: t('subjectEnglish'), count: 1000 },
+    { subject: t('subjectMathematics'), count: 850 },
+    { subject: t('subjectRussian'), count: 680 },
+    { subject: t('subjectArabic'), count: 540 },
+    { subject: t('subjectPhysics'), count: 420 },
+    { subject: t('subjectChemistry'), count: 390 },
+    { subject: t('subjectBiology'), count: 370 },
+    { subject: t('subjectChinese'), count: 320 },
+    { subject: t('subjectLaw'), count: 260 },
+    { subject: t('subjectPsychology'), count: 190 },
+    { subject: t('subjectHistory'), count: 300 },
+  ]
 
   // Search state - TZ bo'yicha SearchBar (Subject, Language, PriceFrom/To)
   const [searchData, setSearchData] = useState({
@@ -213,19 +212,18 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-32">
+      <section className="relative overflow-hidden pb-32">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-purple-600/10" />
         <div className="container mx-auto px-4 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="pt-10 lg:pt-20">
               {/* Hero content */}
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-2">
-                Eng yaxshi o'qituvchilar bilan
-                <span className="text-primary"> o'rganing</span>
+                {t('heroMainTitle')}
+                <span className="text-primary"> {t('heroLearnText')}</span>
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
-                Malakali o'qituvchilar bilan individual onlayn darslar. Istalgan
-                fanni uydan turib o'rganing.
+                {t('heroSubtitle')}
               </p>
 
               {/* SearchBar - TZ bo'yicha (Subject, Language, PriceFrom/To) */}
@@ -233,7 +231,7 @@ export default function Index() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
                     <label className="text-sm font-medium mb-2 block">
-                      Fan
+                      {t('subject')}
                     </label>
                     <Select
                       value={searchData.subject}
@@ -242,7 +240,7 @@ export default function Index() {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Fanni tanlang" />
+                        <SelectValue placeholder={t('selectSubject')} />
                       </SelectTrigger>
                       <SelectContent>
                         {subjects.map((subject) => (
@@ -256,7 +254,7 @@ export default function Index() {
 
                   <div>
                     <label className="text-sm font-medium mb-2 block">
-                      Til
+                      {t('language')}
                     </label>
                     <Select
                       value={searchData.language}
@@ -265,19 +263,21 @@ export default function Index() {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Tilni tanlang" />
+                        <SelectValue placeholder={t('selectLanguage')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="uzbek">O'zbek</SelectItem>
-                        <SelectItem value="russian">Rus</SelectItem>
-                        <SelectItem value="english">Ingliz</SelectItem>
+                        <SelectItem value="uzbek">{t('uzbek')}</SelectItem>
+                        <SelectItem value="russian">{t('russian')}</SelectItem>
+                        <SelectItem value="english">
+                          {t('englishLanguage')}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
                     <label className="text-sm font-medium mb-2 block">
-                      Narx (dan)
+                      {t('priceFrom')}
                     </label>
                     <Select
                       value={searchData.priceFrom}
@@ -286,19 +286,19 @@ export default function Index() {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="0 so'm" />
+                        <SelectValue placeholder={`0 ${t('sum')}`} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="20000">20,000 so'm</SelectItem>
-                        <SelectItem value="40000">40,000 so'm</SelectItem>
-                        <SelectItem value="60000">60,000 so'm</SelectItem>
+                        <SelectItem value="20000">20,000 {t('sum')}</SelectItem>
+                        <SelectItem value="40000">40,000 {t('sum')}</SelectItem>
+                        <SelectItem value="60000">60,000 {t('sum')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
                     <label className="text-sm font-medium mb-2 block">
-                      Narx (gacha)
+                      {t('priceTo')}
                     </label>
                     <Select
                       value={searchData.priceTo}
@@ -307,13 +307,15 @@ export default function Index() {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="100,000 so'm" />
+                        <SelectValue placeholder={`100,000 ${t('sum')}`} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="40000">40,000 so'm</SelectItem>
-                        <SelectItem value="60000">60,000 so'm</SelectItem>
-                        <SelectItem value="80000">80,000 so'm</SelectItem>
-                        <SelectItem value="100000">100,000 so'm</SelectItem>
+                        <SelectItem value="40000">40,000 {t('sum')}</SelectItem>
+                        <SelectItem value="60000">60,000 {t('sum')}</SelectItem>
+                        <SelectItem value="80000">80,000 {t('sum')}</SelectItem>
+                        <SelectItem value="100000">
+                          100,000 {t('sum')}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -325,7 +327,7 @@ export default function Index() {
                   onClick={handleSearch}
                 >
                   <Search className="h-5 w-5 mr-2" />
-                  O'qituvchi qidirish
+                  {t('searchTeachers')}
                 </Button>
               </Card>
 
@@ -377,7 +379,7 @@ export default function Index() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Har bir fan bo'yicha malakali o'qituvchilar
+              {t('qualifiedTeachersPerSubject')}
             </h2>
           </div>
           <div className="mb-20">
@@ -399,7 +401,7 @@ export default function Index() {
                           {item.subject}
                         </h3>
                         <p className="text-gray-400 font-medium text-sm">
-                          {item.count.toLocaleString()} o'qituvchi
+                          {item.count.toLocaleString()} {t('teachersLower')}
                         </p>
                       </div>
                       <ArrowRight className="h-5 w-5 text-gray-400" />
@@ -408,10 +410,9 @@ export default function Index() {
                 </Card>
               ))}
             </div>
-            <div className="flex justify-center mt-4">
-              
+            <div className="flex justify-center mt-6">
               <Button variant="outline" onClick={() => navigate('/subjects')}>
-                Barcha fanlar
+                {t('allSubjects')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
@@ -419,11 +420,10 @@ export default function Index() {
           <div className="container mx-auto px-4">
             <div className="text-center space-y-4 mb-16">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Why Choose Our Platform?
+                {t('whyChooseOurPlatform')}
               </h2>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                We make learning accessible, effective, and enjoyable for
-                students across Uzbekistan
+                {t('whyChooseOurPlatformDesc')}
               </p>
             </div>
 
@@ -456,11 +456,9 @@ export default function Index() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Top o'qituvchilar
+              {t('topTeachers')}
             </h2>
-            <p className="text-xl text-gray-600">
-              Eng yaxshi bahoga ega o'qituvchilar bilan tanishing
-            </p>
+            <p className="text-xl text-gray-600">{t('topTeachersDesc')}</p>
           </div>
 
           {/* Loading state - TZ talabi */}
@@ -491,13 +489,11 @@ export default function Index() {
                 <Users className="h-16 w-16 mx-auto" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Xatolik yuz berdi
+                {t('errorOccurred')}
               </h3>
-              <p className="text-gray-600 mb-4">
-                O'qituvchilar ma'lumotlarini yuklab bo'lmadi
-              </p>
+              <p className="text-gray-600 mb-4">{t('teachersDataLoadError')}</p>
               <Button onClick={() => window.location.reload()}>
-                Qayta urinish
+                {t('tryAgain')}
               </Button>
             </div>
           )}
@@ -509,11 +505,9 @@ export default function Index() {
                 <Users className="h-16 w-16 mx-auto" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Top o'qituvchilar hozircha yo'q
+                {t('noTopTeachers')}
               </h3>
-              <p className="text-gray-600">
-                Tez orada yangi o'qituvchilar qo'shiladi
-              </p>
+              <p className="text-gray-600">{t('newTeachersComingSoon')}</p>
             </div>
           )}
 
@@ -521,7 +515,7 @@ export default function Index() {
           {!isLoading && !error && tutors.length > 0 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tutors.map((tutor) => (
-                <TutorCard key={tutor.id} tutor={tutor} />
+                <TutorCard key={tutor.id} tutor={tutor} t={t} />
               ))}
             </div>
           )}
@@ -533,87 +527,21 @@ export default function Index() {
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto text-white">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              O'qituvchi bo'lib ishlashni xohlaysizmi?
+              {t('wantToTeach')}
             </h2>
-            <p className="text-xl mb-8 opacity-90">
-              Minglab o'quvchilar sizni kutmoqda. Bilimingizni ulashing va
-              daromad oling.
-            </p>
+            <p className="text-xl mb-8 opacity-90">{t('wantToTeachDesc')}</p>
             <Button
               size="lg"
               variant="secondary"
               className="text-primary"
               onClick={handleTutorCTAClick}
             >
-              O'qituvchi bo'ling
+              {t('becomeTeacher')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
         </div>
       </section>
-
-      {/* Minimal Footer - TZ bo'yicha minimal havolalar */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <BookOpen className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-xl font-bold">TutorUZ</span>
-              </div>
-              <p className="text-gray-400">
-                O'zbekistondagi eng yaxshi onlayn ta'lim platformasi
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">Yordam</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link to="/faq" className="hover:text-white">
-                    FAQ
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/support" className="hover:text-white">
-                    Qo'llab-quvvatlash
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">Kompaniya</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link to="/about" className="hover:text-white">
-                    Biz haqimizda
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/careers" className="hover:text-white">
-                    Karyera
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">Bog'lanish</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>+998 90 123 45 67</li>
-                <li>info@tutoruz.com</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 TutorUZ. Barcha huquqlar himoyalangan.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

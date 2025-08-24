@@ -9,6 +9,7 @@ import Header from './components/Header'
 import { SocketProvider } from './contexts/SocketContext'
 import { AuthProvider } from './hooks/useAuth'
 
+import Footer from './components/Footer'
 import { PageLoading } from './components/ui/loading'
 
 // Lazy loaded components
@@ -243,6 +244,7 @@ const AppContent = () => {
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        {isPublicRoute && <Footer />}
       </Suspense>
     </>
   )

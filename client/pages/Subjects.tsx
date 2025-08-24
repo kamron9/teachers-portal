@@ -786,12 +786,11 @@ export default function Subjects() {
   )
 
   return (
-    <div className="pt-16  bg-gray-50">
+    <div className="bg-gray-50">
       {/* Header Section */}
       <div className="bg-white border-b">
         <div className="container py-8">
           <div>
-            Card {/* Page Header */}
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">

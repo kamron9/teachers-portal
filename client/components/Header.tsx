@@ -17,23 +17,25 @@ import {
   User,
 } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import LanguageSwitcher from './LanguageSwitcher'
 import MobileMenu from './MobileMenu'
-
-const navigation = [
-  { name: 'Asosiy', href: '/' },
-  { name: "O'qtuvchi qidirish", href: '/teachers' },
-  { name: 'Fanlar', href: '/subjects' },
-]
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
   const isLoggedIn = false
+  const { t } = useTranslation()
+
+  const navigation = [
+    { name: t('home'), href: '/' },
+    { name: t('findTeachers'), href: '/teachers' },
+    { name: t('subjects'), href: '/subjects' },
+  ]
 
   return (
-    <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 fixed w-full top-0 z-50">
+    <header className="bg-white/85 backdrop-blur-sm border-b border-gray-200 sticky w-full top-0 z-50">
       <div className="container px-4">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-12">
@@ -42,7 +44,7 @@ export default function Header() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <BookOpen className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">TutorUZ</span>
+              <span className="text-xl font-bold text-gray-900">Limify</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -94,34 +96,34 @@ export default function Header() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
+                    <span>{t('profile')}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <BookOpen className="mr-2 h-4 w-4" />
-                    <span>My Lessons</span>
+                    <span>{t('myLessons')}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <MessageCircle className="mr-2 h-4 w-4" />
-                    <span>Messages</span>
+                    <span>{t('messages')}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                    <span>{t('settings')}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <span>{t('logout')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost">Kirish</Button>
+                  <Button variant="ghost">{t('login')}</Button>
                 </Link>
                 <Link to="/teacher-signup">
-                  <Button>O'qtuvchi bo'lish</Button>
+                  <Button>{t('becomeTeacher')}</Button>
                 </Link>
               </>
             )}
