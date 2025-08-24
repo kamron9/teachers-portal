@@ -2,6 +2,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { DatePicker } from '@/components/ui/date-picker'
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/ui/input-otp'
 import { Progress } from '@/components/ui/progress'
 import {
   Select,
@@ -11,7 +16,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  ArrowLeft,
   CheckCircle,
   Eye,
   EyeOff,
@@ -38,13 +42,57 @@ export default function StudentRegister() {
   const [showPassword, setShowPassword] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
   const [otpCode, setOtpCode] = useState('')
-  const [resendTimer, setResendTimer] = useState(60)
+  const [resendTimer, setResendTimer] = useState(0)
+
+  // Format phone number function
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '')
+
+    // If it starts with 998, add +
+    if (digits.startsWith('998')) {
+      const phoneDigits = digits.slice(3)
+      if (phoneDigits.length === 0) return '+998 '
+      if (phoneDigits.length <= 2) return `+998 ${phoneDigits}`
+      if (phoneDigits.length <= 5)
+        return `+998 ${phoneDigits.slice(0, 2)} ${phoneDigits.slice(2)}`
+      if (phoneDigits.length <= 7)
+        return `+998 ${phoneDigits.slice(0, 2)} ${phoneDigits.slice(2, 5)} ${phoneDigits.slice(5)}`
+      return `+998 ${phoneDigits.slice(0, 2)} ${phoneDigits.slice(2, 5)} ${phoneDigits.slice(5, 7)} ${phoneDigits.slice(7, 9)}`
+    }
+
+    // If it doesn't start with 998, add +998 prefix
+    if (digits.length === 0) return '+998 '
+    if (digits.length <= 2) return `+998 ${digits}`
+    if (digits.length <= 5)
+      return `+998 ${digits.slice(0, 2)} ${digits.slice(2)}`
+    if (digits.length <= 7)
+      return `+998 ${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5)}`
+    return `+998 ${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5, 7)} ${digits.slice(7, 9)}`
+  }
+
+  const handlePhoneChange = (value: string) => {
+    // If user deletes everything, reset to +998
+    if (value === '' || value === '+') {
+      setFormData((prev) => ({ ...prev, phone: '+998 ' }))
+      return
+    }
+
+    // Don't allow deleting +998 prefix
+    if (!value.startsWith('+998')) {
+      return
+    }
+
+    // Format the phone number
+    const formatted = formatPhoneNumber(value)
+    setFormData((prev) => ({ ...prev, phone: formatted }))
+  }
 
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
+    phone: '+998 ',
     password: '',
     confirmPassword: '',
     dateOfBirth: undefined as Date | undefined,
@@ -120,12 +168,14 @@ export default function StudentRegister() {
     setTimeout(() => {
       setCurrentStep(3)
       setIsVerifying(false)
+      setResendTimer(60)
+
       // Start countdown timer
       const timer = setInterval(() => {
         setResendTimer((prev) => {
           if (prev <= 1) {
             clearInterval(timer)
-            return 60
+            return 0
           }
           return prev - 1
         })
@@ -289,9 +339,10 @@ export default function StudentRegister() {
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
+              onChange={(e) => handlePhoneChange(e.target.value)}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
               placeholder="+998 90 123 45 67"
+              maxLength={17}
               required
             />
           </div>
@@ -411,18 +462,22 @@ export default function StudentRegister() {
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+        <div className="space-y-2 flex justify-center flex-col">
+          <label className="text-sm font-medium text-gray-700 text-center">
             {t('enterVerificationCode')}
           </label>
-          <input
-            type="text"
-            value={otpCode}
-            onChange={(e) => setOtpCode(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 text-center text-lg tracking-widest"
-            placeholder="123456"
-            maxLength={6}
-          />
+          <div className="flex justify-center">
+            <InputOTP value={otpCode} onChange={setOtpCode} maxLength={6}>
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
           <p className="text-xs text-gray-500 text-center">
             {t('forDemoPurposes')}{' '}
             <span className="font-mono bg-gray-100 px-2 py-1 rounded">
@@ -439,12 +494,14 @@ export default function StudentRegister() {
                 {t('resendIn')} {resendTimer}s
               </span>
             ) : (
-              <button
+              <Button
+                variant="link"
                 onClick={sendOTP}
-                className="text-primary hover:underline"
+                disabled={isVerifying}
+                className="p-0 h-auto text-primary hover:underline"
               >
                 {t('resendCode')}
-              </button>
+              </Button>
             )}
           </p>
         </div>
@@ -596,25 +653,14 @@ export default function StudentRegister() {
   const progressPercentage = (currentStep / registrationSteps.length) * 100
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className=" bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 pt-8">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link
-            to="/"
-            className="inline-flex items-center text-primary hover:text-primary/80 mb-6"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t('backToHome')}
-          </Link>
-
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               {t('createStudentAccount')}
             </h1>
-            <p className="text-gray-600">
-              Join thousands of students learning with expert teachers
-            </p>
           </div>
 
           {/* Progress Bar */}
@@ -660,12 +706,12 @@ export default function StudentRegister() {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-gray-600">
-            Already have an account?{' '}
+            {t('alreadyHaveAccount')}{' '}
             <Link
               to="/login"
               className="text-primary hover:underline font-medium"
             >
-              Sign in here
+              {t('signIn')}
             </Link>
           </p>
         </div>

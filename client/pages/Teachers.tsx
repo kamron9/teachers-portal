@@ -3,6 +3,16 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -14,14 +24,16 @@ import {
 import { Slider } from '@/components/ui/slider'
 import {
   Clock,
+  Filter,
   Heart,
   MessageCircle,
   Search,
-  Shield,
+  ShieldAlert,
   ShieldCheck,
   Star,
   Users,
   Video,
+  X,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -165,6 +177,7 @@ export default function Teachers() {
   const [priceRange, setPriceRange] = useState([0, 100000])
   const [sortBy, setSortBy] = useState('rating')
   const [showOnlineOnly, setShowOnlineOnly] = useState(false)
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
 
   const filteredTeachers = mockTeachers.filter((teacher) => {
     const matchesSearch =
@@ -207,7 +220,7 @@ export default function Teachers() {
   })
 
   return (
-    <div className="py-16 min-h-screen bg-gray-50">
+    <div className="min-h-screen pb-10 bg-gray-50">
       <div>
         <div className="bg-white border-b">
           <div className="container py-8">
@@ -232,8 +245,8 @@ export default function Teachers() {
         </div>
 
         {/* Search and Filters */}
-        <div className="container">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border mb-8 space-y-6 mt-8">
+        <div className="md:container">
+          <div className="bg-white md:rounded-2xl p-6 shadow-sm border mb-8 space-y-6 mt-8">
             {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -241,12 +254,12 @@ export default function Teachers() {
                 placeholder={t('searchByTeacherName')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 h-12 text-lg"
+                className="pl-11 h-12"
               />
             </div>
 
-            {/* Filters Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Desktop Filters Row */}
+            <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <Select
                 value={selectedSubject}
                 onValueChange={setSelectedSubject}
@@ -282,7 +295,7 @@ export default function Teachers() {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">
                   {t('price')}: {priceRange[0].toLocaleString()} -{' '}
-                  {priceRange[1].toLocaleString()} UZS
+                  {priceRange[1].toLocaleString()} {t('sum')}
                 </label>
                 <Slider
                   value={priceRange}
@@ -327,11 +340,121 @@ export default function Teachers() {
         </div>
 
         {/* Results Count */}
-        <div className="container mb-6">
+        <div className="container mb-6 flex items-center justify-between gap-2">
           <p className="text-gray-600">
             {t('showing')} {sortedTeachers.length} {t('of')}{' '}
             {mockTeachers.length} {t('teachersCount')}
           </p>
+          {/* Mobile Filter Button */}
+          <div className="md:hidden">
+            <Drawer open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+              <DrawerTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Filter className="h-4 w-4" />
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>{t('filters')}</DrawerTitle>
+                  <DrawerDescription>
+                    {t('filterTeachersByYourPreferences')}
+                  </DrawerDescription>
+                </DrawerHeader>
+                <div className="px-4 space-y-4">
+                  <Select
+                    value={selectedSubject}
+                    onValueChange={setSelectedSubject}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('subject')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subjects.map((subject) => (
+                        <SelectItem key={subject} value={subject}>
+                          {subject}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={selectedLanguage}
+                    onValueChange={setSelectedLanguage}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('language')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {languages.map((language) => (
+                        <SelectItem key={language} value={language}>
+                          {language}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      {t('price')}: {priceRange[0].toLocaleString()} -{' '}
+                      {priceRange[1].toLocaleString()} {t('sum')}
+                    </label>
+                    <Slider
+                      value={priceRange}
+                      onValueChange={setPriceRange}
+                      max={100000}
+                      min={0}
+                      step={5000}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('sortBy')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="rating">
+                        {t('highestRated')}
+                      </SelectItem>
+                      <SelectItem value="price-low">
+                        {t('priceLowToHigh')}
+                      </SelectItem>
+                      <SelectItem value="price-high">
+                        {t('priceHighToLow')}
+                      </SelectItem>
+                      <SelectItem value="reviews">
+                        {t('mostReviews')}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="online-only-mobile"
+                      checked={showOnlineOnly}
+                      onCheckedChange={(checked: boolean) =>
+                        setShowOnlineOnly(checked)
+                      }
+                    />
+                    <label
+                      htmlFor="online-only-mobile"
+                      className="text-sm font-medium"
+                    >
+                      {t('onlineNowOnly')}
+                    </label>
+                  </div>
+                </div>
+                <DrawerFooter>
+                  <DrawerClose asChild>
+                    <Button variant="outline">
+                      <X className="h-4 w-4 mr-2" />
+                      {t('close')}
+                    </Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
+          </div>
         </div>
 
         {/* Teachers Grid */}
@@ -368,7 +491,7 @@ export default function Teachers() {
                         </Badge>
                       ) : (
                         <Badge className="absolute top-3 right-3 bg-orange-100 text-orange-800 shadow-lg hover:bg-orange-200">
-                          <Shield className="h-3 w-3 mr-1" />
+                          <ShieldAlert className="h-3 w-3 mr-1" />
                           {t('unverified')}
                         </Badge>
                       )}

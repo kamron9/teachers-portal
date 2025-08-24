@@ -1,4 +1,5 @@
 import LanguageSwitcher from '@/components/LanguageSwitcher'
+import { TeacherSchedule } from '@/components/schedule/TeacherSchedule'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -10,6 +11,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Progress } from '@/components/ui/progress'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { useToast } from '@/hooks/use-toast'
 import {
   AlertCircle,
@@ -29,7 +38,6 @@ import {
   ChartLine,
   Check,
   CheckCircle,
-  ChevronLeft,
   ChevronRight,
   Clock,
   Cloud,
@@ -59,16 +67,15 @@ import {
   PieChart,
   PiggyBank,
   Plus,
-  Printer,
   Quote,
   Receipt,
   RefreshCw,
   Reply,
-  RotateCcw,
   Save,
   Search,
   Send,
   Settings,
+  Settings2,
   Share,
   Shield,
   ShieldCheck,
@@ -90,7 +97,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 export interface SidebarItem {
   id: string
@@ -191,6 +198,7 @@ export default function TeacherDashboard() {
   >('account')
   const [settingsChanged, setSettingsChanged] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showSettingsDrawer, setShowSettingsDrawer] = useState(false)
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
   const [emailNotifications, setEmailNotifications] = useState({
     bookingRequests: true,
@@ -513,21 +521,28 @@ export default function TeacherDashboard() {
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
             {t('welcomeBack', { name: teacher.name.split(' ')[0] })}
           </h1>
           <p className="text-gray-600">{t('hereWhatHappeningToday')}</p>
         </div>
-        <div className="flex gap-3">
-          <Button onClick={() => setActiveSection('schedule')}>
+        <div className="flex flex-col flex-wrap justify-end sm:flex-row gap-2 sm:gap-3">
+          <Button
+            onClick={() => setActiveSection('schedule')}
+            className="w-full sm:w-auto"
+          >
             <Calendar className="h-4 w-4 mr-2" />
-            {t('manageSchedule')}
+            <span>{t('manageSchedule')}</span>
           </Button>
-          <Button variant="outline" onClick={() => setActiveSection('profile')}>
+          <Button
+            variant="outline"
+            onClick={() => setActiveSection('profile')}
+            className="w-full sm:w-auto"
+          >
             <Edit3 className="h-4 w-4 mr-2" />
-            {t('editProfile')}
+            <span>{t('editProfile')}</span>
           </Button>
         </div>
       </div>
@@ -536,9 +551,9 @@ export default function TeacherDashboard() {
       {teacher.profileCompletion < 100 && (
         <Card className="border-amber-200 bg-amber-50">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-600" />
+                <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0" />
                 <div>
                   <div className="font-medium text-amber-900">
                     {t('completeProfileMoreBookings')}
@@ -554,6 +569,7 @@ export default function TeacherDashboard() {
                 variant="outline"
                 size="sm"
                 onClick={() => setActiveSection('profile')}
+                className="w-full sm:w-auto"
               >
                 {t('completeNow')}
               </Button>
@@ -564,37 +580,45 @@ export default function TeacherDashboard() {
       )}
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <Card>
-          <CardContent className="p-6 text-center">
-            <div className="text-3xl font-bold text-primary mb-2">
+          <CardContent className="p-4 lg:p-6 text-center">
+            <div className="text-2xl lg:text-3xl font-bold text-primary mb-2">
               {teacher.totalLessons}
             </div>
-            <div className="text-gray-600">{t('totalLessons')}</div>
+            <div className="text-gray-600 text-sm lg:text-base">
+              {t('totalLessons')}
+            </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-6 text-center">
-            <div className="text-3xl font-bold text-primary mb-2">
+          <CardContent className="p-4 lg:p-6 text-center">
+            <div className="text-2xl lg:text-3xl font-bold text-primary mb-2">
               {teacher.totalStudents}
             </div>
-            <div className="text-gray-600">{t('studentsTaught')}</div>
+            <div className="text-gray-600 text-sm lg:text-base">
+              {t('studentsTaught')}
+            </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-6 text-center">
-            <div className="text-3xl font-bold text-primary mb-2">
+          <CardContent className="p-4 lg:p-6 text-center">
+            <div className="text-2xl lg:text-3xl font-bold text-primary mb-2">
               {teacher.rating}
             </div>
-            <div className="text-gray-600">{t('averageRating')}</div>
+            <div className="text-gray-600 text-sm lg:text-base">
+              {t('averageRating')}
+            </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-6 text-center">
-            <div className="text-3xl font-bold text-primary mb-2">
+          <CardContent className="p-4 lg:p-6 text-center">
+            <div className="text-2xl lg:text-3xl font-bold text-primary mb-2">
               {(teacher.totalEarnings / 1000000).toFixed(1)}M
             </div>
-            <div className="text-gray-600">{t('totalEarnings')}</div>
+            <div className="text-gray-600 text-sm lg:text-base">
+              {t('totalEarnings')}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -602,7 +626,7 @@ export default function TeacherDashboard() {
       {/* Today's Schedule */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <span className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
               {t('todaysLessons')}
@@ -611,6 +635,7 @@ export default function TeacherDashboard() {
               variant="ghost"
               size="sm"
               onClick={() => setActiveSection('schedule')}
+              className="w-full sm:w-auto"
             >
               {t('viewAll')} <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
@@ -624,10 +649,10 @@ export default function TeacherDashboard() {
                 .map((lesson) => (
                   <div
                     key={lesson.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-4"
                   >
                     <div className="flex items-center gap-4">
-                      <Avatar className="w-12 h-12">
+                      <Avatar className="w-12 h-12 flex-shrink-0">
                         <AvatarImage
                           src={lesson.student.image}
                           alt={lesson.student.name}
@@ -639,11 +664,11 @@ export default function TeacherDashboard() {
                             .join('')}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <div className="font-semibold">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold truncate">
                           {lesson.student.name}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 truncate">
                           {lesson.type}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -654,20 +679,20 @@ export default function TeacherDashboard() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                       <Badge
-                        className={
+                        className={`${
                           lesson.status === 'confirmed'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-yellow-100 text-yellow-800'
-                        }
+                        } text-center w-fit`}
                       >
-                        {lesson.status}
+                        {t(lesson.status)}
                       </Badge>
                       {lesson.meetingLink && (
-                        <Button size="sm">
+                        <Button size="sm" className="w-full sm:w-auto">
                           <Video className="h-4 w-4 mr-2" />
-                          {t('joinLesson')}
+                          <span>{t('joinLesson')}</span>
                         </Button>
                       )}
                     </div>
@@ -677,9 +702,9 @@ export default function TeacherDashboard() {
           ) : (
             <div className="text-center py-8 text-gray-500">
               <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>{t('noLessonsToday')}</p>
+              <p className="mb-4">{t('noLessonsToday')}</p>
               <Button
-                className="mt-4"
+                className="w-full sm:w-auto"
                 onClick={() => setActiveSection('schedule')}
               >
                 {t('startTeaching')}
@@ -690,7 +715,7 @@ export default function TeacherDashboard() {
       </Card>
 
       {/* Recent Activity */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -703,10 +728,10 @@ export default function TeacherDashboard() {
               {recentBookings.slice(0, 3).map((booking) => (
                 <div
                   key={booking.id}
-                  className="flex items-center justify-between p-3 border rounded-lg"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg gap-3"
                 >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <Avatar className="w-10 h-10 flex-shrink-0">
                       <AvatarImage
                         src={booking.student.image}
                         alt={booking.student.name}
@@ -718,19 +743,27 @@ export default function TeacherDashboard() {
                           .join('')}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <div className="font-medium">{booking.student.name}</div>
-                      <div className="text-sm text-gray-600">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium truncate">
+                        {booking.student.name}
+                      </div>
+                      <div className="text-sm text-gray-600 truncate">
                         {new Date(booking.requestedDate).toLocaleDateString()}{' '}
                         at {booking.requestedTime}
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline">
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1 sm:flex-none"
+                    >
                       {t('decline')}
                     </Button>
-                    <Button size="sm">{t('accept')}</Button>
+                    <Button size="sm" className="flex-1 sm:flex-none">
+                      {t('accept')}
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -746,20 +779,28 @@ export default function TeacherDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('completionRate')}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 text-sm sm:text-base">
+                {t('completionRate')}
+              </span>
               <span className="font-semibold">96%</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('responseTime')}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 text-sm sm:text-base">
+                {t('responseTime')}
+              </span>
               <span className="font-semibold">2 hours</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('newStudents')}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 text-sm sm:text-base">
+                {t('newStudents')}
+              </span>
               <span className="font-semibold">12</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('monthlyEarnings')}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 text-sm sm:text-base">
+                {t('monthlyEarnings')}
+              </span>
               <span className="font-semibold text-green-600">
                 {(earningsData.thisMonth / 1000000).toFixed(1)}M UZS
               </span>
@@ -803,22 +844,29 @@ export default function TeacherDashboard() {
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               {t('profileManagement')}
             </h1>
             <p className="text-gray-600">{t('manageTeachingProfile')}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             {!isEditing ? (
-              <Button onClick={() => setIsEditing(true)}>
+              <Button
+                onClick={() => setIsEditing(true)}
+                className="w-full sm:w-auto"
+              >
                 <Edit3 className="h-4 w-4 mr-2" />
                 {t('editProfile')}
               </Button>
             ) : (
               <>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                  className="w-full sm:w-auto"
+                >
                   {t('profileCancel')}
                 </Button>
                 <Button
@@ -832,6 +880,7 @@ export default function TeacherDashboard() {
                       ),
                     })
                   }}
+                  className="w-full sm:w-auto"
                 >
                   <CheckCircle className="h-4 w-4 mr-2" />
                   {t('profileSaveChanges')}
@@ -875,8 +924,8 @@ export default function TeacherDashboard() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Profile Photo */}
-            <div className="flex items-start gap-6">
-              <div className="flex flex-col items-center space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-6">
+              <div className="flex flex-col items-center space-y-3 w-full sm:w-auto">
                 <Avatar className="w-24 h-24">
                   <AvatarImage src={profileImage} alt="Profile" />
                   <AvatarFallback className="text-xl">
@@ -885,13 +934,17 @@ export default function TeacherDashboard() {
                   </AvatarFallback>
                 </Avatar>
                 {isEditing && (
-                  <Button variant="outline" size="sm">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                  >
                     <Camera className="h-4 w-4 mr-2" />
                     {t('profileChangePhoto')}
                   </Button>
                 )}
               </div>
-              <div className="flex-1 grid grid-cols-2 gap-4">
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
                     {t('profileFirstName')} *
@@ -1060,16 +1113,16 @@ export default function TeacherDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <Video className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-8 text-center">
+              <Video className="h-8 sm:h-12 w-8 sm:w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                 {t('profileUploadVideoIntroduction')}
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-sm sm:text-base text-gray-600 mb-4">
                 {t('profileHelpStudentsKnowYou')}
               </p>
               {isEditing ? (
-                <Button>
+                <Button className="w-full sm:w-auto">
                   <Upload className="h-4 w-4 mr-2" />
                   {t('profileUploadVideo')}
                 </Button>
@@ -1097,7 +1150,7 @@ export default function TeacherDashboard() {
           <CardContent className="space-y-6">
             {/* Subject Cards Editor */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h4 className="font-medium">
                     {t('profileSubjectOfferings')}
@@ -1107,7 +1160,11 @@ export default function TeacherDashboard() {
                   </p>
                 </div>
                 {isEditing && (
-                  <Button onClick={() => setShowAddSubject(true)} size="sm">
+                  <Button
+                    onClick={() => setShowAddSubject(true)}
+                    size="sm"
+                    className="w-full sm:w-auto"
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     {t('profileAddSubject')}
                   </Button>
@@ -1116,23 +1173,26 @@ export default function TeacherDashboard() {
 
               {/* Subject Cards Grid */}
               {subjectCards.length === 0 ? (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-8 text-center">
+                  <BookOpen className="h-8 sm:h-12 w-8 sm:w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                     {t('profileNoSubjectsAdded')}
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-sm sm:text-base text-gray-600 mb-4">
                     {t('profileAddFirstSubject')}
                   </p>
                   {isEditing && (
-                    <Button onClick={() => setShowAddSubject(true)}>
+                    <Button
+                      onClick={() => setShowAddSubject(true)}
+                      className="w-full sm:w-auto"
+                    >
                       <Plus className="h-4 w-4 mr-2" />
                       {t('profileAddSubject')}
                     </Button>
                   )}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {subjectCards.map((subject, index) => (
                     <Card
                       key={subject.id}
@@ -1309,7 +1369,7 @@ export default function TeacherDashboard() {
                         </Button>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label className="text-sm font-medium">
                             {t('profileSubjectName')} *
@@ -1430,17 +1490,17 @@ export default function TeacherDashboard() {
                         </div>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Button
                           onClick={addSubject}
                           disabled={
                             !newSubject.name.trim() || newSubject.price <= 0
                           }
-                          className={
+                          className={`w-full sm:w-auto ${
                             !newSubject.name.trim() || newSubject.price <= 0
                               ? 'opacity-50 cursor-not-allowed'
                               : ''
-                          }
+                          }`}
                         >
                           <Plus className="h-4 w-4 mr-2" />
                           {t('profileAddSubject')}
@@ -1448,6 +1508,7 @@ export default function TeacherDashboard() {
                         <Button
                           variant="outline"
                           onClick={() => setShowAddSubject(false)}
+                          className="w-full sm:w-auto"
                         >
                           {t('profileCancel')}
                         </Button>
@@ -1524,7 +1585,7 @@ export default function TeacherDashboard() {
               </h4>
               <div className="bg-gray-50 p-4 rounded-lg">
                 {/* Preview Subject Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
                   {subjectCards.map((subject) => (
                     <Card
                       key={subject.id}
@@ -1609,21 +1670,21 @@ export default function TeacherDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <Upload className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                <h4 className="font-medium text-gray-900 mb-2">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center">
+                <Upload className="h-6 sm:h-8 w-6 sm:w-8 text-gray-400 mx-auto mb-3" />
+                <h4 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">
                   {t('profileUploadCertificatesDocuments')}
                 </h4>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-xs sm:text-sm text-gray-600 mb-4">
                   {t('profileUploadTeachingCertificates')}
                 </p>
                 {isEditing ? (
-                  <Button variant="outline">
+                  <Button variant="outline" className="w-full sm:w-auto">
                     <Upload className="h-4 w-4 mr-2" />
                     {t('profileChooseFiles')}
                   </Button>
                 ) : (
-                  <div className="text-sm text-gray-500">
+                  <div className="text-xs sm:text-sm text-gray-500">
                     {t('profileNoDocumentsUploaded')}
                   </div>
                 )}
@@ -2383,109 +2444,110 @@ export default function TeacherDashboard() {
   }
 
   const renderScheduleManagement = () => {
-    const timeSlots = generateTimeSlots()
-    const daysInMonth = getDaysInMonth(currentDate)
-    const today = new Date()
+    // const timeSlots = generateTimeSlots()
+    // const daysInMonth = getDaysInMonth(currentDate)
+    // const today = new Date()
 
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               {t('scheduleAndAvailability')}
             </h1>
             <p className="text-gray-600">{t('setAvailabilitySchedule')}</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
             <Button
               variant="outline"
               onClick={() => setShowAvailabilityModal(true)}
+              className="w-full sm:w-auto"
             >
               <Settings className="h-4 w-4 mr-2" />
-              {t('scheduleSetAvailability')}
+              <span>{t('scheduleSetAvailability')}</span>
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
-              {t('scheduleAddBreak')}
+              <span>{t('scheduleAddBreak')}</span>
             </Button>
-            <Button>
+            <Button className="w-full sm:w-auto">
               <Eye className="h-4 w-4 mr-2" />
-              {t('scheduleViewBookings')}
+              <span>{t('scheduleViewBookings')}</span>
             </Button>
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl sm:text-2xl font-bold text-primary">
                     {scheduleAnalytics.bookingRate}%
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {t('scheduleBookingRate')}
                   </div>
                 </div>
-                <TrendingUp className="h-8 w-8 text-green-500" />
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl sm:text-2xl font-bold text-primary">
                     {scheduleAnalytics.utilizationRate}%
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {t('scheduleUtilization')}
                   </div>
                 </div>
-                <BarChart3 className="h-8 w-8 text-blue-500" />
+                <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl sm:text-2xl font-bold text-primary">
                     {mockBookings.filter((b) => b.status === 'pending').length}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {t('schedulePendingBookings')}
                   </div>
                 </div>
-                <Clock className="h-8 w-8 text-orange-500" />
+                <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500" />
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl sm:text-2xl font-bold text-primary">
                     {(scheduleAnalytics.monthlyProjection / 1000000).toFixed(1)}
                     M
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {t('scheduleMonthlyProjection')}
                   </div>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-500" />
+                <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Calendar Controls */}
-        <Card>
+        {/* <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
@@ -2521,7 +2583,7 @@ export default function TeacherDashboard() {
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
-                  <h3 className="text-lg font-semibold">
+                  <h3 className="text-base sm:text-lg font-semibold">
                     {currentDate.toLocaleDateString('en-US', {
                       month: 'long',
                       year: 'numeric',
@@ -2533,225 +2595,71 @@ export default function TeacherDashboard() {
                   variant="outline"
                   size="sm"
                   onClick={() => setCurrentDate(new Date())}
+                  className="hidden sm:inline-flex"
                 >
                   {t('scheduleToday')}
                 </Button>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="flex border rounded-lg p-1">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                <div className="flex border rounded-lg p-1 w-full sm:w-auto">
                   {(['month', 'week', 'day'] as const).map((view) => (
                     <Button
                       key={view}
                       variant={calendarView === view ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => setCalendarView(view)}
-                      className="capitalize"
+                      className="capitalize flex-1 sm:flex-initial"
                     >
-                      {t(
-                        `schedule${view.charAt(0).toUpperCase() + view.slice(1)}`
-                      )}
+                      <span>
+                        {t(
+                          `schedule${view.charAt(0).toUpperCase() + view.slice(1)}`
+                        )}
+                      </span>
                     </Button>
                   ))}
                 </div>
 
-                <Button variant="outline" size="sm">
-                  <Printer className="h-4 w-4 mr-2" />
-                  {t('schedulePrint')}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full sm:w-auto"
+                >
+                  <Printer className="h-4 w-4 sm:mr-2" />
+                  <span>{t('schedulePrint')}</span>
                 </Button>
               </div>
             </div>
           </CardHeader>
-        </Card>
+        </Card> */}
 
-        {/* Calendar Display */}
-        {calendarView === 'month' && (
-          <Card>
-            <CardContent className="p-0">
-              {/* Calendar Header */}
-              <div className="grid grid-cols-7 border-b">
-                {[
-                  t('scheduleSun'),
-                  t('scheduleMon'),
-                  t('scheduleTue'),
-                  t('scheduleWed'),
-                  t('scheduleThu'),
-                  t('scheduleFri'),
-                  t('scheduleSat'),
-                ].map((day) => (
-                  <div
-                    key={day}
-                    className="p-4 text-center font-medium text-gray-600 bg-gray-50"
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              {/* Calendar Body */}
-              <div className="grid grid-cols-7">
-                {daysInMonth.map((day, index) => {
-                  const isToday =
-                    day && day.toDateString() === today.toDateString()
-                  const dayBookings = day
-                    ? mockBookings.filter(
-                        (booking) =>
-                          booking.date === day.toISOString().split('T')[0]
-                      )
-                    : []
-
-                  return (
-                    <div
-                      key={index}
-                      className={`min-h-[120px] border-r border-b p-2 ${
-                        !day ? 'bg-gray-50' : 'hover:bg-gray-50 cursor-pointer'
-                      } ${isToday ? 'bg-blue-50 border-blue-200' : ''}`}
-                    >
-                      {day && (
-                        <>
-                          <div
-                            className={`text-sm font-medium mb-2 ${
-                              isToday ? 'text-blue-600' : 'text-gray-900'
-                            }`}
-                          >
-                            {day.getDate()}
-                          </div>
-                          <div className="space-y-1">
-                            {dayBookings.slice(0, 3).map((booking) => (
-                              <div
-                                key={booking.id}
-                                className={`text-xs p-1 rounded truncate ${
-                                  booking.status === 'confirmed'
-                                    ? 'bg-green-100 text-green-800'
-                                    : booking.status === 'pending'
-                                      ? 'bg-yellow-100 text-yellow-800'
-                                      : 'bg-red-100 text-red-800'
-                                }`}
-                              >
-                                {booking.time} - {booking.student.name}
-                              </div>
-                            ))}
-                            {dayBookings.length > 3 && (
-                              <div className="text-xs text-gray-500 font-medium">
-                                +{dayBookings.length - 3} {t('scheduleMore')}
-                              </div>
-                            )}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Day/Week View */}
-        {(calendarView === 'day' || calendarView === 'week') && (
-          <Card>
-            <CardContent className="p-0">
-              <div className="flex">
-                {/* Time column */}
-                <div className="w-20 border-r">
-                  <div className="h-12 border-b"></div>
-                  {timeSlots
-                    .filter((_, index) => index % 2 === 0)
-                    .map((time) => (
-                      <div
-                        key={time}
-                        className="h-16 border-b flex items-center justify-center text-sm text-gray-600"
-                      >
-                        {time}
-                      </div>
-                    ))}
-                </div>
-
-                {/* Calendar days */}
-                <div className="flex-1">
-                  <div className="grid grid-cols-1 h-12 border-b">
-                    <div className="flex items-center justify-center font-medium">
-                      {formatDate(currentDate)}
-                    </div>
-                  </div>
-
-                  <div className="relative">
-                    {timeSlots
-                      .filter((_, index) => index % 2 === 0)
-                      .map((time, index) => {
-                        const booking = getBookingForSlot(currentDate, time)
-                        const isAvailable = isTimeSlotAvailable(
-                          currentDate,
-                          time
-                        )
-
-                        return (
-                          <div
-                            key={time}
-                            className={`h-16 border-b flex items-center px-4 cursor-pointer ${
-                              booking
-                                ? booking.status === 'confirmed'
-                                  ? 'bg-blue-100 hover:bg-blue-200'
-                                  : 'bg-yellow-100 hover:bg-yellow-200'
-                                : isAvailable
-                                  ? 'hover:bg-green-50'
-                                  : 'bg-gray-50'
-                            }`}
-                          >
-                            {booking ? (
-                              <div className="flex-1">
-                                <div className="font-medium text-sm">
-                                  {booking.student.name}
-                                </div>
-                                <div className="text-xs text-gray-600">
-                                  {booking.subject}
-                                </div>
-                                <Badge
-                                  variant={
-                                    booking.status === 'confirmed'
-                                      ? 'default'
-                                      : 'secondary'
-                                  }
-                                  className="text-xs"
-                                >
-                                  {t(booking.status)}
-                                </Badge>
-                              </div>
-                            ) : isAvailable ? (
-                              <div className="text-sm text-gray-500">
-                                {t('scheduleAvailable')}
-                              </div>
-                            ) : (
-                              <div className="text-sm text-gray-400">
-                                {t('scheduleUnavailable')}
-                              </div>
-                            )}
-                          </div>
-                        )
-                      })}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Teacher Schedule Component */}
+        <TeacherSchedule />
 
         {/* Current Bookings */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <span className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
                 {t('scheduleCurrentBookings')}
               </span>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Filter className="h-4 w-4 mr-2" />
-                  {t('scheduleFilter')}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 sm:flex-initial"
+                >
+                  <Filter className="h-4 w-4 sm:mr-2" />
+                  <span>{t('scheduleFilter')}</span>
                 </Button>
-                <Button variant="outline" size="sm">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  {t('scheduleRefresh')}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 sm:flex-initial"
+                >
+                  <RefreshCw className="h-4 w-4 sm:mr-2" />
+                  <span>{t('scheduleRefresh')}</span>
                 </Button>
               </div>
             </CardTitle>
@@ -2759,10 +2667,10 @@ export default function TeacherDashboard() {
           <CardContent>
             <div className="space-y-4">
               {mockBookings.map((booking) => (
-                <div key={booking.id} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="w-12 h-12">
+                <div key={booking.id} className="border rounded-lg p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
                         <AvatarImage
                           src={booking.student.image}
                           alt={booking.student.name}
@@ -2774,14 +2682,14 @@ export default function TeacherDashboard() {
                             .join('')}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <div className="font-semibold">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-sm sm:text-base">
                           {booking.student.name}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-xs sm:text-sm text-gray-600">
                           {booking.subject}
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-gray-500 mt-1">
                           <span className="flex items-center gap-1">
                             <CalendarIcon className="h-3 w-3" />
                             {new Date(booking.date).toLocaleDateString()}
@@ -2797,7 +2705,7 @@ export default function TeacherDashboard() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                       <Badge
                         className={`${
                           booking.status === 'confirmed'
@@ -2811,14 +2719,22 @@ export default function TeacherDashboard() {
                       </Badge>
 
                       {booking.status === 'pending' && (
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
-                            <X className="h-4 w-4 mr-1" />
-                            {t('scheduleDecline')}
+                        <div className="flex gap-2 w-full sm:w-auto">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 sm:flex-initial"
+                          >
+                            <X className="h-4 w-4 sm:mr-1" />
+                            <span className="hidden sm:inline">
+                              {t('scheduleDecline')}
+                            </span>
                           </Button>
-                          <Button size="sm">
-                            <Check className="h-4 w-4 mr-1" />
-                            {t('scheduleAccept')}
+                          <Button size="sm" className="flex-1 sm:flex-initial">
+                            <Check className="h-4 w-4 sm:mr-1" />
+                            <span className="hidden sm:inline">
+                              {t('scheduleAccept')}
+                            </span>
                           </Button>
                         </div>
                       )}
@@ -3269,88 +3185,92 @@ export default function TeacherDashboard() {
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               {t('bookingsAndLessons')}
             </h1>
             <p className="text-gray-600">{t('manageStudentBookings')}</p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setShowMessageModal(true)}>
-              <MessageCircle className="h-4 w-4 mr-2" />
-              {t('bookingSendMessage')}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              onClick={() => setShowMessageModal(true)}
+              className="w-full sm:w-auto"
+            >
+              <MessageCircle className="h-4 w-4 sm:mr-2" />
+              <span>{t('bookingSendMessage')}</span>
             </Button>
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              {t('bookingExportData')}
+            <Button variant="outline" className="w-full sm:w-auto">
+              <Download className="h-4 w-4 sm:mr-2" />
+              <span>{t('bookingExportData')}</span>
             </Button>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('bookingManualBooking')}
+            <Button className="w-full sm:w-auto">
+              <Plus className="h-4 w-4 sm:mr-2" />
+              <span>{t('bookingManualBooking')}</span>
             </Button>
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl sm:text-2xl font-bold text-primary">
                     {bookingStats.todayLessons}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {t('bookingTodaysLessons')}
                   </div>
                 </div>
-                <Sun className="h-8 w-8 text-yellow-500" />
+                <Sun className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-500" />
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl sm:text-2xl font-bold text-primary">
                     {bookingStats.pendingRequests}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {t('bookingPendingRequests')}
                   </div>
                 </div>
-                <Clock className="h-8 w-8 text-orange-500" />
+                <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500" />
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl sm:text-2xl font-bold text-primary">
                     {(bookingStats.weeklyEarnings / 1000000).toFixed(1)}M
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {t('bookingThisWeek')}
                   </div>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-500" />
+                <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl sm:text-2xl font-bold text-primary">
                     {bookingStats.acceptanceRate}%
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {t('bookingAcceptanceRate')}
                   </div>
                 </div>
-                <TrendingUp className="h-8 w-8 text-blue-500" />
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
@@ -3358,8 +3278,8 @@ export default function TeacherDashboard() {
 
         {/* Navigation Tabs */}
         <Card>
-          <CardContent className="p-0">
-            <div className="flex border-b">
+          <CardContent className="p-0 overflow-x-auto">
+            <div className="flex  flex-wrap  border-b overflow-x-auto">
               {(
                 [
                   {
@@ -3387,15 +3307,16 @@ export default function TeacherDashboard() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveBookingTab(tab.id)}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                  className={`sm:flex-1 shrink-0 min-w-0 px-2 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                     activeBookingTab === tab.id
                       ? 'border-b-2 border-primary text-primary bg-primary/5'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {tab.label}
+                  <span>{tab.label}</span>
+
                   {tab.count > 0 && (
-                    <Badge className="ml-2" variant="secondary">
+                    <Badge className="ml-1 sm:ml-2" variant="secondary">
                       {tab.count}
                     </Badge>
                   )}
@@ -3404,8 +3325,8 @@ export default function TeacherDashboard() {
             </div>
 
             {/* Filter and Search */}
-            <div className="p-4 border-b bg-gray-50">
-              <div className="flex items-center gap-4">
+            <div className="p-3 sm:p-4 border-b bg-gray-50">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                 <div className="flex-1">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -3414,59 +3335,72 @@ export default function TeacherDashboard() {
                       placeholder={t('bookingSearchPlaceholder')}
                       value={searchFilter}
                       onChange={(e) => setSearchFilter(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border rounded-md"
+                      className="w-full pl-10 pr-4 py-2 border rounded-md text-sm"
                     />
                   </div>
                 </div>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as any)}
-                  className="p-2 border rounded-md"
-                >
-                  <option value="all">{t('bookingAllStatus')}</option>
-                  <option value="confirmed">{t('bookingConfirmed')}</option>
-                  <option value="pending">{t('bookingPending')}</option>
-                  <option value="cancelled">{t('bookingCancelled')}</option>
-                  <option value="completed">{t('bookingCompleted')}</option>
-                </select>
-                <Button variant="outline" size="sm">
-                  <Filter className="h-4 w-4 mr-2" />
-                  {t('bookingMoreFilters')}
-                </Button>
+                <div className="flex gap-2 sm:gap-3">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as any)}
+                    className="p-2 border rounded-md text-sm flex-1 sm:flex-initial"
+                  >
+                    <option value="all">{t('bookingAllStatus')}</option>
+                    <option value="confirmed">{t('bookingConfirmed')}</option>
+                    <option value="pending">{t('bookingPending')}</option>
+                    <option value="cancelled">{t('bookingCancelled')}</option>
+                    <option value="completed">{t('bookingCompleted')}</option>
+                  </select>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="whitespace-nowrap"
+                  >
+                    <Filter className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">
+                      {t('bookingMoreFilters')}
+                    </span>
+                  </Button>
+                </div>
               </div>
 
               {/* Bulk Actions */}
               {selectedBookings.length > 0 && (
-                <div className="flex items-center gap-3 mt-3 p-3 bg-blue-50 rounded-lg">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mt-3 p-3 bg-blue-50 rounded-lg">
                   <span className="text-sm font-medium">
                     {selectedBookings.length} {t('bookingSelectedCount')}
                   </span>
-                  {activeBookingTab === 'pending' && (
-                    <>
-                      <Button
-                        size="sm"
-                        onClick={() => handleBulkAction('accept')}
-                      >
-                        <Check className="h-4 w-4 mr-1" />
-                        {t('bookingAcceptAll')}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleBulkAction('decline')}
-                      >
-                        <X className="h-4 w-4 mr-1" />
-                        {t('bookingDeclineAll')}
-                      </Button>
-                    </>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setSelectedBookings([])}
-                  >
-                    {t('bookingClearSelection')}
-                  </Button>
+                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    {activeBookingTab === 'pending' && (
+                      <>
+                        <Button
+                          size="sm"
+                          onClick={() => handleBulkAction('accept')}
+                          className="flex-1 sm:flex-initial"
+                        >
+                          <Check className="h-4 w-4 sm:mr-1" />
+                          <span>{t('bookingAcceptAll')}</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleBulkAction('decline')}
+                          className="flex-1 sm:flex-initial"
+                        >
+                          <X className="h-4 w-4 sm:mr-1" />
+                          <span>{t('bookingDeclineAll')}</span>
+                        </Button>
+                      </>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedBookings([])}
+                      className="flex-1 sm:flex-initial"
+                    >
+                      <span>{t('bookingClearSelection')}</span>
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
@@ -3479,9 +3413,9 @@ export default function TeacherDashboard() {
             <div className="space-y-4">
               {pendingBookingRequests.map((request) => (
                 <Card key={request.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-4">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col lg:flex-row items-start justify-between gap-4">
+                      <div className="flex items-start gap-3 sm:gap-4 w-full lg:flex-1">
                         <input
                           type="checkbox"
                           checked={selectedBookings.includes(request.id)}
@@ -3501,7 +3435,7 @@ export default function TeacherDashboard() {
                           }}
                           className="mt-1"
                         />
-                        <Avatar className="w-16 h-16">
+                        <Avatar className="w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0">
                           <AvatarImage
                             src={request.student.image}
                             alt={request.student.name}
@@ -3513,29 +3447,31 @@ export default function TeacherDashboard() {
                               .join('')}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                            <h3 className="text-base sm:text-lg font-semibold">
                               {request.student.name}
                             </h3>
-                            <Badge variant="outline">
-                              {request.student.totalLessons}{' '}
-                              {t('bookingLessonsCount')}
-                            </Badge>
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                              <span className="text-sm">
-                                {request.student.rating}
-                              </span>
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <Badge variant="outline" className="text-xs">
+                                {request.student.totalLessons}{' '}
+                                {t('bookingLessonsCount')}
+                              </Badge>
+                              <div className="flex items-center gap-1">
+                                <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 fill-current" />
+                                <span className="text-xs sm:text-sm">
+                                  {request.student.rating}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4 mb-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-3">
                             <div className="space-y-1">
-                              <div className="text-sm text-gray-600">
+                              <div className="text-xs sm:text-sm text-gray-600">
                                 {t('bookingRequestedDateTime')}
                               </div>
-                              <div className="font-medium">
+                              <div className="font-medium text-sm">
                                 {new Date(
                                   request.requestedDate
                                 ).toLocaleDateString()}{' '}
@@ -3543,40 +3479,42 @@ export default function TeacherDashboard() {
                               </div>
                             </div>
                             <div className="space-y-1">
-                              <div className="text-sm text-gray-600">
+                              <div className="text-xs sm:text-sm text-gray-600">
                                 {t('bookingSubjectDuration')}
                               </div>
-                              <div className="font-medium">
+                              <div className="font-medium text-sm">
                                 {request.subject} ({request.duration} min)
                               </div>
                             </div>
                           </div>
 
                           <div className="space-y-2 mb-3">
-                            <div className="text-sm text-gray-600">
+                            <div className="text-xs sm:text-sm text-gray-600">
                               {t('bookingMessageFromStudent')}
                             </div>
-                            <div className="text-sm bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs sm:text-sm bg-gray-50 p-2 sm:p-3 rounded-lg">
                               {request.message}
                             </div>
                           </div>
 
                           {request.specialRequirements && (
                             <div className="space-y-1 mb-3">
-                              <div className="text-sm text-gray-600">
+                              <div className="text-xs sm:text-sm text-gray-600">
                                 {t('bookingSpecialRequirements')}
                               </div>
-                              <Badge variant="secondary">
+                              <Badge variant="secondary" className="text-xs">
                                 {request.specialRequirements}
                               </Badge>
                             </div>
                           )}
 
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {t('bookingRequested')}{' '}
-                              {new Date(request.requestedAt).toLocaleString()}
+                              <span>{t('bookingRequested')}</span>
+                              {new Date(
+                                request.requestedAt
+                              ).toLocaleDateString()}
                             </span>
                             <span className="flex items-center gap-1">
                               <DollarSign className="h-3 w-3" />
@@ -3585,13 +3523,13 @@ export default function TeacherDashboard() {
                             <span className="flex items-center gap-1">
                               {request.paymentConfirmed ? (
                                 <>
-                                  <CheckCircle className="h-3 w-3 text-green-500" />{' '}
-                                  {t('bookingPaymentConfirmed')}
+                                  <CheckCircle className="h-3 w-3 text-green-500" />
+                                  <span>{t('bookingPaymentConfirmed')}</span>
                                 </>
                               ) : (
                                 <>
-                                  <AlertTriangle className="h-3 w-3 text-yellow-500" />{' '}
-                                  {t('bookingPaymentPending')}
+                                  <AlertTriangle className="h-3 w-3 text-yellow-500" />
+                                  <span>{t('bookingPaymentPending')}</span>
                                 </>
                               )}
                             </span>
@@ -3599,7 +3537,7 @@ export default function TeacherDashboard() {
                         </div>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 w-full lg:w-auto">
                         <Button
                           size="sm"
                           variant="outline"
@@ -3607,6 +3545,7 @@ export default function TeacherDashboard() {
                             setSelectedStudent(request.student)
                             setShowMessageModal(true)
                           }}
+                          className="lg:flex-initial"
                         >
                           <MessageCircle className="h-4 w-4" />
                         </Button>
@@ -3614,16 +3553,18 @@ export default function TeacherDashboard() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleDeclineBooking(request.id)}
+                          className="flex-1 lg:flex-initial"
                         >
-                          <X className="h-4 w-4 mr-1" />
-                          {t('bookingDecline')}
+                          <X className="h-4 w-4 sm:mr-1" />
+                          <span>{t('bookingDecline')}</span>
                         </Button>
                         <Button
                           size="sm"
                           onClick={() => handleAcceptBooking(request.id)}
+                          className="flex-1 lg:flex-initial"
                         >
-                          <Check className="h-4 w-4 mr-1" />
-                          {t('bookingAccept')}
+                          <Check className="h-4 w-4 sm:mr-1" />
+                          <span>{t('bookingAccept')}</span>
                         </Button>
                       </div>
                     </div>
@@ -3638,10 +3579,10 @@ export default function TeacherDashboard() {
               {todaysLessons.length > 0 ? (
                 todaysLessons.map((lesson) => (
                   <Card key={lesson.id}>
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="w-14 h-14">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4 w-full sm:flex-1">
+                          <Avatar className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0">
                             <AvatarImage
                               src={lesson.student.image}
                               alt={lesson.student.name}
@@ -3653,36 +3594,48 @@ export default function TeacherDashboard() {
                                 .join('')}
                             </AvatarFallback>
                           </Avatar>
-                          <div>
-                            <h3 className="text-lg font-semibold">
+                          <div className="min-w-0 flex-1">
+                            <h3 className="text-base sm:text-lg font-semibold">
                               {lesson.student.name}
                             </h3>
-                            <div className="text-gray-600">
+                            <div className="text-sm sm:text-base text-gray-600">
                               {lesson.subject}
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-gray-500">
                               <span className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
                                 {lesson.time} ({lesson.duration} min)
                               </span>
-                              <Badge className="bg-green-100 text-green-800">
+                              <Badge className="bg-green-100 text-green-800 text-xs w-fit">
                                 {lesson.status}
                               </Badge>
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <Button variant="outline" size="sm">
-                            <Phone className="h-4 w-4 mr-2" />
-                            {t('bookingCall')}
+                        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 sm:flex-initial"
+                          >
+                            <Phone className="h-4 w-4 sm:mr-2" />
+                            <span className="hidden sm:inline">
+                              {t('bookingCall')}
+                            </span>
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <MessageCircle className="h-4 w-4 mr-2" />
-                            {t('bookingMessage')}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 sm:flex-initial"
+                          >
+                            <MessageCircle className="h-4 w-4 sm:mr-2" />
+                            <span className="hidden sm:inline">
+                              {t('bookingMessage')}
+                            </span>
                           </Button>
-                          <Button size="sm">
-                            <Video className="h-4 w-4 mr-2" />
-                            {t('bookingStartLesson')}
+                          <Button size="sm" className="flex-1 sm:flex-initial">
+                            <Video className="h-4 w-4 sm:mr-2" />
+                            <span>{t('bookingStartLesson')}</span>
                           </Button>
                         </div>
                       </div>
@@ -3691,12 +3644,14 @@ export default function TeacherDashboard() {
                 ))
               ) : (
                 <Card>
-                  <CardContent className="p-12 text-center">
-                    <Sun className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <CardContent className="p-8 sm:p-12 text-center">
+                    <Sun className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-4 text-gray-300" />
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                       {t('bookingNoLessonsToday')}
                     </h3>
-                    <p className="text-gray-600">{t('bookingEnjoyFreeDay')}</p>
+                    <p className="text-sm sm:text-base text-gray-600">
+                      {t('bookingEnjoyFreeDay')}
+                    </p>
                   </CardContent>
                 </Card>
               )}
@@ -3707,10 +3662,10 @@ export default function TeacherDashboard() {
             <div className="space-y-4">
               {upcomingLessons.map((lesson) => (
                 <Card key={lesson.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <Avatar className="w-14 h-14">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 sm:gap-4 w-full sm:flex-1">
+                        <Avatar className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0">
                           <AvatarImage
                             src={lesson.student.image}
                             alt={lesson.student.name}
@@ -3722,12 +3677,14 @@ export default function TeacherDashboard() {
                               .join('')}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <h3 className="text-lg font-semibold">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-base sm:text-lg font-semibold">
                             {lesson.student.name}
                           </h3>
-                          <div className="text-gray-600">{lesson.subject}</div>
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <div className="text-sm sm:text-base text-gray-600">
+                            {lesson.subject}
+                          </div>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-gray-500">
                             <span className="flex items-center gap-1">
                               <CalendarIcon className="h-3 w-3" />
                               {new Date(lesson.date).toLocaleDateString()}
@@ -3736,13 +3693,13 @@ export default function TeacherDashboard() {
                               <Clock className="h-3 w-3" />
                               {lesson.time} ({lesson.duration} min)
                             </span>
-                            <Badge className="bg-blue-100 text-blue-800">
+                            <Badge className="bg-blue-100 text-blue-800 text-xs w-fit">
                               {lesson.status}
                             </Badge>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">
@@ -3786,10 +3743,10 @@ export default function TeacherDashboard() {
             <div className="space-y-4">
               {completedLessons.map((lesson) => (
                 <Card key={lesson.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-4">
-                        <Avatar className="w-14 h-14">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col lg:flex-row items-start justify-between gap-4">
+                      <div className="flex items-start gap-3 sm:gap-4 w-full lg:flex-1">
+                        <Avatar className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0">
                           <AvatarImage
                             src={lesson.student.image}
                             alt={lesson.student.name}
@@ -3801,16 +3758,16 @@ export default function TeacherDashboard() {
                               .join('')}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                            <h3 className="text-base sm:text-lg font-semibold">
                               {lesson.student.name}
                             </h3>
                             <div className="flex items-center gap-1">
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`h-4 w-4 ${
+                                  className={`h-3 w-3 sm:h-4 sm:w-4 ${
                                     i < lesson.studentRating
                                       ? 'text-yellow-500 fill-current'
                                       : 'text-gray-300'
@@ -3820,29 +3777,29 @@ export default function TeacherDashboard() {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-3 gap-4 mb-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 mb-3">
                             <div className="space-y-1">
-                              <div className="text-sm text-gray-600">
+                              <div className="text-xs sm:text-sm text-gray-600">
                                 {t('bookingDateTime')}
                               </div>
-                              <div className="text-sm font-medium">
+                              <div className="text-xs sm:text-sm font-medium">
                                 {new Date(lesson.date).toLocaleDateString()} at{' '}
                                 {lesson.time}
                               </div>
                             </div>
                             <div className="space-y-1">
-                              <div className="text-sm text-gray-600">
+                              <div className="text-xs sm:text-sm text-gray-600">
                                 {t('bookingSubject')}
                               </div>
-                              <div className="text-sm font-medium">
+                              <div className="text-xs sm:text-sm font-medium">
                                 {lesson.subject}
                               </div>
                             </div>
                             <div className="space-y-1">
-                              <div className="text-sm text-gray-600">
+                              <div className="text-xs sm:text-sm text-gray-600">
                                 {t('bookingEarnings')}
                               </div>
-                              <div className="text-sm font-medium text-green-600">
+                              <div className="text-xs sm:text-sm font-medium text-green-600">
                                 {lesson.earnings.toLocaleString()} UZS
                               </div>
                             </div>
@@ -3850,20 +3807,20 @@ export default function TeacherDashboard() {
 
                           <div className="space-y-2">
                             <div>
-                              <div className="text-sm text-gray-600 mb-1">
+                              <div className="text-xs sm:text-sm text-gray-600 mb-1">
                                 {t('bookingStudentFeedback')}
                               </div>
-                              <div className="text-sm bg-blue-50 p-3 rounded-lg">
+                              <div className="text-xs sm:text-sm bg-blue-50 p-2 sm:p-3 rounded-lg">
                                 {lesson.studentFeedback}
                               </div>
                             </div>
 
                             {lesson.teacherNotes && (
                               <div>
-                                <div className="text-sm text-gray-600 mb-1">
+                                <div className="text-xs sm:text-sm text-gray-600 mb-1">
                                   {t('bookingYourNotes')}
                                 </div>
-                                <div className="text-sm bg-gray-50 p-3 rounded-lg">
+                                <div className="text-xs sm:text-sm bg-gray-50 p-2 sm:p-3 rounded-lg">
                                   {lesson.teacherNotes}
                                 </div>
                               </div>
@@ -3872,9 +3829,9 @@ export default function TeacherDashboard() {
                         </div>
                       </div>
 
-                      <div className="flex flex-col items-end gap-2">
+                      <div className="flex flex-col lg:flex-row lg:items-end items-start sm:items-end gap-2 w-full lg:w-auto">
                         <Badge
-                          className={`${
+                          className={`text-xs ${
                             lesson.paymentStatus === 'paid'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-yellow-100 text-yellow-800'
@@ -3884,9 +3841,13 @@ export default function TeacherDashboard() {
                             `booking${lesson.paymentStatus.charAt(0).toUpperCase() + lesson.paymentStatus.slice(1)}`
                           )}
                         </Badge>
-                        <Button variant="outline" size="sm">
-                          <Download className="h-4 w-4 mr-2" />
-                          {t('bookingExport')}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full lg:w-auto"
+                        >
+                          <Download className="h-4 w-4 sm:mr-2" />
+                          <span>{t('bookingExport')}</span>
                         </Button>
                       </div>
                     </div>
@@ -3900,13 +3861,13 @@ export default function TeacherDashboard() {
         {/* Recent Messages */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <span className="flex items-center gap-2">
                 <MessageCircle className="h-5 w-5" />
                 {t('bookingRecentMessages')}
               </span>
-              <Button variant="outline" size="sm">
-                {t('bookingViewAllMessages')}
+              <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                <span>{t('bookingViewAllMessages')}</span>
               </Button>
             </CardTitle>
           </CardHeader>
@@ -3917,7 +3878,7 @@ export default function TeacherDashboard() {
                   key={message.id}
                   className="flex items-start gap-3 p-3 border rounded-lg hover:bg-gray-50"
                 >
-                  <Avatar className="w-10 h-10">
+                  <Avatar className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
                     <AvatarImage
                       src={message.student.image}
                       alt={message.student.name}
@@ -3929,22 +3890,30 @@ export default function TeacherDashboard() {
                         .join('')}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                      <span className="font-medium text-sm">
                         {message.student.name}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {new Date(message.timestamp).toLocaleString()}
-                      </span>
-                      {message.unread && (
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">
+                          {new Date(message.timestamp).toLocaleDateString()}
+                        </span>
+                        {message.unread && (
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600">{message.message}</p>
+                    <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
+                      {message.message}
+                    </p>
                   </div>
-                  <Button variant="outline" size="sm">
-                    {t('bookingReply')}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="whitespace-nowrap"
+                  >
+                    <span>{t('bookingReply')}</span>
                   </Button>
                 </div>
               ))}
@@ -3953,44 +3922,46 @@ export default function TeacherDashboard() {
         </Card>
 
         {/* Performance Analytics */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
                 {t('bookingPerformanceMetrics')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-gray-600">
+            <CardContent className="space-y-3 sm:space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm sm:text-base text-gray-600">
                   {t('bookingAcceptanceRate')}
                 </span>
-                <span className="font-semibold text-green-600">
+                <span className="font-semibold text-sm sm:text-base text-green-600">
                   {bookingStats.acceptanceRate}%
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">{t('bookingNoShowRate')}</span>
-                <span className="font-semibold">
+              <div className="flex justify-between items-center">
+                <span className="text-sm sm:text-base text-gray-600">
+                  {t('bookingNoShowRate')}
+                </span>
+                <span className="font-semibold text-sm sm:text-base">
                   {bookingStats.noShowRate}%
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">
+              <div className="flex justify-between items-center">
+                <span className="text-sm sm:text-base text-gray-600">
                   {t('bookingCompletionRate')}
                 </span>
-                <span className="font-semibold text-green-600">
+                <span className="font-semibold text-sm sm:text-base text-green-600">
                   {bookingStats.completionRate}%
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">
+              <div className="flex justify-between items-center">
+                <span className="text-sm sm:text-base text-gray-600">
                   {t('bookingAverageRating')}
                 </span>
                 <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                  <span className="font-semibold">
+                  <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 fill-current" />
+                  <span className="font-semibold text-sm sm:text-base">
                     {bookingStats.averageRating}
                   </span>
                 </div>
@@ -4000,37 +3971,41 @@ export default function TeacherDashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <PieChart className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <PieChart className="h-4 w-4 sm:h-5 sm:w-5" />
                 {t('bookingMonthlyOverview')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-gray-600">
+            <CardContent className="space-y-3 sm:space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm sm:text-base text-gray-600">
                   {t('bookingTotalLessons')}
                 </span>
-                <span className="font-semibold">
+                <span className="font-semibold text-sm sm:text-base">
                   {bookingStats.monthlyLessons}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">
+              <div className="flex justify-between items-center">
+                <span className="text-sm sm:text-base text-gray-600">
                   {t('bookingActiveStudents')}
                 </span>
-                <span className="font-semibold">
+                <span className="font-semibold text-sm sm:text-base">
                   {bookingStats.totalStudents}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">{t('bookingNewBookings')}</span>
-                <span className="font-semibold text-blue-600">+15</span>
+              <div className="flex justify-between items-center">
+                <span className="text-sm sm:text-base text-gray-600">
+                  {t('bookingNewBookings')}
+                </span>
+                <span className="font-semibold text-sm sm:text-base text-blue-600">
+                  +15
+                </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">
+              <div className="flex justify-between items-center">
+                <span className="text-sm sm:text-base text-gray-600">
                   {t('bookingTotalEarnings')}
                 </span>
-                <span className="font-semibold text-green-600">
+                <span className="font-semibold text-sm sm:text-base text-green-600">
                   {((bookingStats.weeklyEarnings * 4) / 1000000).toFixed(1)}M
                   UZS
                 </span>
@@ -4050,121 +4025,137 @@ export default function TeacherDashboard() {
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               {t('earningsPaymentsTitle')}
             </h1>
-            <p className="text-gray-600">{t('trackEarningsPaymentHistory')}</p>
+            <p className="text-sm sm:text-base text-gray-600">
+              {t('trackEarningsPaymentHistory')}
+            </p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setShowTaxModal(true)}>
-              <FileText className="h-4 w-4 mr-2" />
-              {t('taxDocuments')}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowTaxModal(true)}
+              size="sm"
+              className="text-xs sm:text-sm"
+            >
+              <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span>{t('taxDocuments')}</span>
             </Button>
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              {t('exportData')}
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span>{t('exportData')}</span>
             </Button>
-            <Button onClick={() => setShowPayoutModal(true)}>
-              <Wallet className="h-4 w-4 mr-2" />
-              {t('requestPayout')}
+            <Button
+              onClick={() => setShowPayoutModal(true)}
+              size="sm"
+              className="text-xs sm:text-sm"
+            >
+              <Wallet className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span>{t('requestPayout')}</span>
             </Button>
           </div>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">
+                  <div className="text-xs sm:text-sm text-gray-600 mb-1">
                     {t('totalLifetimeEarnings')}
                   </div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-lg sm:text-2xl font-bold text-primary">
                     {(earningsData.totalLifetime / 1000000).toFixed(1)}M UZS
                   </div>
-                  <div className="flex items-center text-sm text-green-600 mt-1">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    {t('overallGrowth')}
-                  </div>
+                  {/* <div className="flex items-center text-xs sm:text-sm text-green-600 mt-1">
+                    <TrendingUp className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
+                    <span>{t('overallGrowth')}</span>
+                  </div> */}
                 </div>
-                <Coins className="h-10 w-10 text-primary opacity-20" />
+                <Coins className="h-6 w-6 sm:h-10 sm:w-10 text-primary" />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">
+                  <div className="text-xs sm:text-sm text-gray-600 mb-1">
                     {t('thisMonth')}
                   </div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-lg sm:text-2xl font-bold text-primary">
                     {(earningsData.thisMonth / 1000000).toFixed(1)}M UZS
                   </div>
-                  <div className="flex items-center text-sm text-green-600 mt-1">
-                    <ArrowUpRight className="h-3 w-3 mr-1" />+{monthlyGrowth}%
-                    {t('vsLastMonth')}
-                  </div>
+                  {/* <div className="flex items-center text-xs sm:text-sm text-green-600 mt-1">
+                    <ArrowUpRight className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
+                    <span>+{monthlyGrowth}%</span>
+                    <span className="hidden sm:inline ml-1">
+                      {t('vsLastMonth')}
+                    </span>
+                  </div> */}
                 </div>
-                <BarChart3 className="h-10 w-10 text-green-500 opacity-20" />
+                <BarChart3 className="h-6 w-6 sm:h-10 sm:w-10 text-green-500" />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">
+                  <div className="text-xs sm:text-sm text-gray-600 mb-1">
                     {t('pendingPayments')}
                   </div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-lg sm:text-2xl font-bold text-primary">
                     {(earningsData.pendingPayments / 1000).toFixed(0)}K UZS
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    {t('availableForPayout')}
+                  <div className="text-xs sm:text-sm text-gray-500 mt-1">
+                    <span>{t('availableForPayout')}</span>
                   </div>
                 </div>
-                <Clock className="h-10 w-10 text-orange-500 opacity-20" />
+                <Clock className="h-6 w-6 sm:h-10 sm:w-10 text-orange-500" />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">
+                  <div className="text-xs sm:text-sm text-gray-600 mb-1">
                     {t('nextPayout')}
                   </div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-sm sm:text-xl lg:text-2xl font-bold text-primary">
                     {new Date(earningsData.nextPayoutDate).toLocaleDateString()}
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    {(earningsData.nextPayoutAmount / 1000000).toFixed(1)}M UZS
-                    {t('expected')}
+                  <div className="text-xs sm:text-sm text-gray-500 mt-1">
+                    {(earningsData.nextPayoutAmount / 1000000).toFixed(1)}M
+                    <span className="hidden sm:inline ml-1">
+                      {t('expected')}
+                    </span>
                   </div>
                 </div>
-                <CalendarIcon className="h-10 w-10 text-blue-500 opacity-20" />
+                <CalendarIcon className="h-6 w-6 sm:h-10 sm:w-10 text-blue-500" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Earnings Chart and Analytics */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           <Card className="lg:col-span-2">
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <ChartLine className="h-5 w-5" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <ChartLine className="h-4 w-4 sm:h-5 sm:w-5" />
                   {t('earningsTrend')}
                 </CardTitle>
-                <div className="flex border rounded-lg p-1">
+                <div className="flex border rounded-lg p-1 self-start sm:self-auto">
                   {(['week', 'month', 'year'] as const).map((period) => (
                     <Button
                       key={period}
@@ -4173,7 +4164,7 @@ export default function TeacherDashboard() {
                       }
                       size="sm"
                       onClick={() => setEarningsTimeframe(period)}
-                      className="capitalize"
+                      className="capitalize text-xs sm:text-sm px-2 sm:px-3"
                     >
                       {t(period)}
                     </Button>
@@ -4183,7 +4174,7 @@ export default function TeacherDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="h-64 flex items-end justify-between gap-2">
+                <div className="h-48 sm:h-64 flex items-end justify-between gap-1 sm:gap-2">
                   {earningsData.monthlyTrend.map((data, index) => {
                     const height =
                       (data.amount /
@@ -4211,28 +4202,28 @@ export default function TeacherDashboard() {
                   })}
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">
+                    <div className="text-lg sm:text-2xl font-bold text-primary">
                       {earningsData.averageHourlyRate.toLocaleString()}
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-xs sm:text-sm text-gray-600">
                       {t('avgHourlyRate')}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">
+                    <div className="text-lg sm:text-2xl font-bold text-green-600">
                       {earningsData.platformFeeRate}%
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-xs sm:text-sm text-gray-600">
                       {t('platformFee')}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">
+                    <div className="text-lg sm:text-2xl font-bold text-blue-600">
                       {goalProgress}%
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-xs sm:text-sm text-gray-600">
                       {t('goalProgress')}
                     </div>
                   </div>
@@ -4243,20 +4234,20 @@ export default function TeacherDashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <PieChart className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <PieChart className="h-4 w-4 sm:h-5 sm:w-5" />
                 {t('subjectBreakdown')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {earningsData.subjectBreakdown.map((subject) => (
                   <div key={subject.subject} className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">
+                      <span className="text-xs sm:text-sm font-medium">
                         {subject.subject}
                       </span>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-xs sm:text-sm text-gray-600">
                         {subject.percentage}%
                       </span>
                     </div>
@@ -4282,26 +4273,28 @@ export default function TeacherDashboard() {
         {/* Goal Tracking */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Target className="h-4 w-4 sm:h-5 sm:w-5" />
               {t('monthlyGoalTracking')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {t('currentGoal')}
                   </div>
-                  <div className="text-xl font-bold">
+                  <div className="text-lg sm:text-xl font-bold">
                     {(earningsGoal / 1000000).toFixed(1)}M UZS /{' '}
                     {t('month').toLowerCase()}
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm text-gray-600">{t('progress')}</div>
-                  <div className="text-xl font-bold text-primary">
+                <div className="text-left sm:text-right">
+                  <div className="text-xs sm:text-sm text-gray-600">
+                    {t('progress')}
+                  </div>
+                  <div className="text-lg sm:text-xl font-bold text-primary">
                     {goalProgress}%
                   </div>
                 </div>
@@ -4316,7 +4309,7 @@ export default function TeacherDashboard() {
                 ></div>
               </div>
 
-              <div className="flex justify-between text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row justify-between text-xs sm:text-sm text-gray-600 gap-2">
                 <span>
                   {t('current')}:{' '}
                   {(earningsData.thisMonth / 1000000).toFixed(1)}M UZS
@@ -4336,25 +4329,29 @@ export default function TeacherDashboard() {
         {/* Payment History */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Receipt className="h-5 w-5" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Receipt className="h-4 w-4 sm:h-5 sm:w-5" />
                 {t('paymentHistory')}
               </CardTitle>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <select
                   value={paymentFilter}
                   onChange={(e) => setPaymentFilter(e.target.value as any)}
-                  className="p-2 border rounded-md text-sm"
+                  className="p-2 border rounded-md text-xs sm:text-sm"
                 >
                   <option value="all">{t('allPayments')}</option>
                   <option value="completed">{t('completed')}</option>
                   <option value="pending">{t('pending')}</option>
                   <option value="failed">{t('failed')}</option>
                 </select>
-                <Button variant="outline" size="sm">
-                  <Filter className="h-4 w-4 mr-2" />
-                  {t('moreFilters')}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs sm:text-sm"
+                >
+                  <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span>{t('moreFilters')}</span>
                 </Button>
               </div>
             </div>
@@ -4364,11 +4361,11 @@ export default function TeacherDashboard() {
               {filteredPayments.map((payment) => (
                 <div
                   key={payment.id}
-                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="w-12 h-12">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
                         <AvatarImage
                           src={payment.student.image}
                           alt={payment.student.name}
@@ -4380,48 +4377,48 @@ export default function TeacherDashboard() {
                             .join('')}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <div className="font-semibold">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-sm sm:text-base truncate">
                           {payment.student.name}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-xs sm:text-sm text-gray-600 truncate">
                           {payment.subject}
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500 mt-1">
                           <span>
                             {new Date(payment.date).toLocaleDateString()}
                           </span>
-                          <span>{payment.paymentMethod}</span>
+                          <span className="hidden sm:inline">
+                            {payment.paymentMethod}
+                          </span>
                           <span>ID: {payment.transactionId}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <div className="font-bold">
-                            {payment.netAmount.toLocaleString()} UZS
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {t('gross')}: {payment.amount.toLocaleString()}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {t('fee')}: -{payment.platformFee.toLocaleString()}
-                          </div>
+                    <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-3 sm:gap-1">
+                      <div className="text-right">
+                        <div className="font-bold text-sm sm:text-base">
+                          {payment.netAmount.toLocaleString()} UZS
                         </div>
-                        <Badge
-                          className={`${
-                            payment.status === 'completed'
-                              ? 'bg-green-100 text-green-800'
-                              : payment.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-red-100 text-red-800'
-                          }`}
-                        >
-                          {t(payment.status)}
-                        </Badge>
+                        <div className="text-xs text-gray-500">
+                          {t('gross')}: {payment.amount.toLocaleString()}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {t('fee')}: -{payment.platformFee.toLocaleString()}
+                        </div>
                       </div>
+                      <Badge
+                        className={`text-xs ${
+                          payment.status === 'completed'
+                            ? 'bg-green-100 text-green-800'
+                            : payment.status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {t(payment.status)}
+                      </Badge>
                     </div>
                   </div>
                 </div>
@@ -4431,36 +4428,38 @@ export default function TeacherDashboard() {
         </Card>
 
         {/* Top Students and Payout History */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5" />
                 {t('topEarningStudents')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {earningsData.topStudents.map((student, index) => (
                   <div
                     key={student.name}
                     className="flex items-center justify-between"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-bold text-primary">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        <span className="text-xs sm:text-sm font-bold text-primary">
                           #{index + 1}
                         </span>
                       </div>
                       <div>
-                        <div className="font-medium">{student.name}</div>
-                        <div className="text-sm text-gray-600">
+                        <div className="font-medium text-sm sm:text-base">
+                          {student.name}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-600">
                           {student.lessons} {t('earningsLessons')}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-green-600">
+                      <div className="font-bold text-green-600 text-sm sm:text-base">
                         {(student.earnings / 1000).toFixed(0)}K UZS
                       </div>
                     </div>
@@ -4472,25 +4471,27 @@ export default function TeacherDashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Banknote className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Banknote className="h-4 w-4 sm:h-5 sm:w-5" />
                 {t('recentPayouts')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {payoutHistory.map((payout) => (
                   <div
                     key={payout.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className="flex items-center justify-between p-2 sm:p-3 border rounded-lg"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <BankCard className="h-5 w-5 text-green-600" />
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <BankCard className="h-3 w-3 sm:h-5 sm:w-5 text-green-600" />
                       </div>
                       <div>
-                        <div className="font-medium">{payout.method}</div>
-                        <div className="text-sm text-gray-600">
+                        <div className="font-medium text-sm sm:text-base">
+                          {payout.method}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-600">
                           {new Date(payout.date).toLocaleDateString()}
                         </div>
                         <div className="text-xs text-gray-500">
@@ -4499,7 +4500,7 @@ export default function TeacherDashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-green-600">
+                      <div className="font-bold text-green-600 text-sm sm:text-base">
                         {(payout.amount / 1000000).toFixed(1)}M UZS
                       </div>
                       <Badge className="bg-green-100 text-green-800 text-xs">
@@ -4516,43 +4517,45 @@ export default function TeacherDashboard() {
         {/* Financial Insights */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calculator className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Calculator className="h-4 w-4 sm:h-5 sm:w-5" />
               {t('financialInsightsTips')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="p-4 bg-blue-50 rounded-lg">
+            <div className="grid md:grid-cols-3 gap-3 sm:gap-4">
+              <div className="p-3 sm:p-4 bg-blue-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="h-5 w-5 text-blue-600" />
-                  <span className="font-medium text-blue-900">
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                  <span className="font-medium text-blue-900 text-sm sm:text-base">
                     {t('growthTip')}
                   </span>
                 </div>
-                <p className="text-sm text-blue-700">{t('growthTipMessage')}</p>
+                <p className="text-xs sm:text-sm text-blue-700">
+                  {t('growthTipMessage')}
+                </p>
               </div>
 
-              <div className="p-4 bg-green-50 rounded-lg">
+              <div className="p-3 sm:p-4 bg-green-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <PiggyBank className="h-5 w-5 text-green-600" />
-                  <span className="font-medium text-green-900">
+                  <PiggyBank className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                  <span className="font-medium text-green-900 text-sm sm:text-base">
                     {t('savingsGoal')}
                   </span>
                 </div>
-                <p className="text-sm text-green-700">
+                <p className="text-xs sm:text-sm text-green-700">
                   {t('savingsGoalMessage')}
                 </p>
               </div>
 
-              <div className="p-4 bg-purple-50 rounded-lg">
+              <div className="p-3 sm:p-4 bg-purple-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <ShieldCheck className="h-5 w-5 text-purple-600" />
-                  <span className="font-medium text-purple-900">
+                  <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+                  <span className="font-medium text-purple-900 text-sm sm:text-base">
                     {t('taxReminder')}
                   </span>
                 </div>
-                <p className="text-sm text-purple-700">
+                <p className="text-xs sm:text-sm text-purple-700">
                   {t('taxReminderMessage')}
                 </p>
               </div>
@@ -4562,37 +4565,41 @@ export default function TeacherDashboard() {
 
         {/* Payout Modal */}
         {showPayoutModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div
+            className={`flex fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4`}
+          >
+            <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md mx-auto">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">{t('requestPayout')}</h2>
+                <h2 className="text-base sm:text-lg font-semibold">
+                  {t('requestPayout')}
+                </h2>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowPayoutModal(false)}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="p-3 bg-green-50 rounded-lg">
-                  <div className="text-sm text-green-600">
+                  <div className="text-xs sm:text-sm text-green-600">
                     {t('availableBalance')}
                   </div>
-                  <div className="text-2xl font-bold text-green-700">
+                  <div className="text-xl sm:text-2xl font-bold text-green-700">
                     {earningsData.pendingPayments.toLocaleString()} UZS
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                  <label className="text-xs sm:text-sm font-medium">
                     {t('payoutMethod')}
                   </label>
                   <select
                     value={selectedPaymentMethod}
                     onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-md text-xs sm:text-sm"
                   >
                     <option value="bank">{t('bankTransferFree')}</option>
                     <option value="paypal">{t('paypalFee')}</option>
@@ -4601,27 +4608,35 @@ export default function TeacherDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('amount')}</label>
+                  <label className="text-xs sm:text-sm font-medium">
+                    {t('amount')}
+                  </label>
                   <input
                     type="number"
                     max={earningsData.pendingPayments}
                     defaultValue={earningsData.pendingPayments}
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-md text-xs sm:text-sm"
                   />
                 </div>
 
                 <div className="text-xs text-gray-500">{t('payoutTerms')}</div>
               </div>
 
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-6">
                 <Button
                   variant="outline"
                   onClick={() => setShowPayoutModal(false)}
+                  size="sm"
+                  className="text-xs sm:text-sm"
                 >
                   {t('cancel')}
                 </Button>
-                <Button onClick={() => setShowPayoutModal(false)}>
-                  <Wallet className="h-4 w-4 mr-2" />
+                <Button
+                  onClick={() => setShowPayoutModal(false)}
+                  size="sm"
+                  className="text-xs sm:text-sm"
+                >
+                  <Wallet className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   {t('requestPayout')}
                 </Button>
               </div>
@@ -4631,75 +4646,87 @@ export default function TeacherDashboard() {
 
         {/* Tax Modal */}
         {showTaxModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-lg">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-lg mx-auto max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">{t('taxInformation')}</h2>
+                <h2 className="text-base sm:text-lg font-semibold">
+                  {t('taxInformation')}
+                </h2>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowTaxModal(false)}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="p-3 bg-blue-50 rounded-lg">
-                    <div className="text-sm text-blue-600">
+                    <div className="text-xs sm:text-sm text-blue-600">
                       {t('thisYear2024')}
                     </div>
-                    <div className="text-xl font-bold text-blue-700">
+                    <div className="text-lg sm:text-xl font-bold text-blue-700">
                       {((earningsData.thisMonth * 12) / 1000000).toFixed(1)}M
                       UZS
                     </div>
                   </div>
                   <div className="p-3 bg-purple-50 rounded-lg">
-                    <div className="text-sm text-purple-600">
+                    <div className="text-xs sm:text-sm text-purple-600">
                       {t('platformFees')}
                     </div>
-                    <div className="text-xl font-bold text-purple-700">
+                    <div className="text-lg sm:text-xl font-bold text-purple-700">
                       {earningsData.totalPlatformFees.toLocaleString()} UZS
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <h3 className="font-medium">{t('availableDocuments')}</h3>
+                  <h3 className="font-medium text-sm sm:text-base">
+                    {t('availableDocuments')}
+                  </h3>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg gap-3">
                       <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-gray-500" />
+                        <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                         <div>
-                          <div className="font-medium">
+                          <div className="font-medium text-sm sm:text-base">
                             {t('taxSummary2024')}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-xs sm:text-sm text-gray-600">
                             {t('januaryCurrent')}
                           </div>
                         </div>
                       </div>
-                      <Button size="sm" variant="outline">
-                        <Download className="h-4 w-4 mr-1" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs sm:text-sm"
+                      >
+                        <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         {t('download')}
                       </Button>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg gap-3">
                       <div className="flex items-center gap-3">
-                        <Receipt className="h-5 w-5 text-gray-500" />
+                        <Receipt className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                         <div>
-                          <div className="font-medium">
+                          <div className="font-medium text-sm sm:text-base">
                             {t('monthlyStatements')}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-xs sm:text-sm text-gray-600">
                             {t('allMonthsAvailable')}
                           </div>
                         </div>
                       </div>
-                      <Button size="sm" variant="outline">
-                        <Download className="h-4 w-4 mr-1" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs sm:text-sm"
+                      >
+                        <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         {t('download')}
                       </Button>
                     </div>
@@ -4707,7 +4734,7 @@ export default function TeacherDashboard() {
                 </div>
 
                 <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <div className="text-sm text-amber-800">
+                  <div className="text-xs sm:text-sm text-amber-800">
                     <strong>{t('taxNote')}:</strong> {t('taxNoteMessage')}
                   </div>
                 </div>
@@ -4717,6 +4744,8 @@ export default function TeacherDashboard() {
                 <Button
                   variant="outline"
                   onClick={() => setShowTaxModal(false)}
+                  size="sm"
+                  className="text-xs sm:text-sm"
                 >
                   {t('close')}
                 </Button>
@@ -4735,40 +4764,42 @@ export default function TeacherDashboard() {
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               {t('reviewsAndRatings')}
             </h1>
-            <p className="text-gray-600">{t('reviewMonitorStudentReviews')}</p>
+            <p className="text-sm sm:text-base text-gray-600">
+              {t('reviewMonitorStudentReviews')}
+            </p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              {t('reviewExportReviews')}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span>{t('reviewExportReviews')}</span>
             </Button>
-            <Button variant="outline">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              {t('reviewQuickResponse')}
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span>{t('reviewQuickResponse')}</span>
             </Button>
-            <Button>
-              <TrendingUpIcon className="h-4 w-4 mr-2" />
-              {t('reviewImproveRating')}
+            <Button size="sm" className="text-xs sm:text-sm">
+              <TrendingUpIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span>{t('reviewImproveRating')}</span>
             </Button>
           </div>
         </div>
 
         {/* Rating Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card>
-            <CardContent className="p-6 text-center">
+            <CardContent className="p-4 sm:p-6 text-center">
               <div className="flex items-center justify-center mb-2">
                 {renderStars(Math.floor(reviewsData.overallRating), 'lg')}
               </div>
-              <div className="text-3xl font-bold text-primary mb-1">
+              <div className="text-2xl sm:text-3xl font-bold text-primary mb-1">
                 {reviewsData.overallRating}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-gray-600">
                 {t('reviewOverallRating')}
               </div>
               <div className="text-xs text-green-600 mt-1">
@@ -4778,61 +4809,64 @@ export default function TeacherDashboard() {
           </Card>
 
           <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-primary mb-2">
+            <CardContent className="p-4 sm:p-6 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
                 {reviewsData.totalReviews}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-gray-600">
                 {t('reviewTotalReviews')}
               </div>
               <div className="flex items-center justify-center text-xs text-gray-500 mt-1">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                +12 {t('reviewThisMonth')}
+                <ArrowUpRight className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
+                +12{' '}
+                <span className="hidden sm:inline ml-1">
+                  {t('reviewThisMonth')}
+                </span>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-primary mb-2">
+            <CardContent className="p-4 sm:p-6 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
                 {reviewsData.recentRating}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-gray-600">
                 {t('reviewRecentRating')}
               </div>
               <div className="text-xs text-gray-500 mt-1">
-                {t('reviewLast30Days')}
+                <span>{t('reviewLast30Days')}</span>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-primary mb-2">
+            <CardContent className="p-4 sm:p-6 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
                 #{reviewsData.ranking}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-gray-600">
                 {t('reviewSubjectRanking')}
               </div>
               <div className="text-xs text-green-600 mt-1">
-                {t('reviewTopInEnglish')}
+                <span>{t('reviewTopInEnglish')}</span>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Rating Analytics and Breakdown */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
                 {t('reviewRatingTrends')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="h-48 flex items-end justify-between gap-2">
+                <div className="h-36 sm:h-48 flex items-end justify-between gap-1 sm:gap-2">
                   {reviewsData.monthlyTrend.map((data, index) => {
                     const height = (data.rating / 5) * 100
                     return (
@@ -4855,26 +4889,28 @@ export default function TeacherDashboard() {
                   })}
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t">
                   <div className="text-center">
-                    <div className="text-lg font-bold text-green-600">
+                    <div className="text-base sm:text-lg font-bold text-green-600">
                       {reviewsData.responseRate}%
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-xs sm:text-sm text-gray-600">
                       {t('reviewResponseRate')}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-bold text-blue-600">4.2</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-base sm:text-lg font-bold text-blue-600">
+                      4.2
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-600">
                       {t('reviewAvgPlatform')}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-bold text-purple-600">
+                    <div className="text-base sm:text-lg font-bold text-purple-600">
                       +15%
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-xs sm:text-sm text-gray-600">
                       {t('reviewAboveAverage')}
                     </div>
                   </div>
@@ -4885,8 +4921,8 @@ export default function TeacherDashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Star className="h-4 w-4 sm:h-5 sm:w-5" />
                 {t('reviewRatingDistribution')}
               </CardTitle>
             </CardHeader>
@@ -4896,12 +4932,12 @@ export default function TeacherDashboard() {
                   <div key={dist.stars} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">
+                        <span className="text-xs sm:text-sm font-medium">
                           {dist.stars}
                         </span>
-                        <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                        <Star className="h-2 w-2 sm:h-3 sm:w-3 text-yellow-500 fill-current" />
                       </div>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-xs sm:text-sm text-gray-600">
                         {dist.count}
                       </span>
                     </div>
@@ -4924,24 +4960,29 @@ export default function TeacherDashboard() {
         {/* Subject Ratings */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
               {t('reviewSubjectPerformance')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {reviewsData.subjectRatings.map((subject) => (
-                <div key={subject.subject} className="p-4 border rounded-lg">
+                <div
+                  key={subject.subject}
+                  className="p-3 sm:p-4 border rounded-lg"
+                >
                   <div className="text-center space-y-2">
-                    <h3 className="font-semibold">{subject.subject}</h3>
+                    <h3 className="font-semibold text-sm sm:text-base">
+                      {subject.subject}
+                    </h3>
                     <div className="flex items-center justify-center">
                       {renderStars(Math.floor(subject.rating))}
                     </div>
-                    <div className="text-2xl font-bold text-primary">
+                    <div className="text-xl sm:text-2xl font-bold text-primary">
                       {subject.rating}
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-xs sm:text-sm text-gray-600">
                       {subject.reviews} {t('reviews')}
                     </div>
                   </div>
@@ -4954,7 +4995,7 @@ export default function TeacherDashboard() {
         {/* Navigation Tabs */}
         <Card>
           <CardContent className="p-0">
-            <div className="flex border-b">
+            <div className="flex border-b overflow-x-auto">
               {(
                 [
                   {
@@ -4973,15 +5014,16 @@ export default function TeacherDashboard() {
                 <button
                   key={tab.id}
                   onClick={() => setReviewsTab(tab.id)}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                  className={`flex-1 min-w-0 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                     reviewsTab === tab.id
                       ? 'border-b-2 border-primary text-primary bg-primary/5'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {tab.label}
+                  <span>{tab.label}</span>
+
                   {tab.count > 0 && (
-                    <Badge className="ml-2" variant="secondary">
+                    <Badge className="ml-1 sm:ml-2" variant="secondary">
                       {tab.count}
                     </Badge>
                   )}
@@ -4991,42 +5033,44 @@ export default function TeacherDashboard() {
 
             {/* Filters and Search */}
             {reviewsTab !== 'analytics' && (
-              <div className="p-4 border-b bg-gray-50">
-                <div className="flex items-center gap-4">
+              <div className="p-3 sm:p-4 border-b bg-gray-50">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                   <div className="flex-1">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
                       <input
                         type="text"
                         placeholder={t('reviewSearchPlaceholder')}
                         value={searchReviews}
                         onChange={(e) => setSearchReviews(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border rounded-md"
+                        className="w-full pl-8 sm:pl-10 pr-4 py-2 border rounded-md text-xs sm:text-sm"
                       />
                     </div>
                   </div>
-                  <select
-                    value={reviewFilter}
-                    onChange={(e) => setReviewFilter(e.target.value as any)}
-                    className="p-2 border rounded-md"
-                  >
-                    <option value="all">{t('reviewAllRatings')}</option>
-                    <option value="5">{t('reviewStars5')}</option>
-                    <option value="4">{t('reviewStars4')}</option>
-                    <option value="3">{t('reviewStars3')}</option>
-                    <option value="2">{t('reviewStars2')}</option>
-                    <option value="1">{t('reviewStars1')}</option>
-                  </select>
-                  <select
-                    value={reviewSort}
-                    onChange={(e) => setReviewSort(e.target.value as any)}
-                    className="p-2 border rounded-md"
-                  >
-                    <option value="newest">{t('reviewNewestFirst')}</option>
-                    <option value="oldest">{t('reviewOldestFirst')}</option>
-                    <option value="highest">{t('reviewHighestRated')}</option>
-                    <option value="lowest">{t('reviewLowestRated')}</option>
-                  </select>
+                  <div className="flex gap-2 sm:gap-3">
+                    <select
+                      value={reviewFilter}
+                      onChange={(e) => setReviewFilter(e.target.value as any)}
+                      className="p-2 border rounded-md text-xs sm:text-sm"
+                    >
+                      <option value="all">{t('reviewAllRatings')}</option>
+                      <option value="5">{t('reviewStars5')}</option>
+                      <option value="4">{t('reviewStars4')}</option>
+                      <option value="3">{t('reviewStars3')}</option>
+                      <option value="2">{t('reviewStars2')}</option>
+                      <option value="1">{t('reviewStars1')}</option>
+                    </select>
+                    <select
+                      value={reviewSort}
+                      onChange={(e) => setReviewSort(e.target.value as any)}
+                      className="p-2 border rounded-md text-xs sm:text-sm"
+                    >
+                      <option value="newest">{t('reviewNewestFirst')}</option>
+                      <option value="oldest">{t('reviewOldestFirst')}</option>
+                      <option value="highest">{t('reviewHighestRated')}</option>
+                      <option value="lowest">{t('reviewLowestRated')}</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             )}
@@ -5035,11 +5079,11 @@ export default function TeacherDashboard() {
 
         {/* Reviews Content */}
         {reviewsTab === 'analytics' ? (
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Quote className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Quote className="h-4 w-4 sm:h-5 sm:w-5" />
                   {t('reviewCommonKeywords')}
                 </CardTitle>
               </CardHeader>
@@ -5050,18 +5094,21 @@ export default function TeacherDashboard() {
                       key={keyword.word}
                       className="flex items-center justify-between"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-bold text-blue-600">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-xs sm:text-sm font-bold text-blue-600">
                             #{index + 1}
                           </span>
                         </div>
-                        <span className="font-medium capitalize">
+                        <span className="font-medium capitalize text-sm sm:text-base">
                           {keyword.word}
                         </span>
                       </div>
-                      <Badge variant="outline">
-                        {keyword.count} {t('reviewMentions')}
+                      <Badge variant="outline" className="text-xs">
+                        {keyword.count}{' '}
+                        <span className="hidden sm:inline">
+                          {t('reviewMentions')}
+                        </span>
                       </Badge>
                     </div>
                   ))}
@@ -5071,50 +5118,58 @@ export default function TeacherDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Shield className="h-4 w-4 sm:h-5 sm:w-5" />
                   {t('reviewQuality')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">
+                  <span className="text-xs sm:text-sm text-gray-600">
                     {t('reviewVerifiedReviews')}
                   </span>
-                  <span className="font-semibold text-green-600">94%</span>
+                  <span className="font-semibold text-green-600 text-sm sm:text-base">
+                    94%
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">
+                  <span className="text-xs sm:text-sm text-gray-600">
                     {t('reviewAverageLength')}
                   </span>
-                  <span className="font-semibold">127 {t('reviewWords')}</span>
+                  <span className="font-semibold text-sm sm:text-base">
+                    127{' '}
+                    <span className="hidden sm:inline">{t('reviewWords')}</span>
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">
+                  <span className="text-xs sm:text-sm text-gray-600">
                     {t('reviewResponseRate')}
                   </span>
-                  <span className="font-semibold text-blue-600">
+                  <span className="font-semibold text-blue-600 text-sm sm:text-base">
                     {reviewsData.responseRate}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">
+                  <span className="text-xs sm:text-sm text-gray-600">
                     {t('reviewHelpfulVotes')}
                   </span>
-                  <span className="font-semibold">156 {t('reviewTotal')}</span>
+                  <span className="font-semibold text-sm sm:text-base">
+                    156{' '}
+                    <span className="hidden sm:inline">{t('reviewTotal')}</span>
+                  </span>
                 </div>
               </CardContent>
             </Card>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {displayReviews.map((review) => (
               <Card key={review.id}>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-4">
-                        <Avatar className="w-12 h-12">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div className="flex items-start gap-3 sm:gap-4 flex-1">
+                        <Avatar className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                           <AvatarImage
                             src={review.student.image}
                             alt={review.student.name}
@@ -5126,42 +5181,49 @@ export default function TeacherDashboard() {
                               .join('')}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                            <h3 className="font-semibold text-sm sm:text-base truncate">
                               {review.student.name}
                             </h3>
-                            {review.student.verified && (
-                              <Verified className="h-4 w-4 text-blue-500" />
-                            )}
-                            <Badge variant="outline" className="text-xs">
-                              {review.student.level}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              {review.student.verified && (
+                                <Verified className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
+                              )}
+                              <Badge variant="outline" className="text-xs">
+                                {review.student.level}
+                              </Badge>
+                            </div>
                           </div>
 
-                          <div className="flex items-center gap-4 mb-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-3">
                             {renderStars(review.rating)}
-                            <span className="text-sm text-gray-600">
-                              {new Date(review.date).toLocaleDateString()}
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {review.lesson.subject} • {review.lesson.duration}{' '}
-                              {t('reviewMin')}
-                            </span>
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                              <span>
+                                {new Date(review.date).toLocaleDateString()}
+                              </span>
+                              <span>
+                                {review.lesson.subject} •{' '}
+                                {review.lesson.duration} {t('reviewMin')}
+                              </span>
+                            </div>
                           </div>
 
-                          <div className="text-gray-700 mb-3">
+                          <div className="text-gray-700 mb-3 text-sm sm:text-base">
                             {review.review}
                           </div>
 
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <button className="flex items-center gap-1 hover:text-blue-600">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
+                            <button className="flex items-center gap-1 hover:text-blue-600 self-start">
                               <ThumbsUp className="h-3 w-3" />
                               <span>
-                                {review.helpful} {t('reviewHelpful')}
+                                {review.helpful}{' '}
+                                <span className="hidden sm:inline">
+                                  {t('reviewHelpful')}
+                                </span>
                               </span>
                             </button>
-                            <span>•</span>
+                            <span className="hidden sm:inline">•</span>
                             <span>
                               {t('reviewLesson')}:{' '}
                               {new Date(
@@ -5171,14 +5233,14 @@ export default function TeacherDashboard() {
                           </div>
 
                           {review.replied && review.response && (
-                            <div className="mt-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                            <div className="mt-3 sm:mt-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
                               <div className="flex items-center gap-2 mb-2">
-                                <Reply className="h-4 w-4 text-blue-600" />
-                                <span className="text-sm font-medium text-blue-900">
+                                <Reply className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                                <span className="text-xs sm:text-sm font-medium text-blue-900">
                                   {t('reviewYourResponse')}
                                 </span>
                               </div>
-                              <p className="text-sm text-blue-800">
+                              <p className="text-xs sm:text-sm text-blue-800">
                                 {review.response}
                               </p>
                             </div>
@@ -5186,7 +5248,7 @@ export default function TeacherDashboard() {
                         </div>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-shrink-0">
                         {!review.replied && (
                           <Button
                             size="sm"
@@ -5195,28 +5257,29 @@ export default function TeacherDashboard() {
                               setSelectedReview(review)
                               setShowReplyModal(true)
                             }}
+                            className="text-xs sm:text-sm"
                           >
-                            <Reply className="h-4 w-4 mr-1" />
-                            {t('reviewReply')}
+                            <Reply className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                            <span>{t('reviewReply')}</span>
                           </Button>
                         )}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
+                              <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
                             <DropdownMenuItem>
-                              <Flag className="h-4 w-4 mr-2" />
+                              <Flag className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                               {t('reviewReportReview')}
                             </DropdownMenuItem>
                             <DropdownMenuItem>
-                              <MessageCircle className="h-4 w-4 mr-2" />
+                              <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                               {t('reviewMessageStudent')}
                             </DropdownMenuItem>
                             <DropdownMenuItem>
-                              <Share className="h-4 w-4 mr-2" />
+                              <Share className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                               {t('reviewShareReview')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -5232,10 +5295,10 @@ export default function TeacherDashboard() {
 
         {/* Reply Modal */}
         {showReplyModal && selectedReview && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-lg">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-lg mx-auto max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">
+                <h2 className="text-base sm:text-lg font-semibold">
                   {t('reviewReplyToReview')}
                 </h2>
                 <Button
@@ -5243,32 +5306,32 @@ export default function TeacherDashboard() {
                   size="sm"
                   onClick={() => setShowReplyModal(false)}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-medium">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                    <span className="font-medium text-sm sm:text-base">
                       {selectedReview.student.name}
                     </span>
                     {renderStars(selectedReview.rating, 'sm')}
                   </div>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-xs sm:text-sm text-gray-700">
                     {selectedReview.review}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                  <label className="text-xs sm:text-sm font-medium">
                     {t('reviewYourResponseLabel')}
                   </label>
                   <textarea
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder={t('reviewReplyPlaceholder')}
-                    className="w-full p-3 border rounded-md min-h-[100px] resize-none"
+                    className="w-full p-3 border rounded-md min-h-[100px] resize-none text-xs sm:text-sm"
                   />
                   <div className="text-xs text-gray-500">
                     {t('reviewResponseGuideline')}
@@ -5276,10 +5339,12 @@ export default function TeacherDashboard() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-6">
                 <Button
                   variant="outline"
                   onClick={() => setShowReplyModal(false)}
+                  size="sm"
+                  className="text-xs sm:text-sm"
                 >
                   {t('reviewCancel')}
                 </Button>
@@ -5288,8 +5353,10 @@ export default function TeacherDashboard() {
                     setShowReplyModal(false)
                     setReplyText('')
                   }}
+                  size="sm"
+                  className="text-xs sm:text-sm"
                 >
-                  <Send className="h-4 w-4 mr-2" />
+                  <Send className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   {t('reviewSendReply')}
                 </Button>
               </div>
@@ -5359,34 +5426,96 @@ export default function TeacherDashboard() {
     ]
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {t('settingsTitle')}
-            </h1>
-            <p className="text-gray-600">{t('settingsManageAccount')}</p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+                {t('settingsTitle')}
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600">
+                {t('settingsManageAccount')}
+              </p>
+            </div>
           </div>
-          <div className="flex gap-3">
-            {settingsChanged && (
-              <Button onClick={() => setSettingsChanged(false)}>
-                <Save className="h-4 w-4 mr-2" />
-                {t('settingsSaveChanges')}
-              </Button>
-            )}
-            <Button variant="outline">
-              <RotateCcw className="h-4 w-4 mr-2" />
-              {t('settingsResetDefaults')}
-            </Button>
-          </div>
-        </div>
 
-        <div className="grid lg:grid-cols-4 gap-6">
-          {/* Settings Navigation */}
-          <Card>
+          {/* Mobile Settings Menu Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="xl:hidden"
+            onClick={() => setShowSettingsDrawer(true)}
+          >
+            <Settings2 className="h-4 w-4" />
+          </Button>
+        </div>
+         {settingsChanged && (
+        <div className="flex justify-end">
+         
+            <Button
+              onClick={() => setSettingsChanged(false)}
+              size="sm"
+              className="text-xs sm:text-sm"
+            >
+              <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span>{t('settingsSaveChanges')}</span>
+            </Button>
+       
+        </div>
+   )}
+        {/* Settings Navigation - Mobile Drawer / Desktop Sidebar */}
+        <Sheet open={showSettingsDrawer} onOpenChange={setShowSettingsDrawer}>
+          <SheetContent side="left" className="w-80 p-0 ">
+            <SheetTitle className="px-4 py-6 border-b">
+              <div className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                {t('settingsTitle')}
+              </div>
+            </SheetTitle>
+            <div className="py-4">
+              <nav className="space-y-1 px-4">
+                {settingsTabs.map((tab, index) => {
+                  const Icon = tab.icon
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setActiveSettingsTab(tab.id as any)
+                        setShowSettingsDrawer(false)
+                      }}
+                      className={`w-full flex items-start gap-3 p-3 rounded-lg text-left transition-colors ${
+                        activeSettingsTab === tab.id
+                          ? 'bg-primary text-white'
+                          : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5 mt-0.5" />
+                      <div>
+                        <div className="font-medium">{tab.label}</div>
+                        <div
+                          className={`text-xs mt-1 ${
+                            activeSettingsTab === tab.id
+                              ? 'text-white/80'
+                              : 'text-gray-500'
+                          }`}
+                        >
+                          {tab.description}
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </nav>
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        <div className="flex gap-4 lg:gap-6">
+          {/* Settings Navigation - Desktop Sidebar */}
+          <Card className="hidden xl:block min-w-[290px]">
             <CardContent className="p-0">
-              <div className="space-y-1 p-4">
+              <div className="space-y-1 p-4 shrink-0">
                 {settingsTabs.map((tab) => {
                   const Icon = tab.icon
                   return (
@@ -5420,80 +5549,92 @@ export default function TeacherDashboard() {
           </Card>
 
           {/* Settings Content */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-4 sm:space-y-6 flex-1">
             {activeSettingsTab === 'account' && (
-              <div className="space-y-6">
+              <div className="space-y-3 sm:space-y-4 lg:space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <User className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <User className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsPersonalInfo')}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="flex items-start gap-6">
-                      <div className="flex flex-col items-center space-y-3">
-                        <Avatar className="w-24 h-24">
+                  <CardContent className="space-y-4 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                      <div className="flex flex-col items-center space-y-3 w-full sm:w-auto">
+                        <Avatar className="w-20 h-20 sm:w-24 sm:h-24">
                           <AvatarImage src={profileImage} alt="Profile" />
-                          <AvatarFallback className="text-xl">
+                          <AvatarFallback className="text-lg sm:text-xl">
                             {profileData.firstName[0]}
                             {profileData.lastName[0]}
                           </AvatarFallback>
                         </Avatar>
-                        <Button variant="outline" size="sm">
-                          <Camera className="h-4 w-4 mr-2" />
-                          {t('settingsChangePhoto')}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs sm:text-sm"
+                        >
+                          <Camera className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                          <span>{t('settingsChangePhoto')}</span>
                         </Button>
                       </div>
-                      <div className="flex-1 grid grid-cols-2 gap-4">
+                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">
+                          <label className="text-xs sm:text-sm font-medium">
                             {t('settingsFirstName')}
                           </label>
                           <input
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                             defaultValue={profileData.firstName}
                             onChange={() => setSettingsChanged(true)}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">
+                          <label className="text-xs sm:text-sm font-medium">
                             {t('settingsLastName')}
                           </label>
                           <input
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                             defaultValue={profileData.lastName}
                             onChange={() => setSettingsChanged(true)}
                           />
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">
+                        <div className="space-y-2 sm:col-span-2">
+                          <label className="text-xs sm:text-sm font-medium">
                             {t('settingsEmailAddress')}
                           </label>
-                          <div className="flex gap-2">
+                          <div className="flex flex-col sm:flex-row gap-2">
                             <input
-                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                              className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                               defaultValue={profileData.email}
                               onChange={() => setSettingsChanged(true)}
                             />
-                            <Button variant="outline" size="sm">
-                              <Verified className="h-4 w-4 mr-1" />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs sm:text-sm whitespace-nowrap"
+                            >
+                              <Verified className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                               {t('settingsVerify')}
                             </Button>
                           </div>
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">
+                        <div className="space-y-2 sm:col-span-2">
+                          <label className="text-xs sm:text-sm font-medium">
                             {t('settingsPhoneNumber')}
                           </label>
-                          <div className="flex gap-2">
+                          <div className="flex flex-col sm:flex-row gap-2">
                             <input
-                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                              className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                               defaultValue={profileData.phone}
                               onChange={() => setSettingsChanged(true)}
                             />
-                            <Button variant="outline" size="sm">
-                              <Phone className="h-4 w-4 mr-1" />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs sm:text-sm whitespace-nowrap"
+                            >
+                              <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                               {t('settingsVerify')}
                             </Button>
                           </div>
@@ -5505,41 +5646,41 @@ export default function TeacherDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Lock className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <Lock className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsSecurity')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">
+                      <label className="text-xs sm:text-sm font-medium">
                         {t('settingsChangePassword')}
                       </label>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <input
                           type="password"
                           placeholder={t('settingsCurrentPassword')}
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                         />
                         <input
                           type="password"
                           placeholder={t('settingsNewPassword')}
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                         />
                         <input
                           type="password"
                           placeholder={t('settingsConfirmPassword')}
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                         />
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                       <div>
-                        <div className="font-medium">
+                        <div className="font-medium text-sm sm:text-base">
                           {t('settingsTwoFactor')}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-xs sm:text-sm text-gray-600">
                           {t('settingsTwoFactorDesc')}
                         </div>
                       </div>
@@ -5558,21 +5699,27 @@ export default function TeacherDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <div className="font-medium">
+                      <div className="font-medium text-sm sm:text-base">
                         {t('settingsLoginHistory')}
                       </div>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                          <span>
+                      <div className="space-y-2 text-xs sm:text-sm">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2 bg-gray-50 rounded gap-2">
+                          <span className="text-xs sm:text-sm">
                             {t('settingsCurrentSession')} - Tashkent, Uzbekistan
                           </span>
-                          <Badge className="bg-green-100 text-green-800">
+                          <Badge className="bg-green-100 text-green-800 text-xs w-fit">
                             {t('settingsActive')}
                           </Badge>
                         </div>
-                        <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                          <span>2 days ago - Tashkent, Uzbekistan</span>
-                          <Button variant="outline" size="sm">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2 bg-gray-50 rounded gap-2">
+                          <span className="text-xs sm:text-sm">
+                            2 days ago - Tashkent, Uzbekistan
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs w-fit"
+                          >
                             {t('settingsRevoke')}
                           </Button>
                         </div>
@@ -5584,32 +5731,32 @@ export default function TeacherDashboard() {
             )}
 
             {activeSettingsTab === 'professional' && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <GraduationCap className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsTeachingProfile')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">
+                      <label className="text-xs sm:text-sm font-medium">
                         {t('settingsProfessionalTitle')}
                       </label>
                       <input
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                         defaultValue={profileData.title}
                         onChange={() => setSettingsChanged(true)}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">
+                      <label className="text-xs sm:text-sm font-medium">
                         {t('settingsExperience')}
                       </label>
                       <select
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                         defaultValue={profileData.experience}
                       >
                         <option value="0-1">
@@ -5631,7 +5778,7 @@ export default function TeacherDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">
+                      <label className="text-xs sm:text-sm font-medium">
                         {t('settingsSpecializations')}
                       </label>
                       <div className="flex flex-wrap gap-2">
@@ -5639,26 +5786,26 @@ export default function TeacherDashboard() {
                           <Badge
                             key={subject}
                             variant="outline"
-                            className="cursor-pointer"
+                            className="cursor-pointer text-xs"
                           >
                             {subject}
                             <X className="h-3 w-3 ml-1" />
                           </Badge>
                         ))}
-                        <Button variant="outline" size="sm">
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add Subject
+                        <Button variant="outline" size="sm" className="text-xs">
+                          <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          <span className="hidden sm:inline">Add Subject</span>
                         </Button>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">
+                      <label className="text-xs sm:text-sm font-medium">
                         {t('settingsHourlyRate')}
                       </label>
                       <input
                         type="number"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                         defaultValue={profileData.hourlyRate}
                         onChange={() => setSettingsChanged(true)}
                       />
@@ -5668,12 +5815,14 @@ export default function TeacherDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>{t('settingsTeachingPreferences')}</CardTitle>
+                    <CardTitle className="text-sm sm:text-base">
+                      {t('settingsTeachingPreferences')}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-xs sm:text-sm font-medium">
                           {t('settingsStudentAgeGroups')}
                         </label>
                         <div className="space-y-2">
@@ -5692,17 +5841,17 @@ export default function TeacherDashboard() {
                                 defaultChecked
                                 className="rounded"
                               />
-                              <span className="text-sm">{age}</span>
+                              <span className="text-xs sm:text-sm">{age}</span>
                             </label>
                           ))}
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-xs sm:text-sm font-medium">
                           {t('settingsMaxStudents')}
                         </label>
-                        <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                        <select className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm">
                           <option value="1">{t('settingsIndividual')}</option>
                           <option value="2">2 students</option>
                           <option value="3">3 students</option>
@@ -5717,11 +5866,11 @@ export default function TeacherDashboard() {
             )}
 
             {activeSettingsTab === 'notifications' && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Mail className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsEmailNotifications')}
                     </CardTitle>
                   </CardHeader>
@@ -5735,11 +5884,13 @@ export default function TeacherDashboard() {
                     }).map(([key, label]) => (
                       <div
                         key={key}
-                        className="flex items-center justify-between"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div>
-                          <div className="font-medium">{label}</div>
-                          <div className="text-sm text-gray-600">
+                          <div className="font-medium text-sm sm:text-base">
+                            {label}
+                          </div>
+                          <div className="text-xs sm:text-sm text-gray-600">
                             {t('settingsReceiveEmail')}
                           </div>
                         </div>
@@ -5776,8 +5927,8 @@ export default function TeacherDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Smartphone className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <Smartphone className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsSmsNotifications')}
                     </CardTitle>
                   </CardHeader>
@@ -5790,11 +5941,13 @@ export default function TeacherDashboard() {
                     }).map(([key, label]) => (
                       <div
                         key={key}
-                        className="flex items-center justify-between"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div>
-                          <div className="font-medium">{label}</div>
-                          <div className="text-sm text-gray-600">
+                          <div className="font-medium text-sm sm:text-base">
+                            {label}
+                          </div>
+                          <div className="text-xs sm:text-sm text-gray-600">
                             {t('settingsReceiveSms')}
                           </div>
                         </div>
@@ -5831,8 +5984,8 @@ export default function TeacherDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Monitor className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <Monitor className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsPushNotifications')}
                     </CardTitle>
                   </CardHeader>
@@ -5845,11 +5998,13 @@ export default function TeacherDashboard() {
                     }).map(([key, label]) => (
                       <div
                         key={key}
-                        className="flex items-center justify-between"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div>
-                          <div className="font-medium">{label}</div>
-                          <div className="text-sm text-gray-600">
+                          <div className="font-medium text-sm sm:text-base">
+                            {label}
+                          </div>
+                          <div className="text-xs sm:text-sm text-gray-600">
                             {t('settingsEnablePush')}
                           </div>
                         </div>
@@ -5887,22 +6042,22 @@ export default function TeacherDashboard() {
             )}
 
             {activeSettingsTab === 'privacy' && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Eye className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsProfileVisibility')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
                       <div>
-                        <label className="text-sm font-medium mb-2 block">
+                        <label className="text-xs sm:text-sm font-medium mb-2 block">
                           {t('settingsProfileVisibility')}
                         </label>
                         <select
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                           value={privacySettings.profileVisibility}
                           onChange={(e) => {
                             setPrivacySettings((prev) => ({
@@ -5922,12 +6077,12 @@ export default function TeacherDashboard() {
                         </select>
                       </div>
 
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                          <div className="font-medium">
+                          <div className="font-medium text-sm sm:text-base">
                             {t('settingsSearchVisible')}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-xs sm:text-sm text-gray-600">
                             {t('settingsSearchVisibleDesc')}
                           </div>
                         </div>
@@ -5955,12 +6110,12 @@ export default function TeacherDashboard() {
                         </button>
                       </div>
 
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                          <div className="font-medium">
+                          <div className="font-medium text-sm sm:text-base">
                             {t('settingsOnlineStatus')}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-xs sm:text-sm text-gray-600">
                             {t('settingsOnlineStatusDesc')}
                           </div>
                         </div>
@@ -5993,8 +6148,8 @@ export default function TeacherDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Database className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <Database className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsDataPrivacy')}
                     </CardTitle>
                   </CardHeader>
@@ -6040,55 +6195,68 @@ export default function TeacherDashboard() {
             )}
 
             {activeSettingsTab === 'billing' && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsPaymentMethods')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                         <div className="flex items-center gap-3">
-                          <Building className="h-8 w-8 text-blue-600" />
+                          <Building className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
                           <div>
-                            <div className="font-medium">
+                            <div className="font-medium text-sm sm:text-base">
                               {t('settingsBankTransfer')}
                             </div>
-                            <div className="text-sm text-gray-600">
+                            <div className="text-xs sm:text-sm text-gray-600">
                               **** **** **** 1234
                             </div>
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Badge className="bg-green-100 text-green-800">
+                          <Badge className="bg-green-100 text-green-800 text-xs">
                             {t('settingsPrimary')}
                           </Badge>
-                          <Button variant="outline" size="sm">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs sm:text-sm"
+                          >
                             {t('settingsEdit')}
                           </Button>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                         <div className="flex items-center gap-3">
-                          <Wallet className="h-8 w-8 text-blue-600" />
+                          <Wallet className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
                           <div>
-                            <div className="font-medium">PayPal</div>
-                            <div className="text-sm text-gray-600">
+                            <div className="font-medium text-sm sm:text-base">
+                              PayPal
+                            </div>
+                            <div className="text-xs sm:text-sm text-gray-600">
                               aziza@example.com
                             </div>
                           </div>
                         </div>
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs sm:text-sm"
+                        >
                           {t('settingsEdit')}
                         </Button>
                       </div>
 
-                      <Button variant="outline" className="w-full">
-                        <Plus className="h-4 w-4 mr-2" />
+                      <Button
+                        variant="outline"
+                        className="w-full text-xs sm:text-sm"
+                      >
+                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                         {t('settingsAddPayment')}
                       </Button>
                     </div>
@@ -6097,15 +6265,17 @@ export default function TeacherDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>{t('settingsPayoutSettings')}</CardTitle>
+                    <CardTitle className="text-sm sm:text-base">
+                      {t('settingsPayoutSettings')}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-xs sm:text-sm font-medium">
                           {t('settingsPayoutSchedule')}
                         </label>
-                        <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                        <select className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm">
                           <option value="weekly">{t('settingsWeekly')}</option>
                           <option value="biweekly">
                             {t('settingsBiweekly')}
@@ -6117,12 +6287,12 @@ export default function TeacherDashboard() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-xs sm:text-sm font-medium">
                           {t('settingsMinimumPayout')}
                         </label>
                         <input
                           type="number"
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                           defaultValue="100000"
                         />
                       </div>
@@ -6133,11 +6303,11 @@ export default function TeacherDashboard() {
             )}
 
             {activeSettingsTab === 'calendar' && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CalendarIcon className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsCalendarIntegration')}
                     </CardTitle>
                   </CardHeader>
@@ -6160,13 +6330,15 @@ export default function TeacherDashboard() {
                       return (
                         <div
                           key={key}
-                          className="flex items-center justify-between p-4 border rounded-lg"
+                          className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3"
                         >
                           <div className="flex items-center gap-3">
-                            <Icon className="h-8 w-8 text-blue-600" />
+                            <Icon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
                             <div>
-                              <div className="font-medium">{calendar.name}</div>
-                              <div className="text-sm text-gray-600">
+                              <div className="font-medium text-sm sm:text-base">
+                                {calendar.name}
+                              </div>
+                              <div className="text-xs sm:text-sm text-gray-600">
                                 {calendarSync[key as keyof typeof calendarSync]
                                   ? t('settingsConnected')
                                   : t('settingsNotConnected')}
@@ -6180,6 +6352,7 @@ export default function TeacherDashboard() {
                                 : 'default'
                             }
                             size="sm"
+                            className="text-xs sm:text-sm"
                             onClick={() => {
                               setCalendarSync((prev) => ({
                                 ...prev,
@@ -6200,15 +6373,17 @@ export default function TeacherDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>{t('settingsSchedulePreferences')}</CardTitle>
+                    <CardTitle className="text-sm sm:text-base">
+                      {t('settingsSchedulePreferences')}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-xs sm:text-sm font-medium">
                           {t('settingsTimeZone')}
                         </label>
-                        <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                        <select className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm">
                           <option value="Asia/Tashkent">
                             Tashkent (UTC+5)
                           </option>
@@ -6218,12 +6393,12 @@ export default function TeacherDashboard() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-xs sm:text-sm font-medium">
                           {t('settingsBufferTime')}
                         </label>
                         <input
                           type="number"
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                           defaultValue="15"
                           min="0"
                           max="60"
@@ -6236,22 +6411,22 @@ export default function TeacherDashboard() {
             )}
 
             {activeSettingsTab === 'communication' && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Globe className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <Globe className="h-4 w-4 sm:h-5 sm:w-5" />
                       {t('settingsLanguageSettings')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-xs sm:text-sm font-medium">
                           {t('settingsPrimaryLanguage')}
                         </label>
                         <select
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                           value={languageSettings.primary}
                           onChange={(e) => {
                             setLanguageSettings((prev) => ({
@@ -6268,11 +6443,11 @@ export default function TeacherDashboard() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-xs sm:text-sm font-medium">
                           {t('settingsPlatformInterface')}
                         </label>
                         <select
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                           value={languageSettings.interface}
                           onChange={(e) => {
                             setLanguageSettings((prev) => ({
@@ -6289,12 +6464,12 @@ export default function TeacherDashboard() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
-                        <div className="font-medium">
+                        <div className="font-medium text-sm sm:text-base">
                           {t('settingsAutoTranslate')}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-xs sm:text-sm text-gray-600">
                           {t('settingsAutoTranslateDesc')}
                         </div>
                       </div>
@@ -6508,27 +6683,27 @@ export default function TeacherDashboard() {
 
         {/* Delete Account Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <Trash2 className="h-6 w-6 text-red-600" />
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <Trash2 className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-red-600">
+                <div className="flex-1">
+                  <h2 className="text-base sm:text-lg font-semibold text-red-600">
                     {t('settingsDeleteConfirmTitle')}
                   </h2>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600">
                     {t('settingsDeleteCannotUndo')}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <p className="text-sm text-gray-700">
+                <p className="text-xs sm:text-sm text-gray-700">
                   {t('settingsDeleteConfirmDesc')}
                 </p>
-                <ul className="text-sm text-gray-600 space-y-1 ml-4">
+                <ul className="text-xs sm:text-sm text-gray-600 space-y-1 ml-4">
                   <li>{t('settingsDeleteProfile')}</li>
                   <li>{t('settingsDeleteReviews')}</li>
                   <li>{t('settingsDeleteLessons')}</li>
@@ -6536,26 +6711,31 @@ export default function TeacherDashboard() {
                 </ul>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                  <label className="text-xs sm:text-sm font-medium">
                     {t('settingsDeleteTypeConfirm')}
                   </label>
                   <input
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
                     placeholder="DELETE"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-6">
                 <Button
                   variant="outline"
                   onClick={() => setShowDeleteModal(false)}
+                  size="sm"
+                  className="text-xs sm:text-sm order-2 sm:order-1"
                 >
                   {t('settingsCancel')}
                 </Button>
-                <Button className="bg-red-600 hover:bg-red-700">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  {t('settingsDeleteAccountButton')}
+                <Button
+                  className="bg-red-600 hover:bg-red-700 text-xs sm:text-sm order-1 sm:order-2"
+                  size="sm"
+                >
+                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span>{t('settingsDeleteAccountButton')}</span>
                 </Button>
               </div>
             </div>
@@ -6587,59 +6767,29 @@ export default function TeacherDashboard() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex">
-      {/* Mobile Sidebar Overlay */}
-      {isMobileSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setIsMobileSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div
-        className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-sm border-r flex flex-col transform transition-transform duration-300 ease-in-out
-        lg:relative lg:transform-none lg:transition-none
-        ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}
-      >
+    <div className="bg-gray-50 flex">
+      {/* Desktop Sidebar */}
+      <div className="hidden sticky top-0 left-0 h-screen lg:flex w-64 bg-white shadow-sm border-r flex-shrink-0 flex-col justify-between">
         {/* Header */}
         <div className="p-6 border-b">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 relative">
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={teacher.image} alt={teacher.name} />
-                <AvatarFallback>
-                  {teacher.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="font-medium text-gray-900">
-                  {teacher.name.split(' ')[0]}
-                </div>
+          <div className="flex items-center gap-3 relative">
+            <Avatar className="w-12 h-12">
+              <AvatarImage src={teacher.image} alt={teacher.name} />
+              <AvatarFallback>
+                {teacher.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="font-medium text-gray-900">
+                {teacher.name.split(' ')[0]}
               </div>
-              <div
-                className={`w-2 h-2 z-10 rounded-full absolute left-1 top-1 ${teacher.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}
-              />
             </div>
-            {/* Close button for mobile */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="lg:hidden"
-              onClick={() => setIsMobileSidebarOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="flex items-center gap-2 mt-3">
-            {/* <span className="text-sm text-gray-600">
-              {teacher.isOnline ? 'Online' : 'Offline'}
-            </span> */}
+            <div
+              className={`w-2 h-2 z-10 rounded-full absolute left-1 top-1 ${teacher.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}
+            />
           </div>
         </div>
 
@@ -6653,11 +6803,7 @@ export default function TeacherDashboard() {
               return (
                 <li key={item.id}>
                   <button
-                    onClick={() => {
-                      setActiveSection(item.id)
-                      // Close mobile sidebar when item is selected
-                      setIsMobileSidebarOpen(false)
-                    }}
+                    onClick={() => setActiveSection(item.id)}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
                       isActive
                         ? 'bg-primary text-white'
@@ -6694,10 +6840,94 @@ export default function TeacherDashboard() {
         </div>
       </div>
 
+      {/* Mobile Sidebar Sheet */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetContent
+          side="left"
+          className="w-72 h-screen p-0 flex flex-col justify-between "
+        >
+          <SheetTitle className="hidden" />
+          <SheetDescription className="hidden" />
+          {/* Header */}
+          <div className="p-6 border-b">
+            <div className="flex items-center gap-3 relative">
+              <Avatar className="w-12 h-12">
+                <AvatarImage src={teacher.image} alt={teacher.name} />
+                <AvatarFallback>
+                  {teacher.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="font-medium text-gray-900">
+                  {teacher.name.split(' ')[0]}
+                </div>
+              </div>
+              <div
+                className={`w-2 h-2 z-10 rounded-full absolute left-1 top-1 ${teacher.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}
+              />
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 p-4">
+            <ul className="space-y-2">
+              {sidebarItems.map((item) => {
+                const Icon = item.icon
+                const isActive = activeSection === item.id
+
+                return (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => {
+                        setActiveSection(item.id)
+                        setIsMobileSidebarOpen(false)
+                      }}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-primary text-white'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span className="flex-1">{item.label}</span>
+                      {item.count && (
+                        <Badge
+                          variant={isActive ? 'secondary' : 'default'}
+                          className="ml-auto"
+                        >
+                          {item.count}
+                        </Badge>
+                      )}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+
+          {/* Footer */}
+          <SheetFooter className="p-4 border-t">
+            <SheetClose asChild>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setShowLogoutModal(true)}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                {t('logout')}
+              </Button>
+            </SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:ml-0">
+      <div className="flex-1 flex flex-col">
         {/* Top Bar */}
-        <header className="bg-white border-b px-4 lg:px-6 py-4">
+        <div className="bg-white border-b px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               {/* Mobile hamburger menu */}
@@ -6709,10 +6939,10 @@ export default function TeacherDashboard() {
               >
                 <Menu className="h-4 w-4" />
               </Button>
-              <h2 className="text-xl font-semibold text-gray-900">
+              {/* <h2 className="text-xl font-semibold text-gray-900">
                 {sidebarItems.find((item) => item.id === activeSection)
                   ?.label || 'Dashboard'}
-              </h2>
+              </h2> */}
             </div>
             <div className="flex items-center gap-2 lg:gap-4">
               <LanguageSwitcher />
@@ -6724,17 +6954,12 @@ export default function TeacherDashboard() {
                   </Badge>
                 )}
               </Button>
-              <Button variant="ghost" size="sm" className="hidden sm:flex">
+              <Button variant="ghost" size="sm">
                 <MessageCircle className="h-4 w-4" />
               </Button>
-              <Link to="/">
-                <Button variant="outline" size="sm" className="hidden sm:flex">
-                  Back to Home
-                </Button>
-              </Link>
             </div>
           </div>
-        </header>
+        </div>
 
         {/* Content Area */}
         <main className="flex-1 p-4 lg:p-6 overflow-auto">

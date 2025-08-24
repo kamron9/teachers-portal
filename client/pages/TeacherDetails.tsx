@@ -1,138 +1,123 @@
-import React, { useState, useEffect } from "react";
-import {
-  ArrowLeft,
-  Share2,
-  Heart,
-  Star,
-  Users,
-  BookOpen,
-  Globe,
-  Clock,
-  Calendar,
-  Video,
-  MessageCircle,
-  CheckCircle,
-  Play,
-  Download,
-  Filter,
-  ChevronDown,
-  ChevronRight,
-  MapPin,
-  Award,
-  GraduationCap,
-  Languages,
-  TrendingUp,
-  Camera,
-  FileText,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
+import {
+  Award,
+  BookOpen,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Download,
+  FileText,
+  GraduationCap,
+  Languages,
+  MapPin,
+  MessageCircle,
+  Play,
+  Share2,
+  ShieldAlert,
+  ShieldCheck,
+  Star,
+  TrendingUp,
+  Users,
+  Video,
+} from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 // Mock Data Interfaces
 interface Teacher {
-  id: string;
-  firstName: string;
-  lastName: string;
-  name: string;
-  title: string;
-  bio: string;
-  teachingPhilosophy: string;
-  whyITeach: string;
-  profileImage: string;
-  isOnline: boolean;
-  isVerified: boolean;
-  rating: number;
-  averageRating: number;
-  totalReviews: number;
-  totalLessons: number;
-  studentsCount: number;
-  experienceYears: number;
-  location: string;
-  countryFlag: string;
-  responseTime: string;
+  id: string
+  firstName: string
+  lastName: string
+  name: string
+  title: string
+  bio: string
+  teachingPhilosophy: string
+  whyITeach: string
+  profileImage: string
+  isOnline: boolean
+  isVerified: boolean
+  rating: number
+  averageRating: number
+  totalReviews: number
+  totalLessons: number
+  studentsCount: number
+  experienceYears: number
+  location: string
+  countryFlag: string
+  responseTime: string
   languages: Array<{
-    language: string;
-    proficiency: string;
-  }>;
+    language: string
+    proficiency: string
+  }>
   subjects: Array<{
-    name: string;
-    icon: string;
-    level: string;
-    price: number;
-    format: string;
-  }>;
+    name: string
+    icon: string
+    level: string
+    price: number
+    format: string
+  }>
   subjectOfferings: Array<{
-    subjectName: string;
-    pricePerHour: number;
-  }>;
-  teachingLevels: string[];
-  examPrep: string[];
+    subjectName: string
+    pricePerHour: number
+  }>
+  teachingLevels: string[]
+  examPrep: string[]
   education: Array<{
-    degree: string;
-    institution: string;
-    year: string;
-    verified: boolean;
-  }>;
+    degree: string
+    institution: string
+    year: string
+    verified: boolean
+  }>
   certifications: Array<{
-    name: string;
-    issuer: string;
-    year: string;
-    verified: boolean;
-  }>;
+    name: string
+    issuer: string
+    year: string
+    verified: boolean
+  }>
   pricing: {
-    trialPrice: number;
-    regularPrice: number;
+    trialPrice: number
+    regularPrice: number
     packages: Array<{
-      lessons: number;
-      price: number;
-      discount: number;
-    }>;
-  };
+      lessons: number
+      price: number
+      discount: number
+    }>
+  }
   schedule: {
-    nextAvailable: string;
-    timezone: string;
-  };
+    nextAvailable: string
+    timezone: string
+  }
   materials: {
     resources: Array<{
-      name: string;
-      type: string;
-    }>;
-  };
+      name: string
+      type: string
+    }>
+  }
 }
 
 interface Review {
-  id: string;
-  studentName: string;
-  studentAvatar: string;
-  rating: number;
-  comment: string;
-  subject: string;
-  lessonCount: number;
-  date: string;
-  helpful: number;
-  teacherResponse?: string;
+  id: string
+  studentName: string
+  studentAvatar: string
+  rating: number
+  comment: string
+  subject: string
+  lessonCount: number
+  date: string
+  helpful: number
+  teacherResponse?: string
 }
 
 // Mock Teacher Data
@@ -142,11 +127,14 @@ const mockTeachers: Teacher[] = [
     firstName: 'Aziz',
     lastName: 'Karimov',
     name: 'Aziz Karimov',
-    title: 'Matematika va Fizika o\'qituvchisi',
-    bio: 'Men 10 yildan ortiq tajribaga ega matematik va fizika o\'qituvchisiman. Toshkent Davlat Universitetini tugatganman va matematika fanidan magistr darajasiga egaman. Mening maqsadim har bir o\'quvchiga matematika va fizikani oson va qiziqarli tarzda o\'rgatishdir. O\'quvchilarimning ko\'pchiligi davlat imtihonlarida yuqori natijalar ko\'rsatishgan.',
-    teachingPhilosophy: 'Men har bir o\'quvchining o\'ziga xos o\'rganish uslubi borligi va individual yondashuvning muhimligiga ishonaman. Matematik tushunchalarni real hayot misollari orqali tushuntirish va amaliy masalalar yechish orqali bilimlarni mustahkamlash mening asosiy usullarimdir.',
-    whyITeach: 'O\'qitish - bu mening ehtirosin. Har bir o\'quvchining "Aha!" deb aytgan lahzasi, tushunmagan mavzuni egallab olgandagi quvonchi - meni ilhomlantiradigan narsalardir. Men kelajak avlodga bilim berishni o\'z vazifam deb bilaman.',
-    profileImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
+    title: "Matematika va Fizika o'qituvchisi",
+    bio: "Men 10 yildan ortiq tajribaga ega matematik va fizika o'qituvchisiman. Toshkent Davlat Universitetini tugatganman va matematika fanidan magistr darajasiga egaman. Mening maqsadim har bir o'quvchiga matematika va fizikani oson va qiziqarli tarzda o'rgatishdir. O'quvchilarimning ko'pchiligi davlat imtihonlarida yuqori natijalar ko'rsatishgan.",
+    teachingPhilosophy:
+      "Men har bir o'quvchining o'ziga xos o'rganish uslubi borligi va individual yondashuvning muhimligiga ishonaman. Matematik tushunchalarni real hayot misollari orqali tushuntirish va amaliy masalalar yechish orqali bilimlarni mustahkamlash mening asosiy usullarimdir.",
+    whyITeach:
+      "O'qitish - bu mening ehtirosin. Har bir o'quvchining \"Aha!\" deb aytgan lahzasi, tushunmagan mavzuni egallab olgandagi quvonchi - meni ilhomlantiradigan narsalardir. Men kelajak avlodga bilim berishni o'z vazifam deb bilaman.",
+    profileImage:
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
     isOnline: true,
     isVerified: true,
     rating: 4.9,
@@ -155,11 +143,11 @@ const mockTeachers: Teacher[] = [
     totalLessons: 2450,
     studentsCount: 89,
     experienceYears: 10,
-    location: 'Toshkent, O\'zbekiston',
+    location: "Toshkent, O'zbekiston",
     countryFlag: '🇺🇿',
     responseTime: 'Odatda 1 soat ichida',
     languages: [
-      { language: 'O\'zbek', proficiency: 'Native' },
+      { language: "O'zbek", proficiency: 'Native' },
       { language: 'Rus', proficiency: 'Fluent' },
       { language: 'Ingliz', proficiency: 'Advanced' },
     ],
@@ -191,7 +179,13 @@ const mockTeachers: Teacher[] = [
       { subjectName: 'Fizika', pricePerHour: 8000000 },
       { subjectName: 'Oliy matematika', pricePerHour: 10000000 },
     ],
-    teachingLevels: ['Boshlang\'ich', 'O\'rta maktab', 'Yuqori sinf', 'Universitet', 'IELTS/TOEFL'],
+    teachingLevels: [
+      "Boshlang'ich",
+      "O'rta maktab",
+      'Yuqori sinf',
+      'Universitet',
+      'IELTS/TOEFL',
+    ],
     examPrep: ['DTM', 'Grant imtihonlari', 'Olimpiada', 'SAT Math'],
     education: [
       {
@@ -202,7 +196,7 @@ const mockTeachers: Teacher[] = [
       },
       {
         degree: 'Bakalavr - Amaliy matematika',
-        institution: 'Toshkent Davlat Universiteti', 
+        institution: 'Toshkent Davlat Universiteti',
         year: '2008-2012',
         verified: true,
       },
@@ -222,7 +216,7 @@ const mockTeachers: Teacher[] = [
       },
       {
         name: 'Advanced Mathematics Teaching',
-        issuer: 'O\'zbekiston Ta\'lim Vazirligi',
+        issuer: "O'zbekiston Ta'lim Vazirligi",
         year: '2019',
         verified: false,
       },
@@ -242,7 +236,7 @@ const mockTeachers: Teacher[] = [
     },
     materials: {
       resources: [
-        { name: 'Algebra formulalar to\'plami', type: 'PDF' },
+        { name: "Algebra formulalar to'plami", type: 'PDF' },
         { name: 'Geometriya mashqlar', type: 'PDF' },
         { name: 'Fizika qonunlari spravochnik', type: 'PDF' },
         { name: 'Video darsliklar', type: 'Video' },
@@ -250,28 +244,33 @@ const mockTeachers: Teacher[] = [
     },
   },
   // Add more mock teachers if needed...
-];
+]
 
 // Mock Reviews Data
 const mockReviews: Review[] = [
   {
     id: 'review-1',
     studentName: 'Malika T.',
-    studentAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b5e31b9c?w=100&h=100&fit=crop&crop=face',
+    studentAvatar:
+      'https://images.unsplash.com/photo-1494790108755-2616b5e31b9c?w=100&h=100&fit=crop&crop=face',
     rating: 5,
-    comment: 'Aziz o\'qituvchi juda professional. Matematikani oson va tushunarli tarzda tushuntiradi. 3 oyda algebra bo\'yicha katta yutuqlarga erishdim.',
+    comment:
+      "Aziz o'qituvchi juda professional. Matematikani oson va tushunarli tarzda tushuntiradi. 3 oyda algebra bo'yicha katta yutuqlarga erishdim.",
     subject: 'Matematika',
     lessonCount: 24,
     date: '2 hafta oldin',
     helpful: 8,
-    teacherResponse: 'Rahmat, Malika! Sizning g\'ayratli o\'rganishingiz meni ham ilhomlantiryapti. Davom eting!',
+    teacherResponse:
+      "Rahmat, Malika! Sizning g'ayratli o'rganishingiz meni ham ilhomlantiryapti. Davom eting!",
   },
   {
     id: 'review-2',
     studentName: 'Javohir U.',
-    studentAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+    studentAvatar:
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
     rating: 5,
-    comment: 'Fizika fanini hayotimda birinchi marta bunday qiziq deb hisobladim. O\'qituvchi har bir mavzuni misol bilan tushuntiradi.',
+    comment:
+      "Fizika fanini hayotimda birinchi marta bunday qiziq deb hisobladim. O'qituvchi har bir mavzuni misol bilan tushuntiradi.",
     subject: 'Fizika',
     lessonCount: 16,
     date: '1 hafta oldin',
@@ -280,9 +279,11 @@ const mockReviews: Review[] = [
   {
     id: 'review-3',
     studentName: 'Dilnoza R.',
-    studentAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+    studentAvatar:
+      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
     rating: 4,
-    comment: 'Yaxshi o\'qituvchi, sabr-toqatli. Universitet matematikasini o\'rganishda juda yordam berdi.',
+    comment:
+      "Yaxshi o'qituvchi, sabr-toqatli. Universitet matematikasini o'rganishda juda yordam berdi.",
     subject: 'Oliy matematika',
     lessonCount: 8,
     date: '3 hafta oldin',
@@ -293,166 +294,178 @@ const mockReviews: Review[] = [
     studentName: 'Bobur N.',
     studentAvatar: '',
     rating: 5,
-    comment: 'DTM ga tayyorgarlik ko\'rayotgan edim. Aziz o\'qituvchi bilan 2 oyda juda ko\'p narsani o\'rgandim. Natijam kutganimdan ham yaxshi bo\'ldi!',
+    comment:
+      "DTM ga tayyorgarlik ko'rayotgan edim. Aziz o'qituvchi bilan 2 oyda juda ko'p narsani o'rgandim. Natijam kutganimdan ham yaxshi bo'ldi!",
     subject: 'Matematika',
     lessonCount: 32,
     date: '1 oy oldin',
     helpful: 15,
-    teacherResponse: 'Tabriklayman, Bobur! DTMda muvaffaqiyat qozonganingizdan juda xursandman.',
+    teacherResponse:
+      'Tabriklayman, Bobur! DTMda muvaffaqiyat qozonganingizdan juda xursandman.',
   },
   {
     id: 'review-5',
     studentName: 'Feruza S.',
-    studentAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
+    studentAvatar:
+      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
     rating: 5,
-    comment: 'Professional yondashuv, aniq tushuntirishlar. Har bir darsdan so\'ng yangi bilimlar olaman.',
+    comment:
+      "Professional yondashuv, aniq tushuntirishlar. Har bir darsdan so'ng yangi bilimlar olaman.",
     subject: 'Matematika',
     lessonCount: 12,
     date: '2 hafta oldin',
     helpful: 9,
   },
-];
+]
 
 // Mock API Functions
 const useTeacherById = (id: string, enabled: boolean) => {
-  const [data, setData] = useState<Teacher | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [data, setData] = useState<Teacher | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    if (!enabled || !id) return;
+    if (!enabled || !id) return
 
     // Simulate API delay
     const timer = setTimeout(() => {
-      const teacher = mockTeachers.find(t => t.id === id);
+      const teacher = mockTeachers.find((t) => t.id === id)
       if (teacher) {
-        setData(teacher);
-        setError(null);
+        setData(teacher)
+        setError(null)
       } else {
-        setError(new Error('Teacher not found'));
+        setError(new Error('Teacher not found'))
       }
-      setIsLoading(false);
-    }, 1000); // 1 second delay to simulate network
+      setIsLoading(false)
+    }, 1000) // 1 second delay to simulate network
 
-    return () => clearTimeout(timer);
-  }, [id, enabled]);
+    return () => clearTimeout(timer)
+  }, [id, enabled])
 
-  return { data, isLoading, error };
-};
+  return { data, isLoading, error }
+}
 
 const useTeacherReviews = (
   teacherId: string,
   filters: { rating?: number[]; limit?: number },
   options: { enabled: boolean }
 ) => {
-  const [data, setData] = useState<{ reviews: Review[]; totalCount: number } | null>(null);
+  const [data, setData] = useState<{
+    reviews: Review[]
+    totalCount: number
+  } | null>(null)
 
   useEffect(() => {
-    if (!options.enabled || !teacherId) return;
+    if (!options.enabled || !teacherId) return
 
     // Simulate API delay
     const timer = setTimeout(() => {
-      let filteredReviews = mockReviews;
-      
+      let filteredReviews = mockReviews
+
       if (filters.rating && filters.rating.length > 0) {
-        filteredReviews = mockReviews.filter(review => 
+        filteredReviews = mockReviews.filter((review) =>
           filters.rating!.includes(review.rating)
-        );
+        )
       }
 
       if (filters.limit) {
-        filteredReviews = filteredReviews.slice(0, filters.limit);
+        filteredReviews = filteredReviews.slice(0, filters.limit)
       }
 
       setData({
         reviews: filteredReviews,
         totalCount: mockReviews.length,
-      });
-    }, 500);
+      })
+    }, 500)
 
-    return () => clearTimeout(timer);
-  }, [teacherId, filters.rating, filters.limit, options.enabled]);
+    return () => clearTimeout(timer)
+  }, [teacherId, filters.rating, filters.limit, options.enabled])
 
-  return { data };
-};
+  return { data }
+}
 
 // Utility function
-const formatPrice = (price: number) => price.toLocaleString();
+const formatPrice = (price: number) => price.toLocaleString()
 
 const TeacherDetails: React.FC = () => {
+  const { t } = useTranslation()
   // Mock current teacher ID for demo
-  const id = 'teacher-1';
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-  const [reviewFilter, setReviewFilter] = useState("all");
-  const [isSaved, setIsSaved] = useState(false);
+  const id = 'teacher-1'
+  const [selectedSubject, setSelectedSubject] = useState<string>('')
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
+  const [reviewFilter, setReviewFilter] = useState('all')
+  const [isSaved, setIsSaved] = useState(false)
 
   // Mock navigation functions
   const navigate = (path: string) => {
-    console.log(`Navigating to: ${path}`);
-    alert(`Demo: Navigating to ${path}`);
-  };
+    console.log(`Navigating to: ${path}`)
+    alert(`Demo: Navigating to ${path}`)
+  }
 
   // Fetch teacher data
-  const { data: teacher, isLoading, error } = useTeacherById(id || "", !!id);
+  const { data: teacher, isLoading, error } = useTeacherById(id || '', !!id)
 
   // Fetch teacher reviews
   const { data: reviewsData } = useTeacherReviews(
-    id || "",
+    id || '',
     {
-      rating: reviewFilter !== "all" ? [parseInt(reviewFilter)] : undefined,
+      rating: reviewFilter !== 'all' ? [parseInt(reviewFilter)] : undefined,
       limit: 20,
     },
-    { enabled: !!id },
-  );
+    { enabled: !!id }
+  )
 
   useEffect(() => {
     if (teacher?.subjectOfferings?.[0]) {
-      setSelectedSubject(teacher.subjectOfferings[0].subjectName);
+      setSelectedSubject(teacher.subjectOfferings[0].subjectName)
     }
-  }, [teacher]);
+  }, [teacher])
 
   const handleBookTrial = () => {
-    if (!teacher) return;
+    if (!teacher) return
 
     const params = new URLSearchParams({
       tutorId: teacher.id,
       tutorName: `${teacher.firstName} ${teacher.lastName}`,
-      tutorAvatar: teacher.profileImage || "/placeholder.svg",
-      tutorRating: teacher.averageRating?.toString() || "0",
+      tutorAvatar: teacher.profileImage || '/placeholder.svg',
+      tutorRating: teacher.averageRating?.toString() || '0',
       subject: selectedSubject,
       slotStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       slotEnd: new Date(
-        Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000,
+        Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000
       ).toISOString(),
-      price: "2500000", // 25,000 UZS trial in kopeks
-      serviceFee: "0",
-    });
+      price: '2500000', // 25,000 UZS trial in kopeks
+      serviceFee: '0',
+    })
 
     // For demo purposes, just show alert
-    alert(`Sinov darsi bron qilindi: ${selectedSubject} - ${teacher.pricing.trialPrice.toLocaleString()} UZS`);
+    alert(
+      `Sinov darsi bron qilindi: ${selectedSubject} - ${teacher.pricing.trialPrice.toLocaleString()} UZS`
+    )
     // navigate(`/booking?${params.toString()}`);
-  };
+  }
 
   const handleBookRegular = () => {
-    if (!teacher) return;
+    if (!teacher) return
 
     const selectedSubjectData = teacher.subjectOfferings?.find(
-      (s) => s.subjectName === selectedSubject,
-    );
-    const price = selectedSubjectData?.pricePerHour || 5000000; // Default 50,000 UZS in kopeks
+      (s) => s.subjectName === selectedSubject
+    )
+    const price = selectedSubjectData?.pricePerHour || 5000000 // Default 50,000 UZS in kopeks
 
     // For demo purposes, just show alert
-    alert(`Oddiy dars bron qilindi: ${selectedSubject} - ${formatPrice(price/100)} UZS`);
-  };
+    alert(
+      `Oddiy dars bron qilindi: ${selectedSubject} - ${formatPrice(price / 100)} UZS`
+    )
+  }
 
-  const reviews = reviewsData?.reviews || [];
+  const reviews = reviewsData?.reviews || []
   const filteredReviews = reviews.filter((review) => {
-    if (reviewFilter === "all") return true;
-    return review.rating === parseInt(reviewFilter);
-  });
+    if (reviewFilter === 'all') return true
+    return review.rating === parseInt(reviewFilter)
+  })
 
-  const totalReviews = reviewsData?.totalCount || 0;
+  const totalReviews = reviewsData?.totalCount || 0
   const ratingDistribution = teacher
     ? [
         { stars: 5, count: Math.floor(totalReviews * 0.8) },
@@ -461,14 +474,14 @@ const TeacherDetails: React.FC = () => {
         { stars: 2, count: Math.floor(totalReviews * 0.01) },
         { stars: 1, count: Math.floor(totalReviews * 0.01) },
       ]
-    : [];
+    : []
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
-    );
+    )
   }
 
   if (error || !teacher) {
@@ -476,80 +489,33 @@ const TeacherDetails: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            O'qituvchi topilmadi
+            {t('teacherNotFound')}
           </h1>
-          <p className="text-gray-600 mb-6">
-            Siz qidirayotgan o'qituvchi mavjud emas.
-          </p>
-          <Button onClick={() => navigate("/teachers")} className="bg-blue-600 hover:bg-blue-700">
-            O'qituvchilar ro'yxatiga qaytish
+          <p className="text-gray-600 mb-6">{t('teacherNotFoundMessage')}</p>
+          <Button
+            onClick={() => navigate('/teachers')}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {t('backToTeachersList')}
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <div className="border-b bg-white sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/teachers")}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                O'qituvchilarga qaytish
-              </Button>
-              <div className="hidden md:flex items-center text-sm text-gray-600">
-                <button className="hover:text-blue-600">
-                  Bosh sahifa
-                </button>
-                <ChevronRight className="h-4 w-4 mx-2" />
-                <button className="hover:text-blue-600">
-                  O'qituvchilar
-                </button>
-                <ChevronRight className="h-4 w-4 mx-2" />
-                <span className="text-gray-900">
-                  {teacher.firstName} {teacher.lastName}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm">
-                <Share2 className="h-4 w-4 mr-2" />
-                Ulashish
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsSaved(!isSaved)}
-                className={isSaved ? "text-red-500" : ""}
-              >
-                <Heart
-                  className={`h-4 w-4 mr-2 ${isSaved ? "fill-current" : ""}`}
-                />
-                {isSaved ? "Saqlangan" : "Saqlash"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
+        <div>
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main Content - Left Column */}
             <div className="lg:col-span-2 space-y-8">
               {/* Teacher Hero Section */}
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-6 pt-4">
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="flex-shrink-0">
-                      <div className="relative">
+                      <div className="relative flex justify-between">
                         <Avatar className="w-32 h-32">
                           <AvatarImage
                             src={teacher.profileImage}
@@ -557,37 +523,51 @@ const TeacherDetails: React.FC = () => {
                           />
                           <AvatarFallback className="text-2xl">
                             {teacher.name
-                              .split(" ")
+                              .split(' ')
                               .map((n) => n[0])
-                              .join("")}
+                              .join('')}
                           </AvatarFallback>
                         </Avatar>
-                        <div
-                          className={`absolute -bottom-2 -right-2 w-6 h-6 rounded-full border-2 border-white ${
-                            teacher.isOnline ? "bg-green-500" : "bg-gray-400"
-                          }`}
-                        />
-                        {teacher.isVerified && (
-                          <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                            <CheckCircle className="h-4 w-4 text-white" />
-                          </div>
-                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="md:hidden"
+                        >
+                          <Share2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
 
                     <div className="flex-1 space-y-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h1 className="text-2xl font-bold">{teacher.name}</h1>
-                          {teacher.isVerified && (
-                            <Badge
-                              variant="secondary"
-                              className="text-blue-600"
-                            >
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              Tasdiqlangan
-                            </Badge>
-                          )}
+                      <div className="w-full">
+                        <div className="flex items-center gap-2 mb-1 w-full justify-between">
+                          <div className="flex flex-wrap gap-4">
+                            <h1 className="text-2xl font-bold">
+                              {teacher.name}
+                            </h1>
+                            {teacher.isVerified ? (
+                              <Badge
+                                variant="secondary"
+                                className="bg-green-100 text-green-800 hover:bg-green-200"
+                              >
+                                <ShieldCheck className="h-4 w-4 mr-1" />
+                                {t('verified')}
+                              </Badge>
+                            ) : (
+                              <Badge className=" bg-orange-100 text-orange-800 hover:bg-orange-200">
+                                <ShieldAlert className="h-4 w-4 mr-1" />
+                                {t('unverified')}
+                              </Badge>
+                            )}
+                          </div>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hidden md:inline-flex"
+                          >
+                            <Share2 className="h-4 w-4" />
+                          </Button>
                         </div>
                         <p className="text-lg text-gray-600 mb-2">
                           {teacher.title}
@@ -608,7 +588,7 @@ const TeacherDetails: React.FC = () => {
                       <div>
                         <h3 className="font-semibold mb-2 flex items-center gap-2">
                           <Languages className="h-4 w-4" />
-                          Tillar
+                          {t('languages')}
                         </h3>
                         <div className="flex flex-wrap gap-2">
                           {teacher.languages.map((lang, index) => (
@@ -629,7 +609,7 @@ const TeacherDetails: React.FC = () => {
                             </span>
                           </div>
                           <p className="text-xs text-gray-600">
-                            {teacher.totalReviews} ta sharh
+                            {t('reviewsCount', { count: teacher.totalReviews })}
                           </p>
                         </div>
                         <div className="text-center">
@@ -640,7 +620,7 @@ const TeacherDetails: React.FC = () => {
                             </span>
                           </div>
                           <p className="text-xs text-gray-600">
-                            ta dars
+                            {t('lessonsCount')}
                           </p>
                         </div>
                         <div className="text-center">
@@ -651,7 +631,7 @@ const TeacherDetails: React.FC = () => {
                             </span>
                           </div>
                           <p className="text-xs text-gray-600">
-                            ta talaba
+                            {t('studentsCount')}
                           </p>
                         </div>
                         <div className="text-center">
@@ -662,7 +642,7 @@ const TeacherDetails: React.FC = () => {
                             </span>
                           </div>
                           <p className="text-xs text-gray-600">
-                            yil tajriba
+                            {t('yearsExperience')}
                           </p>
                         </div>
                       </div>
@@ -674,7 +654,9 @@ const TeacherDetails: React.FC = () => {
               {/* About Section */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{teacher.name} haqida</CardTitle>
+                  <CardTitle>
+                    {t('aboutTeacher', { name: teacher.name })}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -689,7 +671,7 @@ const TeacherDetails: React.FC = () => {
                           setIsDescriptionExpanded(!isDescriptionExpanded)
                         }
                       >
-                        {isDescriptionExpanded ? "Kamroq o'qish" : "Ko'proq o'qish"}
+                        {isDescriptionExpanded ? t('readLess') : t('readMore')}
                       </Button>
                     </p>
                   </div>
@@ -699,17 +681,15 @@ const TeacherDetails: React.FC = () => {
                       <Separator />
                       <div>
                         <h4 className="font-semibold mb-2">
-                          O'qitish falsafasi
+                          {t('teachingPhilosophy')}
                         </h4>
                         <p className="text-gray-600">
                           {teacher.teachingPhilosophy}
                         </p>
                       </div>
                       <div>
-                        <h4 className="font-semibold mb-2">Nega o'qitaman</h4>
-                        <p className="text-gray-600">
-                          {teacher.whyITeach}
-                        </p>
+                        <h4 className="font-semibold mb-2">{t('whyITeach')}</h4>
+                        <p className="text-gray-600">{teacher.whyITeach}</p>
                       </div>
                     </>
                   )}
@@ -719,7 +699,7 @@ const TeacherDetails: React.FC = () => {
               {/* Subjects & Specializations */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Fanlar va narxlar</CardTitle>
+                  <CardTitle>{t('subjectsAndPricing')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-4">
@@ -743,7 +723,7 @@ const TeacherDetails: React.FC = () => {
                                 {subject.price.toLocaleString()} UZS
                               </p>
                               <p className="text-xs text-gray-600">
-                                soatiga
+                                {t('perHour')}
                               </p>
                             </div>
                           </div>
@@ -759,7 +739,9 @@ const TeacherDetails: React.FC = () => {
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <h4 className="font-semibold mb-3">O'qitish darajalari</h4>
+                      <h4 className="font-semibold mb-3">
+                        {t('teachingLevels')}
+                      </h4>
                       <div className="flex flex-wrap gap-2">
                         {teacher.teachingLevels.map((level, index) => (
                           <Badge key={index} variant="secondary">
@@ -769,7 +751,9 @@ const TeacherDetails: React.FC = () => {
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-3">Imtihon tayyorgarligi</h4>
+                      <h4 className="font-semibold mb-3">
+                        {t('examPreparation')}
+                      </h4>
                       <div className="flex flex-wrap gap-2">
                         {teacher.examPrep.map((exam, index) => (
                           <Badge key={index} variant="secondary">
@@ -785,13 +769,13 @@ const TeacherDetails: React.FC = () => {
               {/* Education & Qualifications */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Ta'lim va malaka</CardTitle>
+                  <CardTitle>{t('educationAndQualifications')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
                       <GraduationCap className="h-4 w-4" />
-                      Ta'lim
+                      {t('education')}
                     </h4>
                     <div className="space-y-3">
                       {teacher.education.map((edu, index) => (
@@ -804,9 +788,7 @@ const TeacherDetails: React.FC = () => {
                             <p className="text-sm text-gray-600">
                               {edu.institution}
                             </p>
-                            <p className="text-xs text-gray-600">
-                              {edu.year}
-                            </p>
+                            <p className="text-xs text-gray-600">{edu.year}</p>
                           </div>
                           {edu.verified && (
                             <Badge
@@ -814,7 +796,7 @@ const TeacherDetails: React.FC = () => {
                               className="text-green-600"
                             >
                               <CheckCircle className="h-3 w-3 mr-1" />
-                              Tasdiqlangan
+                              {t('verified')}
                             </Badge>
                           )}
                         </div>
@@ -825,7 +807,7 @@ const TeacherDetails: React.FC = () => {
                   <div>
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
                       <Award className="h-4 w-4" />
-                      Sertifikatlar
+                      {t('certifications')}
                     </h4>
                     <div className="space-y-3">
                       {teacher.certifications.map((cert, index) => (
@@ -838,25 +820,23 @@ const TeacherDetails: React.FC = () => {
                             <p className="text-sm text-gray-600">
                               {cert.issuer}
                             </p>
-                            <p className="text-xs text-gray-600">
-                              {cert.year}
-                            </p>
+                            <p className="text-xs text-gray-600">{cert.year}</p>
                           </div>
                           <Badge
-                            variant={cert.verified ? "secondary" : "outline"}
+                            variant={cert.verified ? 'secondary' : 'outline'}
                             className={
                               cert.verified
-                                ? "text-green-600"
-                                : "text-orange-600"
+                                ? 'text-green-600'
+                                : 'text-orange-600'
                             }
                           >
                             {cert.verified ? (
                               <>
                                 <CheckCircle className="h-3 w-3 mr-1" />
-                                Tasdiqlangan
+                                {t('verified')}
                               </>
                             ) : (
-                              "Kutilmoqda"
+                              t('pending')
                             )}
                           </Badge>
                         </div>
@@ -871,7 +851,7 @@ const TeacherDetails: React.FC = () => {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>
-                      Talabalar sharhlari ({teacher.totalReviews})
+                      {t('studentReviews', { count: teacher.totalReviews })}
                     </CardTitle>
                     <Select
                       value={reviewFilter}
@@ -881,12 +861,12 @@ const TeacherDetails: React.FC = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Barcha baholash</SelectItem>
-                        <SelectItem value="5">5 yulduz</SelectItem>
-                        <SelectItem value="4">4 yulduz</SelectItem>
-                        <SelectItem value="3">3 yulduz</SelectItem>
-                        <SelectItem value="2">2 yulduz</SelectItem>
-                        <SelectItem value="1">1 yulduz</SelectItem>
+                        <SelectItem value="all">{t('allRatings')}</SelectItem>
+                        <SelectItem value="5">{t('fiveStars')}</SelectItem>
+                        <SelectItem value="4">{t('fourStars')}</SelectItem>
+                        <SelectItem value="3">{t('threeStars')}</SelectItem>
+                        <SelectItem value="2">{t('twoStars')}</SelectItem>
+                        <SelectItem value="1">{t('oneStar')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -904,14 +884,14 @@ const TeacherDetails: React.FC = () => {
                             key={star}
                             className={`h-5 w-5 ${
                               star <= teacher.rating
-                                ? "text-yellow-500 fill-current"
-                                : "text-gray-300"
+                                ? 'text-yellow-500 fill-current'
+                                : 'text-gray-300'
                             }`}
                           />
                         ))}
                       </div>
                       <p className="text-sm text-gray-600">
-                        {teacher.totalReviews} ta sharh
+                        {t('reviewsCount', { count: teacher.totalReviews })}
                       </p>
                     </div>
                     <div className="space-y-2">
@@ -962,14 +942,17 @@ const TeacherDetails: React.FC = () => {
                                     key={star}
                                     className={`h-3 w-3 ${
                                       star <= review.rating
-                                        ? "text-yellow-500 fill-current"
-                                        : "text-gray-300"
+                                        ? 'text-yellow-500 fill-current'
+                                        : 'text-gray-300'
                                     }`}
                                   />
                                 ))}
                               </div>
                               <span className="text-xs text-gray-600">
-                                {review.lessonCount} dars • {review.date}
+                                {t('lessonsAndDate', {
+                                  count: review.lessonCount,
+                                  date: review.date,
+                                })}
                               </span>
                             </div>
                             <p className="text-sm text-gray-600 mb-2">
@@ -978,7 +961,7 @@ const TeacherDetails: React.FC = () => {
                             {review.teacherResponse && (
                               <div className="bg-gray-100 p-3 rounded-lg mt-2">
                                 <p className="text-xs font-medium mb-1">
-                                  O'qituvchi javobi:
+                                  {t('teacherResponse')}:
                                 </p>
                                 <p className="text-xs text-gray-600">
                                   {review.teacherResponse}
@@ -990,7 +973,7 @@ const TeacherDetails: React.FC = () => {
                               size="sm"
                               className="mt-2 p-0 h-auto"
                             >
-                              👍 Foydali ({review.helpful})
+                              👍 {t('helpful', { count: review.helpful })}
                             </Button>
                           </div>
                         </div>
@@ -1000,7 +983,7 @@ const TeacherDetails: React.FC = () => {
 
                   {filteredReviews.length > 5 && (
                     <Button variant="outline" className="w-full">
-                      Ko'proq sharhlarni ko'rish
+                      {t('seeMoreReviews')}
                     </Button>
                   )}
                 </CardContent>
@@ -1009,14 +992,14 @@ const TeacherDetails: React.FC = () => {
               {/* Teaching Materials */}
               <Card>
                 <CardHeader>
-                  <CardTitle>O'quv materiallari va namuna</CardTitle>
+                  <CardTitle>{t('teachingMaterialsAndSample')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Intro Video */}
                   <div>
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
                       <Video className="h-4 w-4" />
-                      Tanishuv videosi
+                      {t('introductionVideo')}
                     </h4>
                     <div className="relative bg-gray-100 rounded-lg h-48 flex items-center justify-center">
                       <Button
@@ -1024,7 +1007,7 @@ const TeacherDetails: React.FC = () => {
                         className="flex items-center gap-2"
                       >
                         <Play className="h-4 w-4" />
-                        Tanishuvni tomosha qiling (2:30)
+                        {t('watchIntroduction')}
                       </Button>
                     </div>
                   </div>
@@ -1033,7 +1016,7 @@ const TeacherDetails: React.FC = () => {
                   <div>
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      O'quv resurslari
+                      {t('learningResources')}
                     </h4>
                     <div className="grid md:grid-cols-2 gap-3">
                       {teacher.materials.resources.map((resource, index) => (
@@ -1068,13 +1051,13 @@ const TeacherDetails: React.FC = () => {
               <div className="sticky top-24 space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Dars bron qilish</CardTitle>
+                    <CardTitle>{t('bookLesson')}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {/* Subject Selection */}
                     <div>
                       <label className="text-sm font-medium mb-2 block">
-                        Fan tanlang
+                        {t('selectSubject')}
                       </label>
                       <Select
                         value={selectedSubject}
@@ -1086,7 +1069,7 @@ const TeacherDetails: React.FC = () => {
                         <SelectContent>
                           {teacher.subjects.map((subject) => (
                             <SelectItem key={subject.name} value={subject.name}>
-                              {subject.name} - {subject.price.toLocaleString()}{" "}
+                              {subject.name} - {subject.price.toLocaleString()}{' '}
                               UZS/soat
                             </SelectItem>
                           ))}
@@ -1099,7 +1082,7 @@ const TeacherDetails: React.FC = () => {
                       <div className="flex items-center gap-2 mb-2">
                         <Calendar className="h-4 w-4" />
                         <span className="text-sm font-medium">
-                          Keyingi bo'sh vaqt
+                          {t('nextAvailableTime')}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 mb-1">
@@ -1114,17 +1097,18 @@ const TeacherDetails: React.FC = () => {
                     <div className="space-y-2">
                       <Button
                         onClick={handleBookTrial}
-                        className="w-full bg-blue-600 hover:bg-blue-700"
+                        className="w-full"
                         size="lg"
                       >
-                        Sinov darsini bron qilish
+                        {t('bookTrialLesson')}
                       </Button>
                       <div className="text-center">
                         <span className="text-lg font-bold">
-                          {teacher.pricing.trialPrice.toLocaleString()} UZS
+                          {teacher.pricing.trialPrice.toLocaleString()}{' '}
+                          {t('sum')}
                         </span>
                         <span className="text-sm text-gray-600 ml-1">
-                          • 30 daqiqa
+                          • {t('thirtyMinutes')}
                         </span>
                       </div>
                     </div>
@@ -1135,7 +1119,7 @@ const TeacherDetails: React.FC = () => {
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
                         <span className="bg-white px-2 text-gray-600">
-                          yoki
+                          {t('or')}
                         </span>
                       </div>
                     </div>
@@ -1148,18 +1132,18 @@ const TeacherDetails: React.FC = () => {
                         className="w-full"
                         size="lg"
                       >
-                        Oddiy dars bron qilish
+                        {t('bookRegularLesson')}
                       </Button>
                       <div className="text-center">
                         <span className="text-lg font-bold">
                           {teacher.subjects
                             .find((s) => s.name === selectedSubject)
                             ?.price.toLocaleString() ||
-                            teacher.pricing.regularPrice.toLocaleString()}{" "}
-                          UZS
+                            teacher.pricing.regularPrice.toLocaleString()}{' '}
+                          {t('sum')}
                         </span>
                         <span className="text-sm text-gray-600 ml-1">
-                          • 60 daqiqa
+                          • {t('sixtyMinutes')}
                         </span>
                       </div>
                     </div>
@@ -1167,7 +1151,7 @@ const TeacherDetails: React.FC = () => {
                     {/* Contact */}
                     <Button variant="ghost" className="w-full">
                       <MessageCircle className="h-4 w-4 mr-2" />
-                      Xabar yuborish
+                      {t('sendMessage')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -1175,21 +1159,23 @@ const TeacherDetails: React.FC = () => {
                 {/* Package Deals */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Paket takliflar</CardTitle>
+                    <CardTitle>{t('packageDeals')}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {teacher.pricing.packages.map((pkg, index) => (
                       <div key={index} className="border rounded-lg p-3">
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-medium">
-                            {pkg.lessons} ta dars
+                            {t('lessonsPackage', { count: pkg.lessons })}
                           </span>
-                          <Badge variant="secondary">{pkg.discount}% chegirma</Badge>
+                          <Badge variant="secondary">
+                            {pkg.discount}% {t('discount')}
+                          </Badge>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600">
-                            {(pkg.price / pkg.lessons).toLocaleString()}{" "}
-                            UZS/dars
+                            {(pkg.price / pkg.lessons).toLocaleString()}{' '}
+                            {t('uzsPerLesson')}
                           </span>
                           <span className="font-bold">
                             {pkg.price.toLocaleString()} UZS
@@ -1205,7 +1191,7 @@ const TeacherDetails: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TeacherDetails;
+export default TeacherDetails

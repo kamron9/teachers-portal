@@ -265,15 +265,15 @@ export const TeacherSchedule: React.FC<TeacherScheduleProps> = ({
       for (const [dayKey, dayData] of Object.entries(schedule)) {
         const weekday = WEEKDAYS.findIndex((w) => w.key === dayKey);
 
-        for (const slot of dayData.slots) {
-          await createRuleMutation.mutateAsync({
-            type: "recurring",
-            weekday,
-            startTime: slot.start,
-            endTime: slot.end,
-            isOpen: dayData.enabled,
-          });
-        }
+        // for (const slot of dayData.slots) {
+        //   await createRuleMutation.mutateAsync({
+        //     type: "recurring",
+        //     weekday,
+        //     startTime: slot.start,
+        //     endTime: slot.end,
+        //     isOpen: dayData.enabled,
+        //   });
+        // }
       }
 
       setHasChanges(false);
